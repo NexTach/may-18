@@ -13,9 +13,9 @@ export const scenes: Scene[] = [
     dialogue: [
       { name: "나", line: "오늘은 왠지 밖이 다르다.", avatar: "player" },
       {
-        name: "친구",
-        line: "전남대 쪽에 사람들이 모이고 있대.",
-        avatar: "friend",
+        name: "군인",
+        line: "전남대 방향 접근 금지. 모두 해산하라.",
+        avatar: "soldier",
       },
       { name: "나", line: "그냥 지나칠 일이 아닌 것 같아.", avatar: "player" },
     ],

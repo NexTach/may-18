@@ -50,31 +50,31 @@ const CHAR_POS: Record<SceneType, { x: number; y: number }> = {
 // university/home have no visible NPCs in background → empty
 const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   street: [
-    { x: 22, y: 63 },
-    { x: 69, y: 63 },
-    { x: 50, y: 58 },
+    { x: 16, y: 56 },
+    { x: 69, y: 58 },
+    { x: 50, y: 54 },
   ],
   university: [],
   downtown: [
-    { x: 28, y: 70 },
-    { x: 62, y: 68 },
-    { x: 44, y: 65 },
+    { x: 19.5, y: 58 },
+    { x: 61, y: 55 },
+    { x: 42, y: 60 },
   ],
   home: [],
   plaza: [
-    { x: 26, y: 72 },
-    { x: 65, y: 70 },
-    { x: 45, y: 67 },
+    { x: 28, y: 59 },
+    { x: 75, y: 60 },
+    { x: 44, y: 62 },
   ],
   square: [
-    { x: 22, y: 67 },
-    { x: 63, y: 65 },
+    { x: 12, y: 61 },
+    { x: 62, y: 69 },
     { x: 44, y: 61 },
   ],
   corridor: [
-    { x: 25, y: 65 },
-    { x: 64, y: 65 },
-    { x: 45, y: 60 },
+    { x: 20, y: 64 },
+    { x: 64, y: 64 },
+    { x: 42, y: 60 },
   ],
   ending: [
     { x: 35, y: 68 },
@@ -91,6 +91,7 @@ const AVATAR_COLORS: Record<string, { bg: string; border: string }> = {
   elder: { bg: "#18180c", border: "#5a5a1a" },
   youth: { bg: "#0c1a0c", border: "#2a5a2a" },
   merchant: { bg: "#1a100c", border: "#5a3a1a" },
+  soldier:  { bg: "#0c1208", border: "#3a5a1a" },
 };
 
 export default function GameScreen({ onBackToMenu }: Props) {
