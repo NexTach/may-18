@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { scenes } from "../data/scenes";
 import type { Choice, SceneType, Stats } from "../types";
 import BottomBar from "./BottomBar";
@@ -44,6 +44,7 @@ const CHAR_POS: Record<SceneType, { x: number; y: number; direction: Direction }
   corridor:    { x: 50, y: 80, direction: "up" },
   phonebooth:  { x: 36, y: 83, direction: "down" },
   plaza_night: { x: 50, y: 80, direction: "up" },
+  notebook:    { x: 45, y: 82, direction: "down" },
   ending:      { x: 50, y: 76, direction: "down" },
 };
 
@@ -77,6 +78,10 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   corridor: [
     { x: 18, y: 65 },
     { x: 65, y: 62 },
+  ],
+  // 골목 기록 씬: 곁에 있는 시민 1명
+  notebook: [
+    { x: 25, y: 62 },
   ],
   // 공중전화: 어머니 목소리가 수화기에서 들려오는 위치
   phonebooth: [
@@ -125,6 +130,25 @@ export default function GameScreen({ onBackToMenu }: Props) {
   const [mapOpen, setMapOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Fixed 16:9 scene viewport — measured in JS so % positions never drift
+  const sceneWrapRef = useRef<HTMLDivElement>(null);
+  const [viewport, setViewport] = useState({ w: 0, h: 0 });
+  useEffect(() => {
+    const el = sceneWrapRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      const ratio = 16 / 9;
+      if (width / height >= ratio) {
+        setViewport({ w: Math.round(height * ratio), h: Math.round(height) });
+      } else {
+        setViewport({ w: Math.round(width), h: Math.round(width / ratio) });
+      }
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const currentScene = scenes.find((s) => s.id === currentSceneId);
 
@@ -222,39 +246,45 @@ export default function GameScreen({ onBackToMenu }: Props) {
           visitedSceneIds={visitedSceneIds}
         />
 
-        {/* center scene */}
-        <div className="flex-1 relative overflow-hidden">
-          <PixelScene sceneType={currentScene.sceneType} />
+        {/* center scene — outer div measured by ResizeObserver to compute 16:9 viewport */}
+        <div ref={sceneWrapRef} className="flex-1 overflow-hidden flex items-center justify-center bg-[#090d06]">
+          {/* fixed px viewport: NPC/character % positions never drift regardless of screen size */}
+          <div
+            className="relative overflow-hidden flex-shrink-0"
+            style={{ width: viewport.w || "100%", height: viewport.h || "100%" }}
+          >
+            <PixelScene sceneType={currentScene.sceneType} />
 
-          {/* NPC speech bubbles */}
-          {npcLines.map((d, i) => {
-            const slot = slots[i];
-            if (!slot) return null;
-            const color = AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
-            return (
-              <SpeechBubble
-                key={`${currentSceneId}-${i}`}
-                x={slot.x}
-                y={slot.y}
-                name={d.name}
-                line={d.line}
-                borderColor={color.border}
-                bgColor={color.bg}
-              />
-            );
-          })}
+            {/* NPC speech bubbles */}
+            {npcLines.map((d, i) => {
+              const slot = slots[i];
+              if (!slot) return null;
+              const color = AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
+              return (
+                <SpeechBubble
+                  key={`${currentSceneId}-${i}`}
+                  x={slot.x}
+                  y={slot.y}
+                  name={d.name}
+                  line={d.line}
+                  borderColor={color.border}
+                  bgColor={color.bg}
+                />
+              );
+            })}
 
-          {/* player character */}
-          <Character direction={charPos.direction} x={charPos.x} y={charPos.y} size={120} />
+            {/* player character */}
+            <Character direction={charPos.direction} x={charPos.x} y={charPos.y} size={120} />
 
-          {/* scene date/location overlay */}
-          <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">
-            <span
-              className="text-[12px] text-[#5a7a20]"
-              style={{ fontFamily: "monospace" }}
-            >
-              {currentScene.date} · {currentScene.location}
-            </span>
+            {/* scene date/location overlay */}
+            <div className="absolute top-3 left-3 border border-game-border bg-game-panel/90 px-3 py-1.5">
+              <span
+                className="text-[12px] text-game-text-dim"
+                style={{ fontFamily: "monospace" }}
+              >
+                {currentScene.date} · {currentScene.location}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -283,6 +313,10 @@ export default function GameScreen({ onBackToMenu }: Props) {
           visitedSceneIds={visitedSceneIds}
           choiceLog={choiceLog}
           onClose={() => setMapOpen(false)}
+          onJump={(id) => {
+            setCurrentSceneId(id);
+            setVisitedSceneIds((prev) => new Set([...prev, id]));
+          }}
         />
       )}
       {inventoryOpen && (
@@ -299,11 +333,11 @@ export default function GameScreen({ onBackToMenu }: Props) {
           style={{ background: "rgba(0,0,0,0.85)" }}
         >
           <div
-            className="border-2 border-[#4a6a1a] bg-[#0b1208] p-7 w-80"
+            className="border-2 border-game-border-bright bg-game-panel p-7 w-80"
             style={{ boxShadow: "0 0 0 2px #2c3f12" }}
           >
             <div
-              className="text-[13px] text-[#c4d47a] text-center mb-5 pb-3 border-b border-[#2c3f12]"
+              className="text-[13px] text-game-text text-center mb-5 pb-3 border-b border-game-border"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               일시정지
@@ -333,10 +367,10 @@ export default function GameScreen({ onBackToMenu }: Props) {
               <button
                 key={label}
                 onClick={action}
-                className="w-full border border-[#2c3f12] bg-[#0d1608] hover:bg-[#162010] hover:border-[#4a6a1a] py-3 mb-2.5 transition-all cursor-pointer"
+                className="w-full border border-game-border bg-[#0d1608] hover:bg-[#162010] hover:border-[#4a6a1a] py-3 mb-2.5 transition-all cursor-pointer"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
-                <span className="text-[12px] text-[#8aa040]">{label}</span>
+                <span className="text-[12px] text-game-accent">{label}</span>
               </button>
             ))}
           </div>
