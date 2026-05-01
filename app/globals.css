@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-pixel);
+  --font-korean: var(--font-korean);
+
+  --color-game-bg: #060907;
+  --color-game-panel: #0b1208;
+  --color-game-border: #2c3f12;
+  --color-game-border-bright: #4a6a1a;
+  --color-game-text: #c4d47a;
+  --color-game-text-dim: #5a7a20;
+  --color-game-text-muted: #3a5010;
+  --color-game-accent: #8aa040;
+  --color-game-heart: #cc2200;
+  --color-game-gold: #c8a020;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #060907;
+  color: #c4d47a;
+}
+
+/* pixel art rendering */
+svg, canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* pixel border utility */
+.pixel-border {
+  border: 2px solid #2c3f12;
+  box-shadow: 0 0 0 1px #0b1208, 0 0 0 3px #2c3f12;
+}
+
+.pixel-border-bright {
+  border: 2px solid #4a6a1a;
+  box-shadow: 0 0 0 1px #0b1208, 0 0 0 3px #4a6a1a;
+}
+
+/* pixel text glow */
+.pixel-glow {
+  text-shadow: 0 0 12px rgba(196, 212, 122, 0.5);
+}
+
+/* scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090d06;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c3f12;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a6a1a;
+}
+
+/* cursor blink animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* scan line overlay effect */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* smooth choice hover */
+button {
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
