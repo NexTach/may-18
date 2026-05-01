@@ -4,7 +4,12 @@ import Image from "next/image";
 import { useState } from "react";
 
 type Props = { onStart: () => void };
-type MenuItem = { label: string; icon: string; action: () => void; disabled?: boolean };
+type MenuItem = {
+  label: string;
+  icon: string;
+  action: () => void;
+  disabled?: boolean;
+};
 
 export default function MainMenu({ onStart }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
@@ -21,8 +26,7 @@ export default function MainMenu({ onStart }: Props) {
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#060907]">
-
-      {/* ── 배경 이미지 (img_11.png) ── */}
+      {/* 배경 이미지 */}
       <Image
         src="/menu-bg.png"
         alt=""
@@ -45,8 +49,16 @@ export default function MainMenu({ onStart }: Props) {
       {/* 상단 아이콘 */}
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         {[
-          { label: soundOn ? "🔊" : "🔇", title: "효과음", onClick: () => setSoundOn((v) => !v) },
-          { label: musicOn ? "♪" : "♩", title: "음악", onClick: () => setMusicOn((v) => !v) },
+          {
+            label: soundOn ? "🔊" : "🔇",
+            title: "효과음",
+            onClick: () => setSoundOn((v) => !v),
+          },
+          {
+            label: musicOn ? "♪" : "♩",
+            title: "음악",
+            onClick: () => setMusicOn((v) => !v),
+          },
           { label: "⚙", title: "설정", onClick: () => {} },
         ].map(({ label, title, onClick }) => (
           <button
@@ -63,7 +75,6 @@ export default function MainMenu({ onStart }: Props) {
 
       {/* 중앙 콘텐츠 */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full">
-
         {/* 서브타이틀 */}
         <p
           className="text-[12px] tracking-widest mb-5"
@@ -86,8 +97,7 @@ export default function MainMenu({ onStart }: Props) {
               className="text-5xl font-bold text-center text-[#c4d47a]"
               style={{
                 fontFamily: "'Press Start 2P', monospace",
-                textShadow:
-                  "0 0 24px rgba(196,212,122,0.5), 3px 3px 0 #1a2a0c",
+                textShadow: "0 0 24px rgba(196,212,122,0.5), 3px 3px 0 #1a2a0c",
                 letterSpacing: "0.06em",
               }}
             >

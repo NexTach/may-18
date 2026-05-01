@@ -8,7 +8,11 @@ type Props = {
   compact?: boolean;
 };
 
-export default function MiniMap({ currentSceneId, visitedSceneIds, compact = false }: Props) {
+export default function MiniMap({
+  currentSceneId,
+  visitedSceneIds,
+  compact = false,
+}: Props) {
   const minX = Math.min(...mapNodes.map((n) => n.x)) - 10;
   const maxX = Math.max(...mapNodes.map((n) => n.x)) + 30;
   const minY = Math.min(...mapNodes.map((n) => n.y)) - 10;
@@ -33,7 +37,8 @@ export default function MiniMap({ currentSceneId, visitedSceneIds, compact = fal
           drawnEdges.add(edgeKey);
           const to = nodeById[toId];
           if (!to) return null;
-          const bothVisited = visitedSceneIds.has(node.id) && visitedSceneIds.has(toId);
+          const bothVisited =
+            visitedSceneIds.has(node.id) && visitedSceneIds.has(toId);
           return (
             <line
               key={edgeKey}
@@ -46,7 +51,7 @@ export default function MiniMap({ currentSceneId, visitedSceneIds, compact = fal
               strokeDasharray="3 2"
             />
           );
-        })
+        }),
       )}
 
       {/* nodes */}
@@ -55,8 +60,16 @@ export default function MiniMap({ currentSceneId, visitedSceneIds, compact = fal
         const isVisited = visitedSceneIds.has(node.id);
         const r = compact ? 4 : 5;
         const fill = isCurrent ? "#c4d47a" : isVisited ? "#4a6a1a" : "#1a2a0c";
-        const stroke = isCurrent ? "#e8f090" : isVisited ? "#6a9a2a" : "#2c3f12";
-        const textColor = isCurrent ? "#c4d47a" : isVisited ? "#6a9a2a" : "#2a3a12";
+        const stroke = isCurrent
+          ? "#e8f090"
+          : isVisited
+            ? "#6a9a2a"
+            : "#2c3f12";
+        const textColor = isCurrent
+          ? "#c4d47a"
+          : isVisited
+            ? "#6a9a2a"
+            : "#2a3a12";
         return (
           <g key={node.id}>
             <rect

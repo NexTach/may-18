@@ -1,7 +1,15 @@
 export type DialogueLine = {
   name: string;
   line: string;
-  avatar: "player" | "friend" | "citizen" | "student" | "mother" | "elder" | "youth" | "merchant";
+  avatar:
+    | "player"
+    | "friend"
+    | "citizen"
+    | "student"
+    | "mother"
+    | "elder"
+    | "youth"
+    | "merchant";
 };
 
 export type StatKey = "courage" | "record" | "trust" | "safety";

@@ -9,10 +9,30 @@ type Props = {
 };
 
 const STAT_CONFIG = [
-  { key: "courage" as const, label: "용기", color: "#cc4420", desc: "어려운 상황에서 나선 횟수" },
-  { key: "record" as const, label: "기록", color: "#2080cc", desc: "기록을 남기려 한 횟수" },
-  { key: "trust" as const, label: "신뢰", color: "#20aa60", desc: "타인을 돕고 연결한 횟수" },
-  { key: "safety" as const, label: "안전", color: "#c8a020", desc: "신중하게 행동한 횟수" },
+  {
+    key: "courage" as const,
+    label: "용기",
+    color: "#cc4420",
+    desc: "어려운 상황에서 나선 횟수",
+  },
+  {
+    key: "record" as const,
+    label: "기록",
+    color: "#2080cc",
+    desc: "기록을 남기려 한 횟수",
+  },
+  {
+    key: "trust" as const,
+    label: "신뢰",
+    color: "#20aa60",
+    desc: "타인을 돕고 연결한 횟수",
+  },
+  {
+    key: "safety" as const,
+    label: "안전",
+    color: "#c8a020",
+    desc: "신중하게 행동한 횟수",
+  },
 ];
 
 export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
@@ -30,7 +50,10 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#2c3f12]">
-          <span className="text-[12px] text-[#c4d47a]" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+          <span
+            className="text-[12px] text-[#c4d47a]"
+            style={{ fontFamily: "'Press Start 2P', monospace" }}
+          >
             ▣ 가방 / 기록
           </span>
           <button
@@ -44,7 +67,10 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
 
         {/* stats */}
         <div className="mb-5">
-          <div className="text-[11px] text-[#4a6a1a] mb-3" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+          <div
+            className="text-[11px] text-[#4a6a1a] mb-3"
+            style={{ fontFamily: "'Press Start 2P', monospace" }}
+          >
             나의 선택 통계
           </div>
           <div className="flex flex-col gap-3">
@@ -54,20 +80,36 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
               return (
                 <div key={key}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[14px]" style={{ color, fontFamily: "monospace" }}>
+                    <span
+                      className="text-[14px]"
+                      style={{ color, fontFamily: "monospace" }}
+                    >
                       {label}
                     </span>
-                    <span className="text-[13px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+                    <span
+                      className="text-[13px] text-[#3a5010]"
+                      style={{ fontFamily: "monospace" }}
+                    >
                       {val}
                     </span>
                   </div>
-                  <div className="w-full bg-[#0a1006] border border-[#1e2e0e]" style={{ height: 10 }}>
+                  <div
+                    className="w-full bg-[#0a1006] border border-[#1e2e0e]"
+                    style={{ height: 10 }}
+                  >
                     <div
                       className="h-full transition-all"
-                      style={{ width: `${pct}%`, background: color, opacity: 0.7 }}
+                      style={{
+                        width: `${pct}%`,
+                        background: color,
+                        opacity: 0.7,
+                      }}
                     />
                   </div>
-                  <p className="text-[11px] text-[#2a3a10] mt-0.5" style={{ fontFamily: "monospace" }}>
+                  <p
+                    className="text-[11px] text-[#2a3a10] mt-0.5"
+                    style={{ fontFamily: "monospace" }}
+                  >
                     {desc}
                   </p>
                 </div>
@@ -78,7 +120,10 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
 
         {/* items */}
         <div className="border border-[#2c3f12] bg-[#090d06] p-4 mb-4">
-          <div className="text-[11px] text-[#4a6a1a] mb-3" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+          <div
+            className="text-[11px] text-[#4a6a1a] mb-3"
+            style={{ fontFamily: "'Press Start 2P', monospace" }}
+          >
             소지품
           </div>
           <div className="grid grid-cols-4 gap-3">
@@ -91,10 +136,16 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
               <div
                 key={label}
                 className="flex flex-col items-center p-3 border border-[#1e2e0e]"
-                style={{ background: has ? "#0d1608" : "#090d06", opacity: has ? 1 : 0.4 }}
+                style={{
+                  background: has ? "#0d1608" : "#090d06",
+                  opacity: has ? 1 : 0.4,
+                }}
               >
                 <span className="text-2xl">{icon}</span>
-                <span className="text-[12px] text-[#5a7a20] mt-1" style={{ fontFamily: "monospace" }}>
+                <span
+                  className="text-[12px] text-[#5a7a20] mt-1"
+                  style={{ fontFamily: "monospace" }}
+                >
                   {label}
                 </span>
               </div>

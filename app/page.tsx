@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import MainMenu from "./components/MainMenu";
 import GameScreen from "./components/GameScreen";
+import MainMenu from "./components/MainMenu";
 
 type Screen = "menu" | "game";
 

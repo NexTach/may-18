@@ -16,13 +16,16 @@
   --color-game-gold: #c8a020;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
   background: #060907;
@@ -30,7 +33,8 @@ html, body {
 }
 
 /* pixel art rendering */
-svg, canvas {
+svg,
+canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
@@ -38,12 +42,16 @@ svg, canvas {
 /* pixel border utility */
 .pixel-border {
   border: 2px solid #2c3f12;
-  box-shadow: 0 0 0 1px #0b1208, 0 0 0 3px #2c3f12;
+  box-shadow:
+    0 0 0 1px #0b1208,
+    0 0 0 3px #2c3f12;
 }
 
 .pixel-border-bright {
   border: 2px solid #4a6a1a;
-  box-shadow: 0 0 0 1px #0b1208, 0 0 0 3px #4a6a1a;
+  box-shadow:
+    0 0 0 1px #0b1208,
+    0 0 0 3px #4a6a1a;
 }
 
 /* pixel text glow */
@@ -67,8 +75,13 @@ svg, canvas {
 
 /* cursor blink animation */
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 .animate-blink {
   animation: blink 1s step-end infinite;
@@ -76,7 +89,7 @@ svg, canvas {
 
 /* scan line overlay effect */
 .scanlines::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
@@ -92,5 +105,8 @@ svg, canvas {
 
 /* smooth choice hover */
 button {
-  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    border-color 0.1s,
+    color 0.1s;
 }

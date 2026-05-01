@@ -6,10 +6,10 @@ export type Direction = "down" | "up" | "right" | "left";
 
 // top-left: front(down), top-right: right, bottom-left: back(up), bottom-right: left
 const OFFSETS: Record<Direction, [number, number]> = {
-  down:  [0,   0  ],
-  right: [0.5, 0  ],
-  up:    [0,   0.5],
-  left:  [0.5, 0.5],
+  down: [0, 0],
+  right: [0.5, 0],
+  up: [0, 0.5],
+  left: [0.5, 0.5],
 };
 
 // module-level so cache survives React re-renders
@@ -27,7 +27,17 @@ function extractSprite(dir: Direction, size: number): string {
   canvas.height = size;
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(img, ox * img.width, oy * img.height, half, half, 0, 0, size, size);
+  ctx.drawImage(
+    img,
+    ox * img.width,
+    oy * img.height,
+    half,
+    half,
+    0,
+    0,
+    size,
+    size,
+  );
 
   const imgData = ctx.getImageData(0, 0, size, size);
   const d = imgData.data;
@@ -46,7 +56,10 @@ async function loadAndProcess(size: number): Promise<void> {
   if (loadedImg) return;
   await new Promise<void>((resolve, reject) => {
     const img = new Image();
-    img.onload = () => { loadedImg = img; resolve(); };
+    img.onload = () => {
+      loadedImg = img;
+      resolve();
+    };
     img.onerror = reject;
     img.src = "/sprites/character.png";
   });
@@ -65,11 +78,16 @@ export default function Character({
   y: number; // 0–100 percent
   size?: number;
 }) {
-  const [url, setUrl] = useState<string | null>(() => cache.get(direction) ?? null);
+  const [url, setUrl] = useState<string | null>(
+    () => cache.get(direction) ?? null,
+  );
 
   useEffect(() => {
     const cached = cache.get(direction);
-    if (cached) { setUrl(cached); return; }
+    if (cached) {
+      setUrl(cached);
+      return;
+    }
     loadAndProcess(size).then(() => setUrl(cache.get(direction) ?? null));
   }, [direction, size]);
 
@@ -90,7 +108,8 @@ export default function Character({
         transform: "translate(-50%, -100%)",
         zIndex: 10,
         pointerEvents: "none",
-        filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.95)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))",
+        filter:
+          "drop-shadow(0 6px 14px rgba(0,0,0,0.95)) drop-shadow(0 2px 4px rgba(0,0,0,0.7))",
       }}
     />
   );

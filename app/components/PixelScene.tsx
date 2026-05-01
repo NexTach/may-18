@@ -4,14 +4,14 @@ import Image from "next/image";
 import type { SceneType } from "../types";
 
 const SCENE_IMAGES: Record<SceneType, string> = {
-  street:     "/scenes/street.png",
+  street: "/scenes/street.png",
   university: "/scenes/university.png",
-  downtown:   "/scenes/downtown.png",
-  home:       "/scenes/home.png",
-  plaza:      "/scenes/plaza.png",
-  square:     "/scenes/square.png",
-  corridor:   "/scenes/square.png",
-  ending:     "/scenes/ending.png",
+  downtown: "/scenes/downtown.png",
+  home: "/scenes/home.png",
+  plaza: "/scenes/plaza.png",
+  square: "/scenes/square.png",
+  corridor: "/scenes/square.png",
+  ending: "/scenes/ending.png",
 };
 
 export default function PixelScene({ sceneType }: { sceneType: SceneType }) {

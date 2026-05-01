@@ -1,7 +1,7 @@
 "use client";
 
-import type { Stats } from "../types";
 import { TOTAL_STAGES } from "../data/scenes";
+import type { Stats } from "../types";
 
 type Props = {
   stageNum: number;
@@ -76,26 +76,42 @@ export default function HUD({
       <div className="flex items-center gap-4">
         <span
           className="text-[13px] font-bold text-[#c4d47a]"
-          style={{ fontFamily: "'Press Start 2P', monospace", letterSpacing: "0.05em" }}
+          style={{
+            fontFamily: "'Press Start 2P', monospace",
+            letterSpacing: "0.05em",
+          }}
         >
           {String(stageNum).padStart(2, "0")}. {stageTitle}
         </span>
-        <span className="text-[13px] text-[#5a7a20]" style={{ fontFamily: "monospace" }}>
+        <span
+          className="text-[13px] text-[#5a7a20]"
+          style={{ fontFamily: "monospace" }}
+        >
           {date}
         </span>
-        <span className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+        <span
+          className="text-[12px] text-[#3a5010]"
+          style={{ fontFamily: "monospace" }}
+        >
           | {location}
         </span>
       </div>
 
       {/* center: HP */}
       <div className="flex items-center gap-4">
-        <span className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+        <span
+          className="text-[12px] text-[#3a5010]"
+          style={{ fontFamily: "monospace" }}
+        >
           기록한 선택
         </span>
         <HeartBar hp={hp} />
-        <span className="text-[12px] text-[#5a7a20]" style={{ fontFamily: "monospace" }}>
-          {String(sceneIndex).padStart(2, "0")}/{String(TOTAL_STAGES).padStart(2, "0")}
+        <span
+          className="text-[12px] text-[#5a7a20]"
+          style={{ fontFamily: "monospace" }}
+        >
+          {String(sceneIndex).padStart(2, "0")}/
+          {String(TOTAL_STAGES).padStart(2, "0")}
         </span>
       </div>
 

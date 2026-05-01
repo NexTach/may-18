@@ -7,7 +7,12 @@ type Props = {
   onClose: () => void;
 };
 
-export default function HistoryModal({ history, location, date, onClose }: Props) {
+export default function HistoryModal({
+  history,
+  location,
+  date,
+  onClose,
+}: Props) {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
@@ -16,7 +21,9 @@ export default function HistoryModal({ history, location, date, onClose }: Props
     >
       <div
         className="border-2 border-[#4a6a1a] bg-[#0b1208] p-7 max-w-xl w-full mx-4 relative"
-        style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208, 0 0 0 6px #1a2a0c" }}
+        style={{
+          boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208, 0 0 0 6px #1a2a0c",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* header */}
@@ -28,10 +35,16 @@ export default function HistoryModal({ history, location, date, onClose }: Props
             ▣ 실제 기록
           </div>
           <div className="flex items-center gap-4 mt-2">
-            <span className="text-[13px] text-[#c4d47a]" style={{ fontFamily: "monospace" }}>
+            <span
+              className="text-[13px] text-[#c4d47a]"
+              style={{ fontFamily: "monospace" }}
+            >
               {date}
             </span>
-            <span className="text-[13px] text-[#5a7a20]" style={{ fontFamily: "monospace" }}>
+            <span
+              className="text-[13px] text-[#5a7a20]"
+              style={{ fontFamily: "monospace" }}
+            >
               · {location}
             </span>
           </div>
@@ -39,14 +52,20 @@ export default function HistoryModal({ history, location, date, onClose }: Props
 
         {/* content */}
         <div className="mb-6 border border-[#1e2e0e] bg-[#090d06] p-5">
-          <p className="text-[14px] text-[#9ab048] leading-loose" style={{ fontFamily: "monospace" }}>
+          <p
+            className="text-[14px] text-[#9ab048] leading-loose"
+            style={{ fontFamily: "monospace" }}
+          >
             {history}
           </p>
         </div>
 
         {/* source */}
         <div className="mb-5">
-          <p className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+          <p
+            className="text-[12px] text-[#3a5010]"
+            style={{ fontFamily: "monospace" }}
+          >
             출처: 5·18기념재단 / 국가기록원 / 5·18민주화운동기록관
           </p>
         </div>

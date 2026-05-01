@@ -92,9 +92,15 @@ export default function LeftPanel({
             <div key={label} className="flex items-center gap-2">
               <span
                 className="w-2.5 h-2.5 inline-block flex-shrink-0"
-                style={{ background: color, border: border ? `1px solid ${border}` : undefined }}
+                style={{
+                  background: color,
+                  border: border ? `1px solid ${border}` : undefined,
+                }}
               />
-              <span className="text-[11px] text-[#4a6a1a]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[11px] text-[#4a6a1a]"
+                style={{ fontFamily: "monospace" }}
+              >
                 {label}
               </span>
             </div>

@@ -24,7 +24,10 @@ export default function BottomBar() {
           >
             {key}
           </span>
-          <span className="text-[11px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+          <span
+            className="text-[11px] text-[#3a5010]"
+            style={{ fontFamily: "monospace" }}
+          >
             : {label}
           </span>
         </div>
