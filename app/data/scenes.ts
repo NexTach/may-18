@@ -207,7 +207,7 @@ export const scenes: Scene[] = [
     date: "1980.05.19",
     location: "광주 시내",
     objective: "보이는 것들을 기록으로 남겨라.",
-    sceneType: "street",
+    sceneType: "notebook",
     text: "나는 수첩을 꺼내 보이는 것들을 적기 시작했다. 누가, 어디서, 무엇을 외쳤는지. 이 기록이 언젠가 필요할 것 같았다.",
     dialogue: [
       { name: "시민", line: "이건 기록으로 남겨야 해.", avatar: "citizen" },

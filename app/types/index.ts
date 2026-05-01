@@ -32,6 +32,7 @@ export type SceneType =
   | "corridor"
   | "phonebooth"
   | "plaza_night"
+  | "notebook"
   | "ending";
 
 export type Scene = {

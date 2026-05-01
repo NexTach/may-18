@@ -13,6 +13,7 @@ const SCENE_IMAGES: Record<SceneType, string> = {
   corridor:    "/scenes/corridor.png",
   phonebooth:  "/scenes/phonebooth.png",
   plaza_night: "/scenes/plaza_night.png",
+  notebook:    "/scenes/notebook.png",
   ending:      "/scenes/ending.png",
 };
 
