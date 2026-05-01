@@ -9,7 +9,8 @@ export type DialogueLine = {
     | "mother"
     | "elder"
     | "youth"
-    | "merchant";
+    | "merchant"
+    | "soldier";
 };
 
 export type StatKey = "courage" | "record" | "trust" | "safety";
@@ -29,6 +30,8 @@ export type SceneType =
   | "square"
   | "plaza"
   | "corridor"
+  | "phonebooth"
+  | "plaza_night"
   | "ending";
 
 export type Scene = {

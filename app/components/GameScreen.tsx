@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { scenes } from "../data/scenes";
 import type { Choice, SceneType, Stats } from "../types";
 import BottomBar from "./BottomBar";
-import Character from "./Character";
+import Character, { type Direction } from "./Character";
 import HistoryModal from "./HistoryModal";
 import HUD from "./HUD";
 import InventoryModal from "./InventoryModal";
@@ -33,16 +33,18 @@ const LOCATION_DESCS: Record<string, string> = {
   우리: "그날의 선택은 지금 우리에게 묻고 있다.",
 };
 
-// Fixed player character position per scene type
-const CHAR_POS: Record<SceneType, { x: number; y: number }> = {
-  street: { x: 44, y: 80 },
-  university: { x: 45, y: 79 },
-  downtown: { x: 47, y: 79 },
-  home: { x: 50, y: 82 },
-  plaza: { x: 50, y: 79 },
-  square: { x: 48, y: 80 },
-  corridor: { x: 50, y: 79 },
-  ending: { x: 50, y: 76 },
+// Fixed player character position + facing direction per scene type
+const CHAR_POS: Record<SceneType, { x: number; y: number; direction: Direction }> = {
+  street:      { x: 44, y: 80, direction: "up" },
+  university:  { x: 45, y: 79, direction: "up" },
+  downtown:    { x: 47, y: 79, direction: "up" },
+  home:        { x: 50, y: 82, direction: "down" },
+  plaza:       { x: 50, y: 79, direction: "up" },
+  square:      { x: 48, y: 80, direction: "down" },
+  corridor:    { x: 50, y: 80, direction: "up" },
+  phonebooth:  { x: 36, y: 83, direction: "down" },
+  plaza_night: { x: 50, y: 80, direction: "up" },
+  ending:      { x: 50, y: 76, direction: "down" },
 };
 
 // NPC anchor slots per scene type (tail of speech bubble points here)
@@ -71,10 +73,20 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 62, y: 69 },
     { x: 44, y: 61 },
   ],
+  // 광주 외곽 검문소: 친구 1명, 도로 좌측
   corridor: [
-    { x: 20, y: 64 },
-    { x: 64, y: 64 },
-    { x: 42, y: 60 },
+    { x: 18, y: 65 },
+    { x: 65, y: 62 },
+  ],
+  // 공중전화: 어머니 목소리가 수화기에서 들려오는 위치
+  phonebooth: [
+    { x: 52, y: 62 },
+    { x: 52, y: 52 },
+  ],
+  // 도청 새벽: 남은 시민 한 명, 광장 우측
+  plaza_night: [
+    { x: 62, y: 70 },
+    { x: 35, y: 68 },
   ],
   ending: [
     { x: 35, y: 68 },
@@ -233,7 +245,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
           })}
 
           {/* player character */}
-          <Character direction="down" x={charPos.x} y={charPos.y} />
+          <Character direction={charPos.direction} x={charPos.x} y={charPos.y} size={120} />
 
           {/* scene date/location overlay */}
           <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">

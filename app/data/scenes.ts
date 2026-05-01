@@ -176,7 +176,7 @@ export const scenes: Scene[] = [
     date: "1980.05.18",
     location: "집 근처 공중전화",
     objective: "가족의 안전을 확인하고 상황을 알리자.",
-    sceneType: "street",
+    sceneType: "phonebooth",
     text: "공중전화 너머로 어머니의 목소리가 떨린다. 밖에 오래 있지 말라고 하시지만, 거리의 분위기가 심상치 않다.",
     dialogue: [
       { name: "어머니", line: "괜히 나가지 말고 집에 있어.", avatar: "mother" },
@@ -469,7 +469,7 @@ export const scenes: Scene[] = [
     date: "1980.05.27",
     location: "전남도청",
     objective: "이 밤을 기억하라.",
-    sceneType: "plaza",
+    sceneType: "plaza_night",
     text: "새벽 공기가 무겁다. 모두가 알고 있다. 이 밤이 쉽게 지나가지 않을 것이라는 걸. 그래도 몇몇 사람들은 남기로 한다.",
     dialogue: [
       {
