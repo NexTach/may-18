@@ -2,11 +2,14 @@
 
 import MiniMap from "./MiniMap";
 
+const DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+
 type Props = {
   currentSceneId: string;
   visitedSceneIds: Set<string>;
   choiceLog: string[];
   onClose: () => void;
+  onJump?: (sceneId: string) => void;
 };
 
 export default function MapModal({
@@ -14,6 +17,7 @@ export default function MapModal({
   visitedSceneIds,
   choiceLog,
   onClose,
+  onJump,
 }: Props) {
   return (
     <div
@@ -44,14 +48,23 @@ export default function MapModal({
 
         {/* map */}
         <div
-          className="border border-[#2c3f12] bg-[#090d06] mb-4"
+          className="border border-[#2c3f12] bg-[#090d06] mb-4 relative"
           style={{ height: 280 }}
         >
           <MiniMap
             currentSceneId={currentSceneId}
             visitedSceneIds={visitedSceneIds}
             compact={false}
+            onJump={DEV_MODE && onJump ? (id) => { onJump(id); onClose(); } : undefined}
           />
+          {DEV_MODE && (
+            <div
+              className="absolute top-1.5 right-1.5 px-1.5 py-0.5 border border-[#6a3a1a] bg-[#1a0d06]"
+              style={{ fontFamily: "monospace" }}
+            >
+              <span className="text-[10px] text-[#c4741a]">DEV · 노드 클릭 시 이동</span>
+            </div>
+          )}
         </div>
 
         {/* choice log */}

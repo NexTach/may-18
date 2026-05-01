@@ -6,12 +6,14 @@ type Props = {
   currentSceneId: string;
   visitedSceneIds: Set<string>;
   compact?: boolean;
+  onJump?: (sceneId: string) => void;
 };
 
 export default function MiniMap({
   currentSceneId,
   visitedSceneIds,
   compact = false,
+  onJump,
 }: Props) {
   const minX = Math.min(...mapNodes.map((n) => n.x)) - 10;
   const maxX = Math.max(...mapNodes.map((n) => n.x)) + 30;
@@ -71,7 +73,11 @@ export default function MiniMap({
             ? "#6a9a2a"
             : "#2a3a12";
         return (
-          <g key={node.id}>
+          <g
+            key={node.id}
+            onClick={() => onJump?.(node.id)}
+            style={onJump ? { cursor: "pointer" } : undefined}
+          >
             <rect
               x={node.x - r}
               y={node.y - r}
