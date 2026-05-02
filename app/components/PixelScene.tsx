@@ -5,6 +5,7 @@ import type { SceneType } from "../types";
 
 const SCENE_IMAGES: Record<SceneType, string> = {
   street:      "/scenes/street.png",
+  station:     "/scenes/gwangju_station.png",
   university:  "/scenes/university.png",
   downtown:    "/scenes/downtown.png",
   home:        "/scenes/home.png",

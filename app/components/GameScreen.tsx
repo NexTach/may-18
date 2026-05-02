@@ -206,8 +206,8 @@ export default function GameScreen({ onBackToMenu }: Props) {
 
   return (
     <div
-      className="flex flex-col w-full h-screen bg-[#090d06] overflow-hidden p-2 gap-2"
-      style={{ fontFamily: "monospace" }}
+      className="flex flex-col w-full h-screen overflow-hidden"
+      style={{ fontFamily: "monospace", padding: "20px", gap: "16px", background: "#000000" }}
     >
       <HUD
         stageNum={currentScene.stageNum}
@@ -224,10 +224,10 @@ export default function GameScreen({ onBackToMenu }: Props) {
         onMenu={() => setMenuOpen(true)}
       />
 
-      <div className="flex flex-1 min-h-0 gap-2">
+      <div className="flex flex-1 min-h-0 gap-4">
 
         {/* ── 왼쪽 열: 씬(상단 16:9) + 정보(하단) ── */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-2">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-4">
 
           {/* 씬 — 너비에 맞춰 16:9 비율 유지 */}
           <div
