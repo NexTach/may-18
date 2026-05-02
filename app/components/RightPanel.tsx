@@ -11,28 +11,29 @@ type Props = {
 };
 
 const AVATAR_COLORS: Record<string, { bg: string; border: string }> = {
-  player: { bg: "#1a2a0c", border: "#4a6a1a" },
-  friend: { bg: "#0c1a1a", border: "#1a5a5a" },
-  citizen: { bg: "#1a180c", border: "#5a4a1a" },
-  student: { bg: "#0c0c1a", border: "#2a2a6a" },
-  mother: { bg: "#1a0c0c", border: "#5a2a2a" },
-  elder: { bg: "#18180c", border: "#5a5a1a" },
-  youth: { bg: "#0c1a0c", border: "#2a5a2a" },
+  player:   { bg: "#1a2a0c", border: "#4a6a1a" },
+  friend:   { bg: "#0c1a1a", border: "#1a5a5a" },
+  citizen:  { bg: "#1a180c", border: "#5a4a1a" },
+  student:  { bg: "#0c0c1a", border: "#2a2a6a" },
+  mother:   { bg: "#1a0c0c", border: "#5a2a2a" },
+  elder:    { bg: "#18180c", border: "#5a5a1a" },
+  youth:    { bg: "#0c1a0c", border: "#2a5a2a" },
   merchant: { bg: "#1a100c", border: "#5a3a1a" },
+  soldier:  { bg: "#0c1208", border: "#3a5a1a" },
 };
 
 const STAT_LABELS: Record<StatKey, string> = {
   courage: "용기",
-  record: "기록",
-  trust: "신뢰",
-  safety: "안전",
+  record:  "기록",
+  trust:   "신뢰",
+  safety:  "안전",
 };
 
 const STAT_COLORS: Record<StatKey, string> = {
   courage: "#cc4420",
-  record: "#2080cc",
-  trust: "#20aa60",
-  safety: "#c8a020",
+  record:  "#2080cc",
+  trust:   "#20aa60",
+  safety:  "#c8a020",
 };
 
 function useTypingText(text: string, speed = 22) {
@@ -62,17 +63,12 @@ function useTypingText(text: string, speed = 22) {
   return { displayed, done, skip };
 }
 
-export default function RightPanel({
-  text,
-  dialogue,
-  choices,
-  onChoice,
-}: Props) {
+export default function RightPanel({ text, dialogue, choices, onChoice }: Props) {
   const { displayed, done, skip } = useTypingText(text);
 
   return (
     <div
-      className="flex flex-col bg-[#0b1208] border-l-2 border-[#2c3f12] overflow-hidden"
+      className="flex flex-col bg-[#0b1208] border-2 border-[#2c3f12] overflow-hidden"
       style={{ width: 340, minWidth: 340 }}
     >
       {/* narrative text */}
@@ -89,10 +85,7 @@ export default function RightPanel({
           {!done && <span className="animate-pulse">|</span>}
         </p>
         {!done && (
-          <p
-            className="text-[11px] text-[#2a3a10] mt-2"
-            style={{ fontFamily: "monospace" }}
-          >
+          <p className="text-[11px] text-[#2a3a10] mt-2" style={{ fontFamily: "monospace" }}>
             클릭하면 건너뜁니다
           </p>
         )}
@@ -105,7 +98,6 @@ export default function RightPanel({
             const av = AVATAR_COLORS[line.avatar] ?? AVATAR_COLORS.citizen;
             return (
               <div key={i} className="flex items-start gap-2.5">
-                {/* avatar badge */}
                 <div
                   className="flex-shrink-0 border text-[11px] px-2 py-1 leading-none mt-0.5 text-center"
                   style={{
@@ -118,7 +110,6 @@ export default function RightPanel({
                 >
                   {line.name}
                 </div>
-                {/* dialogue line */}
                 <p
                   className="text-[13px] text-[#9ab048] leading-relaxed flex-1"
                   style={{ fontFamily: "monospace" }}
@@ -131,7 +122,6 @@ export default function RightPanel({
         </div>
       )}
 
-      {/* separator */}
       {done && <div className="border-t border-[#2c3f12] mx-3 mb-1" />}
 
       {/* choices */}
@@ -164,10 +154,7 @@ export default function RightPanel({
               {choice.stat && choice.statDelta !== undefined && (
                 <span
                   className="flex-shrink-0 text-[11px] font-bold mt-0.5"
-                  style={{
-                    color: STAT_COLORS[choice.stat],
-                    fontFamily: "monospace",
-                  }}
+                  style={{ color: STAT_COLORS[choice.stat], fontFamily: "monospace" }}
                 >
                   {STAT_LABELS[choice.stat]} +{choice.statDelta}
                 </span>

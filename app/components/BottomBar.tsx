@@ -13,7 +13,7 @@ const hints: KeyHint[] = [
 export default function BottomBar() {
   return (
     <div
-      className="flex items-center justify-center gap-5 px-4 py-2 border-t-2 border-[#2c3f12] bg-[#090d06]"
+      className="flex items-center justify-center gap-5 px-4 py-2 border-2 border-[#2c3f12] bg-[#090d06]"
       style={{ minHeight: 38 }}
     >
       {hints.map(({ key, label }) => (

@@ -69,7 +69,7 @@ export default function HUD({
 }: Props) {
   return (
     <div
-      className="flex items-center justify-between px-4 py-2 border-b-2 border-[#2c3f12] bg-[#0b1208]"
+      className="flex items-center justify-between px-4 py-2 border-2 border-[#2c3f12] bg-[#0b1208]"
       style={{ minHeight: 52 }}
     >
       {/* left: stage + date */}
