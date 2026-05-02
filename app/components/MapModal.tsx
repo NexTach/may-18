@@ -12,6 +12,7 @@ type Props = {
   currentSceneId: string;
   visitedSceneIds: Set<string>;
   choiceLog: string[];
+  defaultMode: MapMode;
   onClose: () => void;
   onJump?: (sceneId: string) => void;
 };
@@ -428,10 +429,11 @@ export default function MapModal({
   currentSceneId,
   visitedSceneIds,
   choiceLog,
+  defaultMode,
   onClose,
   onJump,
 }: Props) {
-  const [mode, setMode] = useState<MapMode>("activity");
+  const [mode, setMode] = useState<MapMode>(defaultMode);
 
   return (
     <div

@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { scenes, TOTAL_STAGES } from "../data/scenes";
-import type { Choice, SceneType, StatKey, Stats } from "../types";
+import { TEXT_SPEED_MS } from "../lib/game-state";
+import type {
+  Choice,
+  GameProgress,
+  GameSettings,
+  SceneType,
+  StatKey,
+  Stats,
+} from "../types";
 import BottomBar from "./BottomBar";
 import Character, { type Direction } from "./Character";
 import HistoryModal from "./HistoryModal";
@@ -14,7 +22,12 @@ import PixelScene from "./PixelScene";
 import RightPanel from "./RightPanel";
 import SpeechBubble from "./SpeechBubble";
 
-type Props = { onBackToMenu: () => void };
+type Props = {
+  onBackToMenu: () => void;
+  initialProgress: GameProgress;
+  settings: GameSettings;
+  onProgressChange: (progress: GameProgress) => void;
+};
 
 const LOCATION_DESCS: Record<string, string> = {
   "광주역 앞 거리":
@@ -212,19 +225,23 @@ function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   return null;
 }
 
-export default function GameScreen({ onBackToMenu }: Props) {
-  const [currentSceneId, setCurrentSceneId] = useState("start");
-  const [visitedSceneIds, setVisitedSceneIds] = useState<Set<string>>(
-    new Set(["start"]),
+export default function GameScreen({
+  onBackToMenu,
+  initialProgress,
+  settings,
+  onProgressChange,
+}: Props) {
+  const [currentSceneId, setCurrentSceneId] = useState(
+    initialProgress.currentSceneId,
   );
-  const [choiceLog, setChoiceLog] = useState<string[]>([]);
-  const [stats, setStats] = useState<Stats>({
-    courage: 0,
-    record: 0,
-    trust: 0,
-    safety: 0,
-  });
-  const [sceneIndex, setSceneIndex] = useState(1);
+  const [visitedSceneIds, setVisitedSceneIds] = useState<Set<string>>(
+    new Set(initialProgress.visitedSceneIds),
+  );
+  const [choiceLog, setChoiceLog] = useState<string[]>(
+    initialProgress.choiceLog,
+  );
+  const [stats, setStats] = useState<Stats>(initialProgress.stats);
+  const [sceneIndex, setSceneIndex] = useState(initialProgress.sceneIndex);
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -301,6 +318,24 @@ export default function GameScreen({ onBackToMenu }: Props) {
     currentScene,
     handleChoice,
     stats,
+  ]);
+
+  useEffect(() => {
+    onProgressChange({
+      currentSceneId,
+      visitedSceneIds: Array.from(visitedSceneIds),
+      choiceLog,
+      stats,
+      sceneIndex,
+      updatedAt: new Date().toISOString(),
+    });
+  }, [
+    choiceLog,
+    currentSceneId,
+    onProgressChange,
+    sceneIndex,
+    stats,
+    visitedSceneIds,
   ]);
 
   if (!currentScene) return null;
@@ -465,6 +500,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
           situation={currentScene.situation}
           dialogue={currentScene.dialogue}
           choices={choiceViews}
+          typingSpeed={TEXT_SPEED_MS[settings.textSpeed]}
           onChoice={handleChoice}
         />
       </div>
@@ -484,6 +520,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
           currentSceneId={currentSceneId}
           visitedSceneIds={visitedSceneIds}
           choiceLog={choiceLog}
+          defaultMode={settings.defaultMapMode}
           onClose={() => setMapOpen(false)}
           onJump={(id) => {
             setCurrentSceneId(id);

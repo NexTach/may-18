@@ -13,6 +13,7 @@ type Props = {
   situation: string;
   dialogue: DialogueLine[];
   choices: ChoiceView[];
+  typingSpeed: number;
   onChoice: (choice: Choice) => void;
 };
 
@@ -47,6 +48,12 @@ function useTypingText(text: string, speed = 22) {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    if (speed <= 0) {
+      setDisplayed(text);
+      setDone(true);
+      return;
+    }
+
     setDisplayed("");
     setDone(false);
     let i = 0;
@@ -74,9 +81,10 @@ export default function RightPanel({
   situation,
   dialogue,
   choices,
+  typingSpeed,
   onChoice,
 }: Props) {
-  const { displayed, done, skip } = useTypingText(text);
+  const { displayed, done, skip } = useTypingText(text, typingSpeed);
 
   return (
     <div
