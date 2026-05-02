@@ -224,7 +224,6 @@ export default function GameScreen({ onBackToMenu }: Props) {
     trust: 0,
     safety: 0,
   });
-  const [hp, setHp] = useState(4);
   const [sceneIndex, setSceneIndex] = useState(1);
 
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -332,8 +331,6 @@ export default function GameScreen({ onBackToMenu }: Props) {
         stageTitle={currentScene.stageTitle}
         date={currentScene.date}
         location={currentScene.location}
-        hp={hp}
-        stats={stats}
         sceneIndex={sceneIndex}
         totalScenes={TOTAL_STAGES}
         onHistory={() => setHistoryOpen(true)}
@@ -526,7 +523,6 @@ export default function GameScreen({ onBackToMenu }: Props) {
                   setVisitedSceneIds(new Set(["start"]));
                   setChoiceLog([]);
                   setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
-                  setHp(4);
                   setSceneIndex(1);
                   setMenuOpen(false);
                 },

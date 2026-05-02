@@ -1,14 +1,10 @@
 "use client";
 
-import type { Stats } from "../types";
-
 type Props = {
   stageNum: number;
   stageTitle: string;
   date: string;
   location: string;
-  hp: number;
-  stats: Stats;
   sceneIndex: number;
   totalScenes: number;
   onHistory: () => void;
@@ -16,22 +12,6 @@ type Props = {
   onInventory: () => void;
   onMenu: () => void;
 };
-
-function HeartBar({ hp }: { hp: number }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      {Array.from({ length: 4 }, (_, i) => (
-        <span
-          key={i}
-          className="text-xl leading-none"
-          style={{ color: i < hp ? "#cc2200" : "#2a3a18" }}
-        >
-          ♥
-        </span>
-      ))}
-    </div>
-  );
-}
 
 function HUDButton({
   label,
@@ -44,6 +24,7 @@ function HUDButton({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="flex items-center gap-1.5 px-3 py-1.5 border border-[#2c3f12] bg-[#0d1608] hover:bg-[#1a2a0c] transition-colors cursor-pointer"
       style={{ fontFamily: "monospace" }}
@@ -59,7 +40,6 @@ export default function HUD({
   stageTitle,
   date,
   location,
-  hp,
   sceneIndex,
   totalScenes,
   onHistory,
@@ -97,7 +77,7 @@ export default function HUD({
         </span>
       </div>
 
-      {/* center: HP */}
+      {/* center: progress */}
       <div className="flex items-center gap-4">
         <span
           className="text-[12px] text-[#3a5010]"
@@ -105,7 +85,6 @@ export default function HUD({
         >
           기록한 선택
         </span>
-        <HeartBar hp={hp} />
         <span
           className="text-[12px] text-[#5a7a20]"
           style={{ fontFamily: "monospace" }}
