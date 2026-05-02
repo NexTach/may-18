@@ -32,7 +32,7 @@ export default function HistoryModal({
             className="text-[12px] text-[#4a6a1a] mb-2"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
           >
-            ▣ 실제 기록
+            ▣ 당시의 기록
           </div>
           <div className="flex items-center gap-4 mt-2">
             <span
@@ -66,7 +66,7 @@ export default function HistoryModal({
             className="text-[12px] text-[#3a5010]"
             style={{ fontFamily: "monospace" }}
           >
-            출처: 5·18기념재단 / 국가기록원 / 5·18민주화운동기록관
+            참고: 5·18기념재단 / 국가기록원 / 5·18민주화운동기록관
           </p>
         </div>
 

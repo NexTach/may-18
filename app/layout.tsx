@@ -19,7 +19,7 @@ const notoSansKR = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: "그날의 선택 — 5.18 민주화운동",
   description:
-    "1980년 5월, 광주의 시민이 되어 선택을 경험하는 인터랙티브 픽셀 게임",
+    "1980년 5월 광주의 시민들이 마주한 상황과 기록을 따라가는 5·18민주화운동 인터랙티브 스토리",
 };
 
 export default function RootLayout({

@@ -17,11 +17,11 @@ export default function MainMenu({ onStart }: Props) {
   const [musicOn, setMusicOn] = useState(false);
 
   const menuItems: MenuItem[] = [
-    { label: "게임 시작", icon: "▶", action: onStart },
+    { label: "시작하기", icon: "▶", action: onStart },
     { label: "기록 보기", icon: "▣", action: () => {}, disabled: true },
     { label: "업적", icon: "★", action: () => {}, disabled: true },
     { label: "설정", icon: "◈", action: () => {}, disabled: true },
-    { label: "게임 종료", icon: "✕", action: () => window.close() },
+    { label: "종료", icon: "✕", action: () => window.close() },
   ];
 
   return (
@@ -80,7 +80,7 @@ export default function MainMenu({ onStart }: Props) {
           className="text-[12px] tracking-widest mb-5"
           style={{ fontFamily: "monospace", color: "#7a9a40" }}
         >
-          · 5.18 민주화운동 인터랙티브 체험 게임 ·
+          · 5·18민주화운동 인터랙티브 스토리 ·
         </p>
 
         {/* 타이틀 박스 */}
@@ -126,7 +126,7 @@ export default function MainMenu({ onStart }: Props) {
           className="text-[13px] mb-12 tracking-widest"
           style={{ fontFamily: "monospace", color: "#5a7a20" }}
         >
-          ◈ 1980년 5월, 광주의 시민이 되어 선택을 경험하세요. ◈
+          ◈ 1980년 5월 광주의 시간을 따라가며, 시민들의 선택과 기록을 마주합니다. ◈
         </p>
 
         {/* 메뉴 버튼 */}
@@ -176,7 +176,7 @@ export default function MainMenu({ onStart }: Props) {
             className="text-[11px]"
             style={{ fontFamily: "monospace", color: "#4a6a20" }}
           >
-            기억하지 않는 역사는 반복된다
+            역사를 기억하는 일은 오늘을 지키는 일입니다
           </p>
           <p
             className="text-[10px]"
