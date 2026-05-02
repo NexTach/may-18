@@ -35,18 +35,18 @@ const GAME_NODE_SVG: Record<string, [number, number]> = {
   family_neighborhood: [304.8, 185.8], // 양동 골목
   radio_room: [301.0, 190.2], // 양동 주택가
   leaflet_room: [304.5, 194.0], // 양동 주택가
-  record_scene: [349.8, 176.8], // 충장로 골목
-  downtown: [345.6, 178.5], // 금남로
-  market_people: [349.8, 170.0], // 대인시장
-  street_clinic: [350.4, 182.8], // 수기동 골목
-  citizen_voice: [353.7, 186.2], // 전남도청 앞
-  citizen_debate: [351.8, 183.4], // 광주 YMCA 앞
-  help_people: [350.8, 184.8], // 수기동 일대
-  supply_run: [355.8, 180.0], // 불로동 골목
-  community: [351.5, 179.9], // 금남로 일대
+  record_scene: [342.8, 172.2], // 충장로 골목
+  downtown: [346.0, 177.4], // 금남로
+  market_people: [352.8, 168.8], // 대인시장
+  street_clinic: [344.4, 186.0], // 수기동 골목
+  citizen_voice: [360.6, 188.2], // 전남도청 앞
+  citizen_debate: [359.0, 180.4], // 광주 YMCA 앞
+  help_people: [348.4, 190.2], // 수기동 일대
+  supply_run: [357.6, 174.8], // 불로동 골목
+  community: [349.8, 172.6], // 금남로 일대
   checkpoint_edge: [367.8, 204.0], // 지원동 길목
   outside_message: [372.6, 210.8], // 지원동 외곽
-  night_meeting: [352.2, 184.0], // 광주 YMCA
+  night_meeting: [363.2, 182.4], // 광주 YMCA
   last_night: [353.7, 186.2], // 전남도청
   archive_ending: [350.2, 185.6], // 5·18민주화운동기록관
   memory_ending: [305.6, 108.2], // 국립5·18민주묘지
@@ -69,8 +69,21 @@ function GwangjuCityMap({
 
   const PIN_VISITED = "#5a8a2a";
   const PIN_UNVISIT = "#243014";
+  const PIN_FRONTIER = "#879946";
   const STK_VISITED = "#3a6018";
   const STK_UNVISIT = "#1a2a0c";
+  const STK_FRONTIER = "#c4d47a";
+  const currentNode = mapNodes.find((node) => node.id === currentSceneId);
+  const frontierNodeIds = new Set(
+    mapNodes
+      .filter(
+        (node) =>
+          node.id !== currentSceneId &&
+          (node.connections.includes(currentSceneId) ||
+            currentNode?.connections.includes(node.id)),
+      )
+      .map((node) => node.id),
+  );
 
   return (
     <svg viewBox="0 0 500 346" className="h-full w-full">
@@ -268,9 +281,18 @@ function GwangjuCityMap({
         if (!pos || node.id === currentSceneId) return null;
         const [px, py] = pos;
         const isVisited = visitedSceneIds.has(node.id);
-        const pinFill = isVisited ? PIN_VISITED : PIN_UNVISIT;
-        const pinStroke = isVisited ? STK_VISITED : STK_UNVISIT;
-        const r = isVisited ? 2.5 : 1.8;
+        const isFrontier = frontierNodeIds.has(node.id);
+        const pinFill = isFrontier
+          ? PIN_FRONTIER
+          : isVisited
+            ? PIN_VISITED
+            : PIN_UNVISIT;
+        const pinStroke = isFrontier
+          ? STK_FRONTIER
+          : isVisited
+            ? STK_VISITED
+            : STK_UNVISIT;
+        const r = isFrontier ? 2.8 : isVisited ? 2.2 : 1.5;
         return (
           <g key={node.id}>
             <circle
@@ -281,21 +303,6 @@ function GwangjuCityMap({
               stroke={pinStroke}
               strokeWidth="0.6"
             />
-            {isVisited && (
-              <text
-                x={px}
-                y={py + r + 6}
-                textAnchor="middle"
-                fontSize="4.5"
-                fontFamily="monospace"
-                fill="#7ab030"
-                stroke="#060a04"
-                strokeWidth="1.5"
-                paintOrder="stroke fill"
-              >
-                {node.label}
-              </text>
-            )}
           </g>
         );
       })}
@@ -424,7 +431,7 @@ export default function MapModal({
   onClose,
   onJump,
 }: Props) {
-  const [mode, setMode] = useState<MapMode>("city");
+  const [mode, setMode] = useState<MapMode>("activity");
 
   return (
     <div
@@ -563,9 +570,10 @@ export default function MapModal({
         <div className="flex items-center gap-5 mt-3">
           {[
             { color: "#c4d47a", label: "현재 위치" },
+            { color: "#7d8f3a", label: "이동 가능" },
             {
               color: mode === "activity" ? "#4a6a1a" : "#5a8a2a",
-              label: "방문함",
+              label: "지나온 곳",
             },
             { color: "#1a2a0c", label: "미방문" },
           ].map(({ color, label }) => (
