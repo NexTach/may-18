@@ -80,3 +80,46 @@ export type Stats = {
 };
 
 export type GameScreen = "menu" | "game";
+
+export type TextSpeed = "instant" | "normal" | "slow";
+
+export type MapDefaultMode = "activity" | "city";
+
+export type GameSettings = {
+  soundOn: boolean;
+  musicOn: boolean;
+  textSpeed: TextSpeed;
+  defaultMapMode: MapDefaultMode;
+  autoSync: boolean;
+};
+
+export type GameProgress = {
+  currentSceneId: string;
+  visitedSceneIds: string[];
+  choiceLog: string[];
+  stats: Stats;
+  sceneIndex: number;
+  updatedAt: string | null;
+};
+
+export type DataGsmUser = {
+  id: string;
+  name: string;
+  role: string;
+  grade?: number;
+  classRoom?: number;
+  number?: number;
+};
+
+export type SyncBundle = {
+  progress: GameProgress;
+  settings: GameSettings;
+  savedAt: string;
+};
+
+export type SyncStatus = {
+  configured: boolean;
+  authenticated: boolean;
+  user: DataGsmUser | null;
+  lastSyncedAt: string | null;
+};
