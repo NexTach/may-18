@@ -24,6 +24,7 @@ export type Choice = {
 
 export type SceneType =
   | "street"
+  | "station"
   | "university"
   | "downtown"
   | "home"

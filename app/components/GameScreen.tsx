@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { scenes } from "../data/scenes";
 import type { Choice, SceneType, Stats } from "../types";
 import BottomBar from "./BottomBar";
@@ -8,8 +8,8 @@ import Character, { type Direction } from "./Character";
 import HistoryModal from "./HistoryModal";
 import HUD from "./HUD";
 import InventoryModal from "./InventoryModal";
-import LeftPanel from "./LeftPanel";
 import MapModal from "./MapModal";
+import MiniMap from "./MiniMap";
 import PixelScene from "./PixelScene";
 import RightPanel from "./RightPanel";
 import SpeechBubble from "./SpeechBubble";
@@ -36,6 +36,7 @@ const LOCATION_DESCS: Record<string, string> = {
 // Fixed player character position + facing direction per scene type
 const CHAR_POS: Record<SceneType, { x: number; y: number; direction: Direction }> = {
   street:      { x: 44, y: 80, direction: "up" },
+  station:     { x: 44, y: 82, direction: "up" },
   university:  { x: 45, y: 79, direction: "up" },
   downtown:    { x: 47, y: 79, direction: "up" },
   home:        { x: 50, y: 82, direction: "down" },
@@ -56,6 +57,10 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 16, y: 56 },
     { x: 69, y: 58 },
     { x: 50, y: 54 },
+  ],
+  station: [
+    { x: 72, y: 60 },
+    { x: 18, y: 62 },
   ],
   university: [],
   downtown: [
@@ -131,24 +136,6 @@ export default function GameScreen({ onBackToMenu }: Props) {
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Fixed 16:9 scene viewport — measured in JS so % positions never drift
-  const sceneWrapRef = useRef<HTMLDivElement>(null);
-  const [viewport, setViewport] = useState({ w: 0, h: 0 });
-  useEffect(() => {
-    const el = sceneWrapRef.current;
-    if (!el) return;
-    const obs = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      const ratio = 16 / 9;
-      if (width / height >= ratio) {
-        setViewport({ w: Math.round(height * ratio), h: Math.round(height) });
-      } else {
-        setViewport({ w: Math.round(width), h: Math.round(width / ratio) });
-      }
-    });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
 
   const currentScene = scenes.find((s) => s.id === currentSceneId);
 
@@ -219,7 +206,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
 
   return (
     <div
-      className="flex flex-col w-full h-screen bg-[#090d06] overflow-hidden"
+      className="flex flex-col w-full h-screen bg-[#090d06] overflow-hidden p-2 gap-2"
       style={{ fontFamily: "monospace" }}
     >
       <HUD
@@ -237,25 +224,18 @@ export default function GameScreen({ onBackToMenu }: Props) {
         onMenu={() => setMenuOpen(true)}
       />
 
-      <div className="flex flex-1 min-h-0">
-        <LeftPanel
-          objective={currentScene.objective}
-          location={currentScene.location}
-          locationDesc={locationDesc}
-          currentSceneId={currentSceneId}
-          visitedSceneIds={visitedSceneIds}
-        />
+      <div className="flex flex-1 min-h-0 gap-2">
 
-        {/* center scene — outer div measured by ResizeObserver to compute 16:9 viewport */}
-        <div ref={sceneWrapRef} className="flex-1 overflow-hidden flex items-center justify-center bg-[#090d06]">
-          {/* fixed px viewport: NPC/character % positions never drift regardless of screen size */}
+        {/* ── 왼쪽 열: 씬(상단 16:9) + 정보(하단) ── */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-2">
+
+          {/* 씬 — 너비에 맞춰 16:9 비율 유지 */}
           <div
-            className="relative overflow-hidden flex-shrink-0"
-            style={{ width: viewport.w || "100%", height: viewport.h || "100%" }}
+            className="relative overflow-hidden bg-[#060907] flex-shrink-0 border border-[#2c3f12]"
+            style={{ width: "100%", aspectRatio: "16/9" }}
           >
             <PixelScene sceneType={currentScene.sceneType} />
 
-            {/* NPC speech bubbles */}
             {npcLines.map((d, i) => {
               const slot = slots[i];
               if (!slot) return null;
@@ -273,21 +253,57 @@ export default function GameScreen({ onBackToMenu }: Props) {
               );
             })}
 
-            {/* player character */}
             <Character direction={charPos.direction} x={charPos.x} y={charPos.y} size={120} />
 
-            {/* scene date/location overlay */}
-            <div className="absolute top-3 left-3 border border-game-border bg-game-panel/90 px-3 py-1.5">
-              <span
-                className="text-[12px] text-game-text-dim"
-                style={{ fontFamily: "monospace" }}
-              >
+            <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">
+              <span className="text-[12px] text-[#5a7a20]" style={{ fontFamily: "monospace" }}>
                 {currentScene.date} · {currentScene.location}
               </span>
             </div>
           </div>
+
+          {/* 하단 정보: 목표+위치(좌) + 지역 지도(우) */}
+          <div className="flex flex-1 min-h-0 border border-[#2c3f12] overflow-hidden">
+
+            {/* 목표 + 현재 위치 */}
+            <div className="flex flex-col gap-4 p-4 border-r border-[#2c3f12] bg-[#0b1208] overflow-y-auto" style={{ minWidth: 0, flex: "0 0 38%" }}>
+              <div>
+                <div className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  목표
+                </div>
+                <p className="text-[12px] text-[#8aa040] leading-relaxed mt-1" style={{ fontFamily: "monospace" }}>
+                  {currentScene.objective}
+                </p>
+              </div>
+              <div>
+                <div className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  현재 위치
+                </div>
+                <p className="text-[12px] text-[#6a8a30] font-bold mt-1 mb-1.5" style={{ fontFamily: "monospace" }}>
+                  {currentScene.location}
+                </p>
+                <p className="text-[11px] text-[#4a6a20] leading-relaxed" style={{ fontFamily: "monospace" }}>
+                  {locationDesc}
+                </p>
+              </div>
+            </div>
+
+            {/* 지역 지도 — compact 해제로 노드 라벨 표시 */}
+            <div className="flex flex-col p-4 bg-[#090d06] flex-1 min-w-0">
+              <div className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e] flex-shrink-0" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                지역 지도
+              </div>
+              <div className="flex-1 min-h-0">
+                <MiniMap
+                  currentSceneId={currentSceneId}
+                  visitedSceneIds={visitedSceneIds}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* ── 오른쪽 열: 내러티브 + 대화 + 선택지 ── */}
         <RightPanel
           key={currentSceneId}
           text={currentScene.text}

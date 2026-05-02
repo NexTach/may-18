@@ -8,7 +8,7 @@ export const scenes: Scene[] = [
     date: "1980.05.18",
     location: "광주역 앞 거리",
     objective: "전남대학교 쪽으로 이동해 학생들의 상황을 확인하자.",
-    sceneType: "street",
+    sceneType: "station",
     text: "아침부터 거리가 이상하게 조용하다. 학교 근처에는 군인들이 서 있고, 사람들은 서로 눈치를 보며 걷고 있다.",
     dialogue: [
       { name: "나", line: "오늘은 왠지 밖이 다르다.", avatar: "player" },
@@ -49,7 +49,7 @@ export const scenes: Scene[] = [
     date: "1980.05.18",
     location: "광주역 앞 거리",
     objective: "상황을 파악하고 어떻게 행동할지 결정하자.",
-    sceneType: "street",
+    sceneType: "station",
     text: "거리 한쪽에는 계엄군이 도열해 있다. 시민들은 멀리서 그 광경을 지켜보며 수군거린다. 학교 쪽에서 구호 소리가 들려온다.",
     dialogue: [
       {

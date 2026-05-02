@@ -25,7 +25,7 @@ const SCENE_IMAGE_CLASS: Partial<Record<SceneType, string>> = {
 export default function PixelScene({ sceneType }: { sceneType: SceneType }) {
   const imgClass = SCENE_IMAGE_CLASS[sceneType] ?? "object-cover object-bottom";
   return (
-    <div className="w-full h-full relative bg-[#060907]">
+    <div className="w-full h-full relative bg-game-bg">
       <Image
         src={SCENE_IMAGES[sceneType]}
         alt=""
