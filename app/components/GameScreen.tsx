@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { scenes } from "../data/scenes";
-import type { Choice, SceneType, Stats } from "../types";
+import { scenes, TOTAL_STAGES } from "../data/scenes";
+import type { Choice, SceneType, StatKey, Stats } from "../types";
 import BottomBar from "./BottomBar";
 import Character, { type Direction } from "./Character";
 import HistoryModal from "./HistoryModal";
@@ -19,34 +19,80 @@ type Props = { onBackToMenu: () => void };
 const LOCATION_DESCS: Record<string, string> = {
   "광주역 앞 거리":
     "군인들이 곳곳을 지키고 있고, 시민들의 발걸음이 조심스럽다.",
+  "광주역 광장":
+    "역 광장과 인근 상점 앞에 멈춰 선 시민들 사이로 불안한 말이 번지고 있다.",
+  "용봉동 골목":
+    "전남대 정문을 비껴 가는 골목이다. 담장 너머로도 긴장이 배어 나온다.",
   "전남대학교 정문 앞":
     "학생들을 군인들이 막아서고 있다. 팽팽한 긴장감이 감돈다.",
-  "집 근처 공중전화": "집 앞 공중전화. 가족의 안부를 확인할 수 있다.",
-  "광주 시내": "좁은 골목과 거리에 사람들이 모여 있다.",
+  "양동시장 인근 공중전화":
+    "양동시장 쪽으로 난 공중전화 앞이다. 집 안의 걱정과 바깥 소식이 맞닿는다.",
+  "양동 골목":
+    "양동 주택가 골목마다 이웃들이 문밖으로 나와 조심스럽게 소식을 묻고 있다.",
+  "양동 주택가":
+    "골목 안쪽 작은 집들 사이로 라디오 소리와 낮은 목소리가 엇갈린다.",
+  "충장로 골목":
+    "충장로 안쪽 골목이다. 지나가는 말과 표정까지 기록으로 붙잡고 싶어진다.",
+  대인시장:
+    "대인시장 골목마다 상인과 주민들이 장사를 멈추고 시내 분위기를 주고받고 있다.",
+  "수기동 골목":
+    "임시 돌봄 자리가 꾸려진 골목이다. 물과 수건, 사람들의 손길이 분주하다.",
   금남로: "넓은 대로에 수많은 시민들이 모여 목소리를 높이고 있다.",
-  집: "라디오에서 흘러나오는 소식과 창밖의 현실이 다르다.",
+  "수기동 일대":
+    "돌봄과 물자 전달이 이어지는 구역이다. 시민들의 손길이 질서를 만들고 있다.",
+  "불로동 골목":
+    "광장과 골목을 잇는 동선이다. 물자와 짧은 쪽지가 사람들 손을 따라 움직인다.",
   "전남도청 앞": "시민들이 광장에 모여 서로의 이야기를 듣고 있다.",
-  "광주 외곽": "도시 밖으로 나가는 길목. 기록을 전달할 수 있는 곳.",
-  광주: "시민들이 서로를 돕고 있다. 혼란 속에도 공동체가 살아 있다.",
+  "광주 YMCA 앞":
+    "도청 인근 YMCA 앞 공간이다. 시민들이 작은 원을 이뤄 앞으로의 일을 의논하고 있다.",
+  "지원동 길목":
+    "광주 외곽으로 빠지는 지원동 쪽 길목이다. 검문과 우회로를 함께 살펴야 한다.",
+  "지원동 외곽":
+    "도시 밖으로 이어지는 가장자리다. 기록과 소식을 바깥으로 잇는 길이 된다.",
+  "금남로 일대":
+    "광장과 골목이 이어진 공동체의 중심이다. 서로를 돕는 손길이 끊이지 않는다.",
+  "광주 YMCA": "희미한 불빛 아래 마지막 논의를 이어 가는 실내 공간이다.",
   전남도청: "항쟁의 마지막 거점. 새벽 공기가 무겁게 내려앉았다.",
-  기록: "시간이 지나도 사라지지 않는 기억과 기록.",
-  우리: "그날의 선택은 지금 우리에게 묻고 있다.",
+  "5·18민주화운동기록관":
+    "남겨진 기록이 훗날 역사를 증언하는 장소다. 기억을 지키는 힘이 모여 있다.",
+  국립5·18민주묘지:
+    "오늘의 우리가 5·18을 기억하고 되새기는 자리다. 시간이 지나도 질문은 남아 있다.",
+};
+
+const STAT_LABELS: Record<StatKey, string> = {
+  courage: "용기",
+  record: "기록",
+  trust: "신뢰",
+  safety: "안전",
 };
 
 // Fixed player character position + facing direction per scene type
-const CHAR_POS: Record<SceneType, { x: number; y: number; direction: Direction }> = {
-  street:      { x: 44, y: 80, direction: "up" },
-  station:     { x: 44, y: 82, direction: "up" },
-  university:  { x: 45, y: 79, direction: "up" },
-  downtown:    { x: 47, y: 79, direction: "up" },
-  home:        { x: 50, y: 82, direction: "down" },
-  plaza:       { x: 50, y: 79, direction: "up" },
-  square:      { x: 48, y: 80, direction: "down" },
-  corridor:    { x: 50, y: 80, direction: "up" },
-  phonebooth:  { x: 36, y: 83, direction: "down" },
+const CHAR_POS: Record<
+  SceneType,
+  { x: number; y: number; direction: Direction }
+> = {
+  street: { x: 44, y: 80, direction: "up" },
+  station: { x: 44, y: 82, direction: "up" },
+  university: { x: 45, y: 79, direction: "up" },
+  downtown: { x: 47, y: 79, direction: "up" },
+  home: { x: 50, y: 82, direction: "down" },
+  plaza: { x: 50, y: 79, direction: "up" },
+  square: { x: 48, y: 80, direction: "down" },
+  corridor: { x: 50, y: 80, direction: "up" },
+  phonebooth: { x: 36, y: 83, direction: "down" },
   plaza_night: { x: 50, y: 80, direction: "up" },
-  notebook:    { x: 45, y: 82, direction: "down" },
-  ending:      { x: 50, y: 76, direction: "down" },
+  notebook: { x: 45, y: 82, direction: "down" },
+  station_rumor: { x: 44, y: 82, direction: "up" },
+  side_alley_detour: { x: 43, y: 82, direction: "up" },
+  family_neighborhood: { x: 42, y: 84, direction: "down" },
+  leaflet_room: { x: 49, y: 82, direction: "down" },
+  market_people: { x: 48, y: 79, direction: "up" },
+  street_clinic: { x: 46, y: 82, direction: "down" },
+  citizen_debate: { x: 48, y: 79, direction: "up" },
+  supply_run: { x: 47, y: 82, direction: "down" },
+  checkpoint_edge: { x: 49, y: 80, direction: "up" },
+  night_meeting: { x: 50, y: 80, direction: "down" },
+  ending: { x: 50, y: 76, direction: "down" },
 };
 
 // NPC anchor slots per scene type (tail of speech bubble points here)
@@ -79,15 +125,52 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 62, y: 69 },
     { x: 44, y: 61 },
   ],
+  station_rumor: [
+    { x: 18, y: 60 },
+    { x: 72, y: 60 },
+  ],
+  side_alley_detour: [
+    { x: 25, y: 62 },
+    { x: 72, y: 60 },
+  ],
+  family_neighborhood: [
+    { x: 30, y: 60 },
+    { x: 68, y: 58 },
+  ],
+  leaflet_room: [{ x: 26, y: 60 }],
+  market_people: [
+    { x: 18, y: 60 },
+    { x: 74, y: 60 },
+    { x: 46, y: 56 },
+  ],
+  street_clinic: [
+    { x: 20, y: 62 },
+    { x: 70, y: 60 },
+  ],
+  citizen_debate: [
+    { x: 26, y: 60 },
+    { x: 74, y: 60 },
+    { x: 50, y: 56 },
+  ],
+  supply_run: [
+    { x: 20, y: 62 },
+    { x: 70, y: 64 },
+  ],
+  checkpoint_edge: [
+    { x: 18, y: 64 },
+    { x: 72, y: 60 },
+  ],
+  night_meeting: [
+    { x: 28, y: 60 },
+    { x: 72, y: 60 },
+  ],
   // 광주 외곽 검문소: 친구 1명, 도로 좌측
   corridor: [
     { x: 18, y: 65 },
     { x: 65, y: 62 },
   ],
   // 골목 기록 씬: 곁에 있는 시민 1명
-  notebook: [
-    { x: 25, y: 62 },
-  ],
+  notebook: [{ x: 25, y: 62 }],
   // 공중전화: 어머니 목소리가 수화기에서 들려오는 위치
   phonebooth: [
     { x: 52, y: 62 },
@@ -113,8 +196,21 @@ const AVATAR_COLORS: Record<string, { bg: string; border: string }> = {
   elder: { bg: "#18180c", border: "#5a5a1a" },
   youth: { bg: "#0c1a0c", border: "#2a5a2a" },
   merchant: { bg: "#1a100c", border: "#5a3a1a" },
-  soldier:  { bg: "#0c1208", border: "#3a5a1a" },
+  soldier: { bg: "#0c1208", border: "#3a5a1a" },
 };
+
+function getChoiceDisabledReason(choice: Choice, stats: Stats) {
+  if (!choice.requirements) return null;
+
+  for (const key of Object.keys(choice.requirements) as StatKey[]) {
+    const min = choice.requirements[key];
+    if (min !== undefined && stats[key] < min) {
+      return `${STAT_LABELS[key]} ${min}`;
+    }
+  }
+
+  return null;
+}
 
 export default function GameScreen({ onBackToMenu }: Props) {
   const [currentSceneId, setCurrentSceneId] = useState("start");
@@ -136,21 +232,26 @@ export default function GameScreen({ onBackToMenu }: Props) {
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-
   const currentScene = scenes.find((s) => s.id === currentSceneId);
 
-  const handleChoice = useCallback((choice: Choice) => {
-    setChoiceLog((prev) => [...prev, choice.text]);
-    if (choice.stat && choice.statDelta) {
-      setStats((prev) => ({
-        ...prev,
-        [choice.stat!]: prev[choice.stat!] + (choice.statDelta ?? 1),
-      }));
-    }
-    setCurrentSceneId(choice.nextSceneId);
-    setVisitedSceneIds((prev) => new Set([...prev, choice.nextSceneId]));
-    setSceneIndex((prev) => prev + 1);
-  }, []);
+  const handleChoice = useCallback(
+    (choice: Choice) => {
+      if (getChoiceDisabledReason(choice, stats)) return;
+
+      setChoiceLog((prev) => [...prev, choice.text]);
+      if (choice.stat && choice.statDelta) {
+        const statKey = choice.stat;
+        setStats((prev) => ({
+          ...prev,
+          [statKey]: prev[statKey] + (choice.statDelta ?? 1),
+        }));
+      }
+      setCurrentSceneId(choice.nextSceneId);
+      setVisitedSceneIds((prev) => new Set([...prev, choice.nextSceneId]));
+      setSceneIndex((prev) => prev + 1);
+    },
+    [stats],
+  );
 
   // keyboard shortcuts
   useEffect(() => {
@@ -177,12 +278,18 @@ export default function GameScreen({ onBackToMenu }: Props) {
         setInventoryOpen((v) => !v);
       }
       if (!historyOpen && !mapOpen && !inventoryOpen && !menuOpen) {
-        if (e.key === "1" && currentScene?.choices[0])
-          handleChoice(currentScene.choices[0]);
-        if (e.key === "2" && currentScene?.choices[1])
-          handleChoice(currentScene.choices[1]);
-        if (e.key === "3" && currentScene?.choices[2])
-          handleChoice(currentScene.choices[2]);
+        const canUseChoice = (choice?: Choice): choice is Choice =>
+          choice !== undefined && !getChoiceDisabledReason(choice, stats);
+        const firstChoice = currentScene?.choices[0];
+        const secondChoice = currentScene?.choices[1];
+        const thirdChoice = currentScene?.choices[2];
+
+        if (e.key === "1" && canUseChoice(firstChoice))
+          handleChoice(firstChoice);
+        if (e.key === "2" && canUseChoice(secondChoice))
+          handleChoice(secondChoice);
+        if (e.key === "3" && canUseChoice(thirdChoice))
+          handleChoice(thirdChoice);
       }
     };
     window.addEventListener("keydown", handler);
@@ -194,12 +301,18 @@ export default function GameScreen({ onBackToMenu }: Props) {
     menuOpen,
     currentScene,
     handleChoice,
+    stats,
   ]);
 
   if (!currentScene) return null;
 
   const charPos = CHAR_POS[currentScene.sceneType];
   const slots = NPC_SLOTS[currentScene.sceneType] ?? [];
+  const choiceViews = currentScene.choices.map((choice) => ({
+    ...choice,
+    disabled: Boolean(getChoiceDisabledReason(choice, stats)),
+    disabledReason: getChoiceDisabledReason(choice, stats) ?? undefined,
+  }));
   // Only non-player dialogue lines get speech bubbles
   const npcLines = currentScene.dialogue.filter((d) => d.avatar !== "player");
   const locationDesc = LOCATION_DESCS[currentScene.location] ?? "";
@@ -207,7 +320,12 @@ export default function GameScreen({ onBackToMenu }: Props) {
   return (
     <div
       className="flex flex-col w-full h-screen overflow-hidden"
-      style={{ fontFamily: "monospace", padding: "20px", gap: "16px", background: "#000000" }}
+      style={{
+        fontFamily: "monospace",
+        padding: "20px",
+        gap: "16px",
+        background: "#000000",
+      }}
     >
       <HUD
         stageNum={currentScene.stageNum}
@@ -217,7 +335,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
         hp={hp}
         stats={stats}
         sceneIndex={sceneIndex}
-        totalScenes={12}
+        totalScenes={TOTAL_STAGES}
         onHistory={() => setHistoryOpen(true)}
         onMap={() => setMapOpen(true)}
         onInventory={() => setInventoryOpen(true)}
@@ -225,10 +343,8 @@ export default function GameScreen({ onBackToMenu }: Props) {
       />
 
       <div className="flex flex-1 min-h-0 gap-4">
-
         {/* ── 왼쪽 열: 씬(상단 16:9) + 정보(하단) ── */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-4">
-
           {/* 씬 — 너비에 맞춰 16:9 비율 유지 */}
           <div
             className="relative overflow-hidden bg-[#060907] flex-shrink-0 border border-[#2c3f12]"
@@ -242,7 +358,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
               const color = AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
               return (
                 <SpeechBubble
-                  key={`${currentSceneId}-${i}`}
+                  key={`${currentSceneId}-${d.avatar}-${d.name}-${d.line}`}
                   x={slot.x}
                   y={slot.y}
                   name={d.name}
@@ -253,10 +369,18 @@ export default function GameScreen({ onBackToMenu }: Props) {
               );
             })}
 
-            <Character direction={charPos.direction} x={charPos.x} y={charPos.y} size={120} />
+            <Character
+              direction={charPos.direction}
+              x={charPos.x}
+              y={charPos.y}
+              size={120}
+            />
 
             <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">
-              <span className="text-[12px] text-[#5a7a20]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[12px] text-[#5a7a20]"
+                style={{ fontFamily: "monospace" }}
+              >
                 {currentScene.date} · {currentScene.location}
               </span>
             </div>
@@ -264,33 +388,67 @@ export default function GameScreen({ onBackToMenu }: Props) {
 
           {/* 하단 정보: 목표+위치(좌) + 지역 지도(우) */}
           <div className="flex flex-1 min-h-0 border border-[#2c3f12] overflow-hidden">
-
             {/* 목표 + 현재 위치 */}
-            <div className="flex flex-col gap-4 p-4 border-r border-[#2c3f12] bg-[#0b1208] overflow-y-auto" style={{ minWidth: 0, flex: "0 0 38%" }}>
+            <div
+              className="flex flex-col gap-4 p-4 border-r border-[#2c3f12] bg-[#0b1208] overflow-y-auto"
+              style={{ minWidth: 0, flex: "0 0 38%" }}
+            >
               <div>
-                <div className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-                  목표
+                <div
+                  className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]"
+                  style={{ fontFamily: "'Press Start 2P', monospace" }}
+                >
+                  해야 할 일
                 </div>
-                <p className="text-[12px] text-[#8aa040] leading-relaxed mt-1" style={{ fontFamily: "monospace" }}>
+                <p
+                  className="text-[12px] text-[#8aa040] leading-relaxed mt-1"
+                  style={{ fontFamily: "monospace" }}
+                >
                   {currentScene.objective}
                 </p>
               </div>
               <div>
-                <div className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                <div
+                  className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]"
+                  style={{ fontFamily: "'Press Start 2P', monospace" }}
+                >
                   현재 위치
                 </div>
-                <p className="text-[12px] text-[#6a8a30] font-bold mt-1 mb-1.5" style={{ fontFamily: "monospace" }}>
+                <p
+                  className="text-[12px] text-[#6a8a30] font-bold mt-1 mb-1.5"
+                  style={{ fontFamily: "monospace" }}
+                >
                   {currentScene.location}
                 </p>
-                <p className="text-[11px] text-[#4a6a20] leading-relaxed" style={{ fontFamily: "monospace" }}>
+                <p
+                  className="text-[11px] text-[#4a6a20] leading-relaxed"
+                  style={{ fontFamily: "monospace" }}
+                >
                   {locationDesc}
+                </p>
+              </div>
+              <div>
+                <div
+                  className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e]"
+                  style={{ fontFamily: "'Press Start 2P', monospace" }}
+                >
+                  눈앞의 상황
+                </div>
+                <p
+                  className="text-[11px] text-[#7f9440] leading-relaxed mt-1"
+                  style={{ fontFamily: "monospace" }}
+                >
+                  {currentScene.situation}
                 </p>
               </div>
             </div>
 
             {/* 지역 지도 — compact 해제로 노드 라벨 표시 */}
             <div className="flex flex-col p-4 bg-[#090d06] flex-1 min-w-0">
-              <div className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e] flex-shrink-0" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+              <div
+                className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e] flex-shrink-0"
+                style={{ fontFamily: "'Press Start 2P', monospace" }}
+              >
                 지역 지도
               </div>
               <div className="flex-1 min-h-0">
@@ -307,8 +465,9 @@ export default function GameScreen({ onBackToMenu }: Props) {
         <RightPanel
           key={currentSceneId}
           text={currentScene.text}
+          situation={currentScene.situation}
           dialogue={currentScene.dialogue}
-          choices={currentScene.choices}
+          choices={choiceViews}
           onChoice={handleChoice}
         />
       </div>
@@ -382,6 +541,7 @@ export default function GameScreen({ onBackToMenu }: Props) {
             ].map(({ label, action }) => (
               <button
                 key={label}
+                type="button"
                 onClick={action}
                 className="w-full border border-game-border bg-[#0d1608] hover:bg-[#162010] hover:border-[#4a6a1a] py-3 mb-2.5 transition-all cursor-pointer"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}

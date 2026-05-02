@@ -1,6 +1,5 @@
 "use client";
 
-import { TOTAL_STAGES } from "../data/scenes";
 import type { Stats } from "../types";
 
 type Props = {
@@ -62,6 +61,7 @@ export default function HUD({
   location,
   hp,
   sceneIndex,
+  totalScenes,
   onHistory,
   onMap,
   onInventory,
@@ -111,7 +111,7 @@ export default function HUD({
           style={{ fontFamily: "monospace" }}
         >
           {String(sceneIndex).padStart(2, "0")}/
-          {String(TOTAL_STAGES).padStart(2, "0")}
+          {String(totalScenes).padStart(2, "0")}
         </span>
       </div>
 
