@@ -17,9 +17,11 @@ export type StatKey = "courage" | "record" | "trust" | "safety";
 
 export type Choice = {
   text: string;
+  detail: string;
   nextSceneId: string;
   stat?: StatKey;
   statDelta?: number;
+  requirements?: Partial<Record<StatKey, number>>;
 };
 
 export type SceneType =
@@ -34,6 +36,16 @@ export type SceneType =
   | "phonebooth"
   | "plaza_night"
   | "notebook"
+  | "station_rumor"
+  | "side_alley_detour"
+  | "family_neighborhood"
+  | "leaflet_room"
+  | "market_people"
+  | "street_clinic"
+  | "citizen_debate"
+  | "supply_run"
+  | "checkpoint_edge"
+  | "night_meeting"
   | "ending";
 
 export type Scene = {
@@ -45,6 +57,7 @@ export type Scene = {
   objective: string;
   sceneType: SceneType;
   text: string;
+  situation: string;
   dialogue: DialogueLine[];
   history: string;
   choices: Choice[];
