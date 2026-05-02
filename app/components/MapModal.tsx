@@ -25,21 +25,31 @@ type Props = {
 
 // 게임 노드 id → 실제 SVG 좌표 (OSM 위경도 → 변환식)
 const GAME_NODE_SVG: Record<string, [number, number]> = {
-  start:           [341.4, 159.4],  // 광주역
-  observe_street:  [344.8, 163.6],  // 거리 (광주역 인근)
-  university_gate: [338.6, 141.5],  // 전남대학교 정문
-  talk_students:   [336.3, 138.4],  // 전남대 교내
-  call_family:     [309.5, 179.8],  // 공중전화 (서구 서쪽)
-  radio_room:      [301.0, 190.2],  // 집 (서구)
-  record_scene:    [337.5, 168.0],  // 기록 장소 (광주역~금남로 사이)
-  downtown:        [345.6, 178.5],  // 금남로
-  citizen_voice:   [353.7, 186.2],  // 전남도청 앞
-  help_people:     [348.4, 174.0],  // 시내 (금남로 일대)
-  community:       [351.5, 179.9],  // 공동체 (도청 인근)
-  outside_message: [382.4, 211.0],  // 동구 외곽
-  last_night:      [353.7, 186.2],  // 전남도청
-  archive_ending:  [350.2, 185.6],  // 5·18민주화운동기록관 (금남로1가)
-  memory_ending:   [305.6, 108.2],  // 국립5·18민주묘지 (북구 쌍암동)
+  start: [341.4, 159.4], // 광주역
+  observe_street: [344.8, 163.6], // 광주역 앞 거리
+  station_rumor: [347.2, 166.0], // 광주역 광장
+  university_gate: [338.6, 141.5], // 전남대학교 정문
+  side_alley_detour: [335.0, 145.0], // 용봉동 골목
+  talk_students: [336.3, 138.4], // 전남대 교내
+  call_family: [309.5, 179.8], // 양동시장 인근 공중전화
+  family_neighborhood: [304.8, 185.8], // 양동 골목
+  radio_room: [301.0, 190.2], // 양동 주택가
+  leaflet_room: [304.5, 194.0], // 양동 주택가
+  record_scene: [349.8, 176.8], // 충장로 골목
+  downtown: [345.6, 178.5], // 금남로
+  market_people: [349.8, 170.0], // 대인시장
+  street_clinic: [350.4, 182.8], // 수기동 골목
+  citizen_voice: [353.7, 186.2], // 전남도청 앞
+  citizen_debate: [351.8, 183.4], // 광주 YMCA 앞
+  help_people: [350.8, 184.8], // 수기동 일대
+  supply_run: [355.8, 180.0], // 불로동 골목
+  community: [351.5, 179.9], // 금남로 일대
+  checkpoint_edge: [367.8, 204.0], // 지원동 길목
+  outside_message: [372.6, 210.8], // 지원동 외곽
+  night_meeting: [352.2, 184.0], // 광주 YMCA
+  last_night: [353.7, 186.2], // 전남도청
+  archive_ending: [350.2, 185.6], // 5·18민주화운동기록관
+  memory_ending: [305.6, 108.2], // 국립5·18민주묘지
 };
 
 function GwangjuCityMap({
@@ -52,18 +62,19 @@ function GwangjuCityMap({
   // 게임 범위 bounding box
   const gxs = Object.values(GAME_NODE_SVG).map(([x]) => x);
   const gys = Object.values(GAME_NODE_SVG).map(([, y]) => y);
-  const gx1 = Math.min(...gxs) - 6, gy1 = Math.min(...gys) - 6;
-  const gx2 = Math.max(...gxs) + 6, gy2 = Math.max(...gys) + 6;
+  const gx1 = Math.min(...gxs) - 6,
+    gy1 = Math.min(...gys) - 6;
+  const gx2 = Math.max(...gxs) + 6,
+    gy2 = Math.max(...gys) + 6;
 
-  const PIN_CURRENT  = "#c4d47a";
-  const PIN_VISITED  = "#5a8a2a";
-  const PIN_UNVISIT  = "#243014";
-  const STK_CURRENT  = "#e8f090";
-  const STK_VISITED  = "#3a6018";
-  const STK_UNVISIT  = "#1a2a0c";
+  const PIN_VISITED = "#5a8a2a";
+  const PIN_UNVISIT = "#243014";
+  const STK_VISITED = "#3a6018";
+  const STK_UNVISIT = "#1a2a0c";
 
   return (
-    <svg viewBox="0 0 500 346" className="w-full h-full">
+    <svg viewBox="0 0 500 346" className="h-full w-full">
+      <title>광주 전도 위의 게임 위치</title>
 
       {/* ── 구 면 (OSM Nominatim 데이터 기반) ─────────────────── */}
 
@@ -81,7 +92,10 @@ function GwangjuCityMap({
            L 111.4,67.7 L 108.6,89.0 L 90.3,96.1 L 71.5,84.7 L 60.0,103.4
            L 59.0,120.7 L 50.8,115.6 L 30.4,118.5 L 53.3,148.2 L 32.0,159.3
            L 30.7,177.3 Z"
-        fill="#1e3818" fillOpacity="0.55" stroke="#2e5020" strokeWidth="0.8"
+        fill="#1e3818"
+        fillOpacity="0.55"
+        stroke="#2e5020"
+        strokeWidth="0.8"
       />
 
       {/* 북구 (북동부) */}
@@ -94,7 +108,10 @@ function GwangjuCityMap({
            L 413.7,135.7 L 400.7,118.4 L 410.1,102.0 L 394.7,90.1 L 390.7,68.0
            L 369.3,46.8 L 365.8,29.7 L 348.1,20.1 L 334.5,21.5 L 316.9,38.5
            L 304.9,36.1 L 305.4,30.9 L 298.3,33.3 Z"
-        fill="#243c14" fillOpacity="0.55" stroke="#2e5020" strokeWidth="0.8"
+        fill="#243c14"
+        fillOpacity="0.55"
+        stroke="#2e5020"
+        strokeWidth="0.8"
       />
 
       {/* 서구 (중서부) */}
@@ -104,7 +121,10 @@ function GwangjuCityMap({
            L 327.2,177.6 L 341.9,182.4 L 316.0,164.2 L 310.3,151.6 L 255.8,139.2
            L 254.1,150.6 L 239.2,157.9 L 244.5,195.0 L 231.7,207.2 L 235.8,216.0
            L 230.0,230.0 L 212.0,237.4 L 216.3,251.2 Z"
-        fill="#1a3010" fillOpacity="0.55" stroke="#2e5020" strokeWidth="0.8"
+        fill="#1a3010"
+        fillOpacity="0.55"
+        stroke="#2e5020"
+        strokeWidth="0.8"
       />
 
       {/* 동구 (동부 도심) */}
@@ -113,7 +133,10 @@ function GwangjuCityMap({
            L 369.2,293.2 L 392.7,295.4 L 406.7,274.4 L 437.2,263.8 L 435.2,247.0
            L 451.3,236.1 L 456.9,224.2 L 442.8,221.8 L 431.4,200.9 L 395.3,192.8
            L 397.3,178.1 L 377.4,163.9 L 367.5,166.2 L 350.1,158.5 Z"
-        fill="#28401a" fillOpacity="0.55" stroke="#2e5020" strokeWidth="0.8"
+        fill="#28401a"
+        fillOpacity="0.55"
+        stroke="#2e5020"
+        strokeWidth="0.8"
       />
 
       {/* 남구 (남부) */}
@@ -124,7 +147,10 @@ function GwangjuCityMap({
            L 344.7,233.1 L 366.3,216.4 L 341.9,182.4 L 325.9,178.1 L 312.5,186.5
            L 315.2,230.3 L 297.8,225.9 L 294.4,240.4 L 255.0,252.2 L 233.0,268.9
            L 222.1,268.9 L 216.5,259.2 L 191.2,293.4 Z"
-        fill="#1c3410" fillOpacity="0.55" stroke="#2e5020" strokeWidth="0.8"
+        fill="#1c3410"
+        fillOpacity="0.55"
+        stroke="#2e5020"
+        strokeWidth="0.8"
       />
 
       {/* ── 하천 ──────────────────────────────────────────────── */}
@@ -135,8 +161,11 @@ function GwangjuCityMap({
            Q 158,142 169.8,154.7 Q 180,168 184.4,181.4
            Q 189,197 190.5,211.0 Q 191,225 190.5,240
            Q 190,252 185.5,260.0"
-        fill="none" stroke="#0e2230" strokeWidth="3.5"
-        strokeLinecap="round" opacity="0.8"
+        fill="none"
+        stroke="#0e2230"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        opacity="0.8"
       />
 
       {/* 영산강 (남부 동서 흐름) */}
@@ -144,40 +173,91 @@ function GwangjuCityMap({
         d="M 26.4,270.3 Q 56,274 87.2,277.7 Q 118,285 147.9,292.5
            Q 178,292 208.7,292.5 Q 221,288 233.0,282.2
            Q 245,275 257.3,265.9"
-        fill="none" stroke="#0e2230" strokeWidth="3"
-        strokeLinecap="round" opacity="0.7"
+        fill="none"
+        stroke="#0e2230"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.7"
       />
 
       {/* ── 주요 도로 (매우 옅게) ─────────────────────────────── */}
       {/* 무등로 (남북) */}
-      <line x1="341" y1="120" x2="341" y2="270"
-        stroke="#1e3010" strokeWidth="1" opacity="0.5" />
+      <line
+        x1="341"
+        y1="120"
+        x2="341"
+        y2="270"
+        stroke="#1e3010"
+        strokeWidth="1"
+        opacity="0.5"
+      />
       {/* 금남로 (동서) */}
-      <line x1="288" y1="184" x2="400" y2="184"
-        stroke="#1e3010" strokeWidth="1" opacity="0.5" />
+      <line
+        x1="288"
+        y1="184"
+        x2="400"
+        y2="184"
+        stroke="#1e3010"
+        strokeWidth="1"
+        opacity="0.5"
+      />
       {/* 광주대로 (광주역~광산구) */}
-      <line x1="200" y1="165" x2="345" y2="165"
-        stroke="#1a2c0c" strokeWidth="0.8" opacity="0.35" />
+      <line
+        x1="200"
+        y1="165"
+        x2="345"
+        y2="165"
+        stroke="#1a2c0c"
+        strokeWidth="0.8"
+        opacity="0.35"
+      />
 
       {/* ── 구 이름 ──────────────────────────────────────────── */}
-      <g fontFamily="monospace" textAnchor="middle" fill="#4a7228" opacity="0.75"
-         stroke="#060a04" strokeWidth="1.5" paintOrder="stroke fill">
-        <text x="138" y="172" fontSize="9">광산구</text>
-        <text x="370" y="80"  fontSize="9">북구</text>
-        <text x="280" y="210" fontSize="9">서구</text>
-        <text x="415" y="230" fontSize="9">동구</text>
-        <text x="295" y="300" fontSize="9">남구</text>
+      <g
+        fontFamily="monospace"
+        textAnchor="middle"
+        fill="#4a7228"
+        opacity="0.75"
+        stroke="#060a04"
+        strokeWidth="1.5"
+        paintOrder="stroke fill"
+      >
+        <text x="138" y="172" fontSize="9">
+          광산구
+        </text>
+        <text x="370" y="80" fontSize="9">
+          북구
+        </text>
+        <text x="280" y="210" fontSize="9">
+          서구
+        </text>
+        <text x="415" y="230" fontSize="9">
+          동구
+        </text>
+        <text x="295" y="300" fontSize="9">
+          남구
+        </text>
       </g>
 
       {/* ── 게임 활동 범위 표시 ───────────────────────────────── */}
       <rect
-        x={gx1} y={gy1} width={gx2 - gx1} height={gy2 - gy1}
-        fill="none" stroke="#4a6a1a" strokeWidth="0.8"
-        strokeDasharray="4,3" opacity="0.5"
+        x={gx1}
+        y={gy1}
+        width={gx2 - gx1}
+        height={gy2 - gy1}
+        fill="none"
+        stroke="#4a6a1a"
+        strokeWidth="0.8"
+        strokeDasharray="4,3"
+        opacity="0.5"
       />
       <text
-        x={gx1 + 2} y={gy1 - 2}
-        fontSize="5" fontFamily="monospace" fill="#4a6a1a" opacity="0.65"
+        x={gx1 + 2}
+        y={gy1 - 2}
+        fontSize="5"
+        fontFamily="monospace"
+        fill="#4a6a1a"
+        opacity="0.65"
       >
         게임 무대
       </text>
@@ -188,18 +268,30 @@ function GwangjuCityMap({
         if (!pos || node.id === currentSceneId) return null;
         const [px, py] = pos;
         const isVisited = visitedSceneIds.has(node.id);
-        const pinFill   = isVisited ? PIN_VISITED : PIN_UNVISIT;
+        const pinFill = isVisited ? PIN_VISITED : PIN_UNVISIT;
         const pinStroke = isVisited ? STK_VISITED : STK_UNVISIT;
         const r = isVisited ? 2.5 : 1.8;
         return (
           <g key={node.id}>
-            <circle cx={px} cy={py} r={r}
-              fill={pinFill} stroke={pinStroke} strokeWidth="0.6" />
+            <circle
+              cx={px}
+              cy={py}
+              r={r}
+              fill={pinFill}
+              stroke={pinStroke}
+              strokeWidth="0.6"
+            />
             {isVisited && (
               <text
-                x={px} y={py + r + 6}
-                textAnchor="middle" fontSize="4.5" fontFamily="monospace"
-                fill="#7ab030" stroke="#060a04" strokeWidth="1.5" paintOrder="stroke fill"
+                x={px}
+                y={py + r + 6}
+                textAnchor="middle"
+                fontSize="4.5"
+                fontFamily="monospace"
+                fill="#7ab030"
+                stroke="#060a04"
+                strokeWidth="1.5"
+                paintOrder="stroke fill"
               >
                 {node.label}
               </text>
@@ -219,34 +311,77 @@ function GwangjuCityMap({
         return (
           <g>
             {/* 바깥 펄스 링 (SVG animate) */}
-            <circle cx={px} cy={py} r={13} fill="none" stroke="#c4d47a" strokeWidth="1.2">
-              <animate attributeName="r"       values="11;18;11" dur="2.4s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite" />
+            <circle
+              cx={px}
+              cy={py}
+              r={13}
+              fill="none"
+              stroke="#c4d47a"
+              strokeWidth="1.2"
+            >
+              <animate
+                attributeName="r"
+                values="11;18;11"
+                dur="2.4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="0.5;0;0.5"
+                dur="2.4s"
+                repeatCount="indefinite"
+              />
             </circle>
             {/* 중간 링 */}
-            <circle cx={px} cy={py} r={10}
-              fill="none" stroke="#c4d47a" strokeWidth="1" opacity="0.35" />
+            <circle
+              cx={px}
+              cy={py}
+              r={10}
+              fill="none"
+              stroke="#c4d47a"
+              strokeWidth="1"
+              opacity="0.35"
+            />
             {/* 채운 원 */}
-            <circle cx={px} cy={py} r={6.5}
-              fill="#c4d47a" stroke="#e8f090" strokeWidth="1.2" />
+            <circle
+              cx={px}
+              cy={py}
+              r={6.5}
+              fill="#c4d47a"
+              stroke="#e8f090"
+              strokeWidth="1.2"
+            />
             {/* 위쪽 화살표 */}
             <polygon
               points={`${px},${py - 19} ${px - 4},${py - 27} ${px + 4},${py - 27}`}
               fill="#c4d47a"
             />
-            <line x1={px} y1={py - 8} x2={px} y2={py - 19}
-              stroke="#c4d47a" strokeWidth="1.5" />
+            <line
+              x1={px}
+              y1={py - 8}
+              x2={px}
+              y2={py - 19}
+              stroke="#c4d47a"
+              strokeWidth="1.5"
+            />
             {/* 라벨 배경 박스 */}
             <rect
-              x={px - LW} y={py + 9}
-              width={LW * 2} height={LH}
+              x={px - LW}
+              y={py + 9}
+              width={LW * 2}
+              height={LH}
               rx="1.5"
-              fill="#0b1208" stroke="#4a6a1a" strokeWidth="0.8"
+              fill="#0b1208"
+              stroke="#4a6a1a"
+              strokeWidth="0.8"
             />
             {/* 라벨 텍스트 */}
             <text
-              x={px} y={py + 9 + LH - 2}
-              textAnchor="middle" fontSize="6.5" fontFamily="monospace"
+              x={px}
+              y={py + 9 + LH - 2}
+              textAnchor="middle"
+              fontSize="6.5"
+              fontFamily="monospace"
               fill="#c4d47a"
             >
               {node.label}
@@ -258,10 +393,25 @@ function GwangjuCityMap({
       {/* ── 기타 주요 랜드마크 ───────────────────────────────── */}
       {/* 광주공항 */}
       <g opacity="0.4">
-        <rect x="217" y="192" width="9" height="7"
-          fill="none" stroke="#3a6020" strokeWidth="0.7" />
-        <text x="221.5" y="206" fontSize="4" fontFamily="monospace"
-          fill="#3a6020" textAnchor="middle">공항</text>
+        <rect
+          x="217"
+          y="192"
+          width="9"
+          height="7"
+          fill="none"
+          stroke="#3a6020"
+          strokeWidth="0.7"
+        />
+        <text
+          x="221.5"
+          y="206"
+          fontSize="4"
+          fontFamily="monospace"
+          fill="#3a6020"
+          textAnchor="middle"
+        >
+          공항
+        </text>
       </g>
     </svg>
   );
@@ -274,18 +424,26 @@ export default function MapModal({
   onClose,
   onJump,
 }: Props) {
-  const [mode, setMode] = useState<MapMode>("activity");
+  const [mode, setMode] = useState<MapMode>("city");
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ background: "rgba(0,0,0,0.8)" }}
-      onClick={onClose}
     >
+      <button
+        type="button"
+        aria-label="지도 닫기"
+        className="absolute inset-0"
+        onClick={onClose}
+      />
       <div
-        className="border-2 border-[#4a6a1a] bg-[#0b1208] p-5 max-w-2xl w-full mx-4"
+        className="relative mx-4 w-full max-w-2xl border-2 border-[#4a6a1a] bg-[#0b1208] p-5"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
-        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        aria-label="지역 지도"
+        aria-modal="true"
+        role="dialog"
       >
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#2c3f12]">
@@ -300,13 +458,14 @@ export default function MapModal({
               {(["activity", "city"] as const).map((m) => (
                 <button
                   key={m}
+                  type="button"
                   onClick={() => setMode(m)}
                   className="px-2.5 py-1 text-[11px] border transition-colors cursor-pointer"
                   style={{
                     fontFamily: "monospace",
                     borderColor: mode === m ? "#4a6a1a" : "#2c3f12",
-                    background:  mode === m ? "#162010" : "#0d1608",
-                    color:       mode === m ? "#c4d47a" : "#4a6a1a",
+                    background: mode === m ? "#162010" : "#0d1608",
+                    color: mode === m ? "#c4d47a" : "#4a6a1a",
                   }}
                 >
                   {m === "activity" ? "활동 지도" : "광주 전도"}
@@ -315,6 +474,7 @@ export default function MapModal({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-[13px] text-[#4a6a1a] hover:text-[#c4d47a] transition-colors cursor-pointer"
             style={{ fontFamily: "monospace" }}
@@ -334,14 +494,23 @@ export default function MapModal({
                 currentSceneId={currentSceneId}
                 visitedSceneIds={visitedSceneIds}
                 compact={false}
-                onJump={DEV_MODE && onJump ? (id) => { onJump(id); onClose(); } : undefined}
+                onJump={
+                  DEV_MODE && onJump
+                    ? (id) => {
+                        onJump(id);
+                        onClose();
+                      }
+                    : undefined
+                }
               />
               {DEV_MODE && (
                 <div
                   className="absolute top-1.5 right-1.5 px-1.5 py-0.5 border border-[#6a3a1a] bg-[#1a0d06]"
                   style={{ fontFamily: "monospace" }}
                 >
-                  <span className="text-[10px] text-[#c4741a]">DEV · 노드 클릭 시 이동</span>
+                  <span className="text-[10px] text-[#c4741a]">
+                    DEV · 노드 클릭 시 이동
+                  </span>
                 </div>
               )}
             </>
@@ -362,17 +531,26 @@ export default function MapModal({
             기록한 선택
           </div>
           {choiceLog.length === 0 ? (
-            <p className="text-[13px] text-[#2a3a10]" style={{ fontFamily: "monospace" }}>
+            <p
+              className="text-[13px] text-[#2a3a10]"
+              style={{ fontFamily: "monospace" }}
+            >
               아직 기록된 선택이 없습니다.
             </p>
           ) : (
             <div className="flex flex-col gap-1.5">
               {choiceLog.map((c, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+                <div key={`${i}-${c}`} className="flex items-start gap-3">
+                  <span
+                    className="text-[12px] text-[#3a5010]"
+                    style={{ fontFamily: "monospace" }}
+                  >
                     {String(i + 1).padStart(2, "0")}.
                   </span>
-                  <span className="text-[13px] text-[#7a9038]" style={{ fontFamily: "monospace" }}>
+                  <span
+                    className="text-[13px] text-[#7a9038]"
+                    style={{ fontFamily: "monospace" }}
+                  >
                     {c}
                   </span>
                 </div>
@@ -385,7 +563,10 @@ export default function MapModal({
         <div className="flex items-center gap-5 mt-3">
           {[
             { color: "#c4d47a", label: "현재 위치" },
-            { color: mode === "activity" ? "#4a6a1a" : "#5a8a2a", label: "방문함" },
+            {
+              color: mode === "activity" ? "#4a6a1a" : "#5a8a2a",
+              label: "방문함",
+            },
             { color: "#1a2a0c", label: "미방문" },
           ].map(({ color, label }) => (
             <div key={label} className="flex items-center gap-1.5">
@@ -393,27 +574,42 @@ export default function MapModal({
                 className="w-3 h-3 inline-block border"
                 style={{ background: color, borderColor: color }}
               />
-              <span className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[12px] text-[#3a5010]"
+                style={{ fontFamily: "monospace" }}
+              >
                 {label}
               </span>
             </div>
           ))}
           {mode === "activity" && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[12px] text-[#4a6a1a]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[12px] text-[#4a6a1a]"
+                style={{ fontFamily: "monospace" }}
+              >
                 - - -
               </span>
-              <span className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[12px] text-[#3a5010]"
+                style={{ fontFamily: "monospace" }}
+              >
                 경로
               </span>
             </div>
           )}
           {mode === "city" && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] text-[#4a6a1a]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[11px] text-[#4a6a1a]"
+                style={{ fontFamily: "monospace" }}
+              >
                 □ - -
               </span>
-              <span className="text-[12px] text-[#3a5010]" style={{ fontFamily: "monospace" }}>
+              <span
+                className="text-[12px] text-[#3a5010]"
+                style={{ fontFamily: "monospace" }}
+              >
                 게임 무대
               </span>
             </div>
