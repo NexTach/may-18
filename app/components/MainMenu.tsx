@@ -82,7 +82,7 @@ export default function MainMenu({
 
   return (
     <>
-      <div className="relative h-screen w-full overflow-hidden bg-game-bg">
+      <div className="relative h-[100dvh] w-full overflow-hidden bg-game-bg">
         <Image
           src="/menu-bg.png"
           alt=""

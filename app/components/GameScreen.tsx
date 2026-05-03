@@ -389,7 +389,7 @@ export default function GameScreen({
 
   return (
     <div
-      className="flex flex-col w-full h-screen overflow-hidden bg-black p-2 gap-2 md:p-5 md:gap-4"
+      className="flex flex-col w-full h-dvh overflow-hidden bg-black p-2 gap-2 md:p-5 md:gap-4"
       style={{ fontFamily: "monospace" }}
     >
       <HUD

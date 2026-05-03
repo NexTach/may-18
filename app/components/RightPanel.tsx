@@ -195,7 +195,7 @@ export default function RightPanel({
       {done && (
         <div
           className={`md:hidden flex flex-col ${situationOpen ? "shrink-0" : "flex-1"}`}
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}
         >
           <div className="mt-auto border-t border-game-border">
             <button
