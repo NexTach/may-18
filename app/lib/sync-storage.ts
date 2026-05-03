@@ -1,27 +1,73 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import type { SyncBundle } from "../types";
+import { getDb } from "./db";
 
-const STORAGE_DIR = path.join(process.cwd(), "data", "user-sync");
+let ensureTablePromise: Promise<void> | null = null;
 
-function getUserFilePath(userId: string) {
-  return path.join(STORAGE_DIR, `${userId}.json`);
+async function ensureSyncTable() {
+  if (!ensureTablePromise) {
+    ensureTablePromise = (async () => {
+      const sql = getDb();
+      await sql`
+        create table if not exists user_sync (
+          user_id text primary key,
+          progress jsonb not null,
+          settings jsonb not null,
+          saved_at timestamptz not null default now(),
+          updated_at timestamptz not null default now()
+        )
+      `;
+    })();
+  }
+
+  await ensureTablePromise;
 }
 
 export async function readUserBundle(userId: string) {
-  try {
-    const contents = await readFile(getUserFilePath(userId), "utf8");
-    return JSON.parse(contents) as SyncBundle;
-  } catch {
+  await ensureSyncTable();
+  const sql = getDb();
+  const rows = await sql<
+    {
+      progress: SyncBundle["progress"];
+      settings: SyncBundle["settings"];
+      saved_at: Date | string;
+    }[]
+  >`
+    select progress, settings, saved_at
+    from user_sync
+    where user_id = ${userId}
+    limit 1
+  `;
+
+  const row = rows[0];
+  if (!row) {
     return null;
   }
+
+  return {
+    progress: row.progress,
+    settings: row.settings,
+    savedAt: new Date(row.saved_at).toISOString(),
+  };
 }
 
 export async function writeUserBundle(userId: string, bundle: SyncBundle) {
-  await mkdir(STORAGE_DIR, { recursive: true });
-  await writeFile(
-    getUserFilePath(userId),
-    JSON.stringify(bundle, null, 2),
-    "utf8",
-  );
+  await ensureSyncTable();
+  const sql = getDb();
+
+  await sql`
+    insert into user_sync (user_id, progress, settings, saved_at, updated_at)
+    values (
+      ${userId},
+      ${sql.json(bundle.progress)},
+      ${sql.json(bundle.settings)},
+      ${bundle.savedAt}::timestamptz,
+      now()
+    )
+    on conflict (user_id) do update
+    set
+      progress = excluded.progress,
+      settings = excluded.settings,
+      saved_at = excluded.saved_at,
+      updated_at = now()
+  `;
 }
