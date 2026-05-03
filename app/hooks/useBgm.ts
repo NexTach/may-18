@@ -27,7 +27,7 @@ function fade(
   return id;
 }
 
-type St = {
+type BgmState = {
   cur: HTMLAudioElement | null;
   out: HTMLAudioElement | null;
   src: string | null;
@@ -35,12 +35,11 @@ type St = {
 };
 
 export function useBgm(src: string | null, enabled: boolean) {
-  const s = useRef<St>({ cur: null, out: null, src: null, tid: null });
+  const s = useRef<BgmState>({ cur: null, out: null, src: null, tid: null });
 
   useEffect(() => {
     const st = s.current;
 
-    // 진행 중인 페이드 취소, 페이드아웃 중인 오디오 정리
     if (st.tid != null) { clearInterval(st.tid); st.tid = null; }
     if (st.out) { st.out.pause(); st.out = null; }
 
@@ -64,10 +63,8 @@ export function useBgm(src: string | null, enabled: boolean) {
       return;
     }
 
-    // 같은 트랙 재생 중 → 유지
     if (st.src === src && st.cur && !st.cur.paused) return;
 
-    // 같은 트랙이지만 일시정지 상태 → 페이드인 재개
     if (st.src === src && st.cur && st.cur.paused) {
       st.cur.volume = 0;
       void st.cur.play().catch(() => {});
@@ -75,7 +72,6 @@ export function useBgm(src: string | null, enabled: boolean) {
       return;
     }
 
-    // 새 트랙으로 전환
     if (st.cur && !st.cur.paused) {
       const old = st.cur;
       st.out = old;
@@ -87,7 +83,6 @@ export function useBgm(src: string | null, enabled: boolean) {
     }
   }, [src, enabled]);
 
-  // 언마운트 정리
   useEffect(() => {
     const st = s.current;
     return () => {

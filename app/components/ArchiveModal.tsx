@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { scenes } from "../data/scenes";
+import { STAT_LABELS } from "../lib/constants";
 import type { GameProgress, Stats } from "../types";
 
 type AchievementView = {
@@ -15,13 +16,6 @@ type Props = {
   progress: GameProgress;
   achievements: AchievementView[];
   onClose: () => void;
-};
-
-const STAT_LABELS: Record<keyof Stats, string> = {
-  courage: "용기",
-  record: "기록",
-  trust: "신뢰",
-  safety: "안전",
 };
 
 export default function ArchiveModal({

@@ -17,14 +17,6 @@ type Props = {
   onJump?: (sceneId: string) => void;
 };
 
-// ── 실제 지리 좌표 기반 광주 전도 ──────────────────────────────
-// viewBox="0 0 500 346"
-// 변환식: svg_x = (lon - 126.6447028) / 0.3785964 * 460 + 20
-//         svg_y = (35.2588841 - lat) / 0.2064681 * 306 + 20
-// 경계 데이터: OpenStreetMap Nominatim (OSM) RDP 간소화 적용
-// ──────────────────────────────────────────────────────────────
-
-// 게임 노드 id → 실제 SVG 좌표 (OSM 위경도 → 변환식)
 const GAME_NODE_SVG: Record<string, [number, number]> = {
   start: [341.4, 159.4], // 광주역
   observe_street: [344.8, 163.6], // 광주역 앞 거리
@@ -60,7 +52,6 @@ function GwangjuCityMap({
   visitedSceneIds: Set<string>;
   currentSceneId: string;
 }) {
-  // 게임 범위 bounding box
   const gxs = Object.values(GAME_NODE_SVG).map(([x]) => x);
   const gys = Object.values(GAME_NODE_SVG).map(([, y]) => y);
   const gx1 = Math.min(...gxs) - 6,
@@ -90,9 +81,6 @@ function GwangjuCityMap({
     <svg viewBox="0 0 500 346" className="h-full w-full">
       <title>광주 전도 위의 게임 위치</title>
 
-      {/* ── 구 면 (OSM Nominatim 데이터 기반) ─────────────────── */}
-
-      {/* 광산구 (서부 최대 구) */}
       <path
         d="M 20.0,186.4 L 30.5,190.3 L 28.8,226.4 L 32.8,233.5 L 49.1,238.1
            L 47.5,247.5 L 67.4,244.0 L 68.4,237.5 L 82.1,244.1 L 91.8,236.4
@@ -112,7 +100,6 @@ function GwangjuCityMap({
         strokeWidth="0.8"
       />
 
-      {/* 북구 (북동부) */}
       <path
         d="M 251.1,64.0 L 254.9,71.7 L 263.0,68.9 L 278.0,81.4 L 271.8,109.8
            L 280.3,115.6 L 282.1,128.5 L 255.8,139.2 L 310.3,151.6 L 316.0,164.2
@@ -128,7 +115,6 @@ function GwangjuCityMap({
         strokeWidth="0.8"
       />
 
-      {/* 서구 (중서부) */}
       <path
         d="M 209.4,259.5 L 211.8,265.1 L 216.5,259.2 L 222.1,268.9 L 233.0,268.9
            L 255.0,252.2 L 294.4,240.4 L 297.8,225.9 L 315.2,230.3 L 312.5,186.5
@@ -141,7 +127,6 @@ function GwangjuCityMap({
         strokeWidth="0.8"
       />
 
-      {/* 동구 (동부 도심) */}
       <path
         d="M 338.9,179.2 L 366.3,216.4 L 344.7,233.1 L 355.9,260.0 L 353.8,269.0
            L 369.2,293.2 L 392.7,295.4 L 406.7,274.4 L 437.2,263.8 L 435.2,247.0
@@ -153,7 +138,6 @@ function GwangjuCityMap({
         strokeWidth="0.8"
       />
 
-      {/* 남구 (남부) */}
       <path
         d="M 151.7,307.0 L 156.1,317.3 L 167.8,309.0 L 175.2,325.4 L 202.9,312.9
            L 215.1,325.8 L 231.4,325.7 L 236.3,314.3 L 262.0,306.8 L 276.3,288.1
@@ -167,9 +151,6 @@ function GwangjuCityMap({
         strokeWidth="0.8"
       />
 
-      {/* ── 하천 ──────────────────────────────────────────────── */}
-
-      {/* 황룡강 (광산구 북서→남서 관통) */}
       <path
         d="M 104.2,80.6 Q 118,93 133.4,107.3 Q 150,120 150.4,129.5
            Q 158,142 169.8,154.7 Q 180,168 184.4,181.4
@@ -182,7 +163,6 @@ function GwangjuCityMap({
         opacity="0.8"
       />
 
-      {/* 영산강 (남부 동서 흐름) */}
       <path
         d="M 26.4,270.3 Q 56,274 87.2,277.7 Q 118,285 147.9,292.5
            Q 178,292 208.7,292.5 Q 221,288 233.0,282.2
@@ -194,8 +174,6 @@ function GwangjuCityMap({
         opacity="0.7"
       />
 
-      {/* ── 주요 도로 (매우 옅게) ─────────────────────────────── */}
-      {/* 무등로 (남북) */}
       <line
         x1="341"
         y1="120"
@@ -205,7 +183,6 @@ function GwangjuCityMap({
         strokeWidth="1"
         opacity="0.5"
       />
-      {/* 금남로 (동서) */}
       <line
         x1="288"
         y1="184"
@@ -215,7 +192,6 @@ function GwangjuCityMap({
         strokeWidth="1"
         opacity="0.5"
       />
-      {/* 광주대로 (광주역~광산구) */}
       <line
         x1="200"
         y1="165"
@@ -226,7 +202,6 @@ function GwangjuCityMap({
         opacity="0.35"
       />
 
-      {/* ── 구 이름 ──────────────────────────────────────────── */}
       <g
         fontFamily="monospace"
         textAnchor="middle"
@@ -253,7 +228,6 @@ function GwangjuCityMap({
         </text>
       </g>
 
-      {/* ── 게임 활동 범위 표시 ───────────────────────────────── */}
       <rect
         x={gx1}
         y={gy1}
@@ -276,7 +250,6 @@ function GwangjuCityMap({
         게임 무대
       </text>
 
-      {/* ── 게임 장소 핀 (현재 위치 제외) ──────────────────────── */}
       {mapNodes.map((node) => {
         const pos = GAME_NODE_SVG[node.id];
         if (!pos || node.id === currentSceneId) return null;
@@ -323,17 +296,15 @@ function GwangjuCityMap({
         );
       })}
 
-      {/* ── 현재 위치 핀 (최상단 렌더) ───────────────────────── */}
       {(() => {
         const pos = GAME_NODE_SVG[currentSceneId];
         const node = mapNodes.find((n) => n.id === currentSceneId);
         if (!pos || !node) return null;
         const [px, py] = pos;
-        const LW = 42; // 라벨 박스 절반 너비
-        const LH = 15; // 라벨 박스 높이
+        const LW = 42;
+        const LH = 15;
         return (
           <g>
-            {/* 바깥 펄스 링 (SVG animate) */}
             <circle
               cx={px}
               cy={py}
@@ -355,7 +326,6 @@ function GwangjuCityMap({
                 repeatCount="indefinite"
               />
             </circle>
-            {/* 중간 링 */}
             <circle
               cx={px}
               cy={py}
@@ -365,7 +335,6 @@ function GwangjuCityMap({
               strokeWidth="1"
               opacity="0.35"
             />
-            {/* 채운 원 */}
             <circle
               cx={px}
               cy={py}
@@ -374,7 +343,6 @@ function GwangjuCityMap({
               stroke="#e8f090"
               strokeWidth="1.2"
             />
-            {/* 위쪽 화살표 */}
             <polygon
               points={`${px},${py - 19} ${px - 4},${py - 27} ${px + 4},${py - 27}`}
               fill="#c4d47a"
@@ -387,7 +355,6 @@ function GwangjuCityMap({
               stroke="#c4d47a"
               strokeWidth="1.5"
             />
-            {/* 라벨 배경 박스 */}
             <rect
               x={px - LW}
               y={py + 9}
@@ -398,7 +365,6 @@ function GwangjuCityMap({
               stroke="#4a6a1a"
               strokeWidth="0.8"
             />
-            {/* 라벨 텍스트 */}
             <text
               x={px}
               y={py + 9 + LH - 3}
@@ -416,8 +382,6 @@ function GwangjuCityMap({
         );
       })()}
 
-      {/* ── 기타 주요 랜드마크 ───────────────────────────────── */}
-      {/* 광주공항 */}
       <g opacity="0.4">
         <rect
           x="217"
@@ -472,7 +436,6 @@ export default function MapModal({
         aria-modal="true"
         role="dialog"
       >
-        {/* 헤더 */}
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#2c3f12]">
           <div className="flex items-center gap-3">
             <span
@@ -510,7 +473,6 @@ export default function MapModal({
           </button>
         </div>
 
-        {/* 지도 영역 */}
         <div
           className="border border-[#2c3f12] bg-[#060d04] mb-4 relative flex items-center justify-center"
           style={{ height: 280 }}
@@ -549,7 +511,6 @@ export default function MapModal({
           )}
         </div>
 
-        {/* 선택 기록 */}
         <div className="border border-[#2c3f12] bg-[#090d06] p-4">
           <div
             className="text-[11px] text-[#4a6a1a] mb-3"
@@ -586,7 +547,6 @@ export default function MapModal({
           )}
         </div>
 
-        {/* 범례 */}
         <div className="flex items-center gap-5 mt-3">
           {[
             { color: "#c4d47a", label: "현재 위치" },

@@ -83,7 +83,6 @@ export default function MainMenu({
   return (
     <>
       <div className="relative h-screen w-full overflow-hidden bg-[#060907]">
-        {/* 배경 이미지 */}
         <Image
           src="/menu-bg.png"
           alt=""
@@ -94,7 +93,6 @@ export default function MainMenu({
           style={{ imageRendering: "pixelated" }}
         />
 
-        {/* 상단 어두운 그라데이션 — 텍스트 가독성 확보 */}
         <div
           className="absolute inset-0"
           style={{
@@ -103,10 +101,7 @@ export default function MainMenu({
           }}
         />
 
-
-        {/* 중앙 콘텐츠 */}
         <div className="relative z-10 flex h-full flex-col items-center justify-center">
-          {/* 서브타이틀 */}
           <p
             className="text-[12px] tracking-widest mb-5"
             style={{ fontFamily: "monospace", color: "#7a9a40" }}
@@ -114,7 +109,6 @@ export default function MainMenu({
             · 5·18민주화운동 인터랙티브 스토리 ·
           </p>
 
-          {/* 타이틀 박스 */}
           <div className="relative mb-3">
             <div
               className="px-10 py-5 border-2 border-[#4a6a1a]"
@@ -136,7 +130,6 @@ export default function MainMenu({
                 그날의 선택
               </h1>
             </div>
-            {/* 코너 장식 */}
             {(
               [
                 "top-0 left-0 border-t-4 border-l-4",
@@ -153,7 +146,6 @@ export default function MainMenu({
             ))}
           </div>
 
-          {/* 태그라인 */}
           <p
             className="text-[13px] mb-12 tracking-widest"
             style={{ fontFamily: "monospace", color: "#5a7a20" }}
@@ -162,7 +154,6 @@ export default function MainMenu({
             마주합니다. ◈
           </p>
 
-          {/* 메뉴 버튼 */}
           <div className="flex flex-col items-center gap-2.5 w-96">
             {menuItems.map(({ label, icon, action }) => (
               <button
@@ -202,7 +193,6 @@ export default function MainMenu({
             ))}
           </div>
 
-          {/* 하단 문구 */}
           <div className="absolute bottom-7 flex flex-col items-center gap-1.5">
             <p
               className="text-[11px]"

@@ -37,7 +37,6 @@ const SCREEN_STORAGE_KEY = "may18.screen";
 const MARCH = "/sounds/march.mp3";
 const MAY = "/sounds/may.mp3";
 
-// 씬별 BGM 매핑
 // 초반·성찰(1~6, 엔딩): 오월의 노래 / 항쟁 절정(7~13): 임을 위한 행진곡
 const SCENE_BGM: Record<string, string> = {
   start: MAY,

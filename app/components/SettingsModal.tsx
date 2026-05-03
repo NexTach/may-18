@@ -511,7 +511,6 @@ export default function SettingsModal({
       className="fixed inset-0 z-50 flex flex-col"
       style={{ background: "#060907" }}
     >
-      {/* 헤더 */}
       <div className="flex items-center justify-between px-8 py-4 border-b-2 border-[#2c3f12] bg-[#0b1208] flex-shrink-0">
         <div
           className="text-[13px] text-[#c4d47a]"
@@ -529,9 +528,7 @@ export default function SettingsModal({
         </button>
       </div>
 
-      {/* 바디 */}
       <div className="flex flex-1 min-h-0">
-        {/* 왼쪽 탭 네비게이션 */}
         <div className="w-56 flex-shrink-0 border-r border-[#2c3f12] bg-[#090d06] flex flex-col p-4 gap-1.5">
           {TABS.map((tab) => (
             <button
@@ -557,7 +554,6 @@ export default function SettingsModal({
           ))}
         </div>
 
-        {/* 오른쪽 콘텐츠 */}
         <div className="flex-1 overflow-y-auto p-10">
           {activeTab === "display" && (
             <DisplayTab

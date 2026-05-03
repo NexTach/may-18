@@ -57,6 +57,7 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
             ▣ 가방 / 기록
           </span>
           <button
+            type="button"
             onClick={onClose}
             className="text-[13px] text-[#4a6a1a] hover:text-[#c4d47a] transition-colors cursor-pointer"
             style={{ fontFamily: "monospace" }}
@@ -65,7 +66,6 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
           </button>
         </div>
 
-        {/* stats */}
         <div className="mb-5">
           <div
             className="text-[11px] text-[#4a6a1a] mb-3"
@@ -118,7 +118,6 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
           </div>
         </div>
 
-        {/* items */}
         <div className="border border-[#2c3f12] bg-[#090d06] p-4 mb-4">
           <div
             className="text-[11px] text-[#4a6a1a] mb-3"
@@ -154,6 +153,7 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
         </div>
 
         <button
+          type="button"
           onClick={onClose}
           className="w-full border border-[#4a6a1a] bg-[#0d1608] hover:bg-[#162010] py-3 transition-colors cursor-pointer"
           style={{ fontFamily: "'Press Start 2P', monospace" }}

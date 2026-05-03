@@ -52,7 +52,6 @@ export default function HUD({
       className="flex items-center justify-between px-4 py-2 border-2 border-[#2c3f12] bg-[#0b1208]"
       style={{ minHeight: 52 }}
     >
-      {/* left: stage + date */}
       <div className="flex items-center gap-4">
         <span
           className="text-[13px] font-bold text-[#c4d47a]"
@@ -77,7 +76,6 @@ export default function HUD({
         </span>
       </div>
 
-      {/* center: progress */}
       <div className="flex items-center gap-4">
         <span
           className="text-[12px] text-[#3a5010]"
@@ -94,7 +92,6 @@ export default function HUD({
         </span>
       </div>
 
-      {/* right: action buttons */}
       <div className="flex items-center gap-1.5">
         <HUDButton label="역사" shortcut="X" onClick={onHistory} />
         <HUDButton label="지도" shortcut="M" onClick={onMap} />

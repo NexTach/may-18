@@ -34,31 +34,31 @@ type LabelPlacement = {
 };
 
 const LABEL_LAYOUTS: Record<string, LabelLayout> = {
-  start: { dx: 0, dy: -10 },            // (197,107) 위
-  observe_street: { dx: 14, dy: -8 },   // (212,115) 우상
-  station_rumor: { dx: 0, dy: 14 },     // (223,119) 아래
-  call_family: { dx: -14, dy: -8 },     // (58,144) 좌상
-  family_neighborhood: { dx: 18, dy: 0 }, // (32,155) 우 (서쪽 끝)
-  radio_room: { dx: 18, dy: 0 },        // (15,163) 우
-  leaflet_room: { dx: 18, dy: 8 },      // (31,169) 우하
-  side_alley_detour: { dx: -18, dy: -6 }, // (168,81) 좌상
-  university_gate: { dx: 0, dy: -10 }, // (184,75) 위
-  talk_students: { dx: 16, dy: -8 },   // (174,69) 우상
-  record_scene: { dx: -16, dy: -8 },   // (203,130) 좌상
-  downtown: { dx: 0, dy: 16 },         // (218,140) 아래
-  market_people: { dx: 16, dy: -4 },   // (248,124) 우
-  street_clinic: { dx: -16, dy: 0 },   // (210,155) 좌
-  citizen_voice: { dx: 16, dy: 8 },    // (283,159) 우하
-  citizen_debate: { dx: 18, dy: -8 },  // (276,145) 우상
-  help_people: { dx: 0, dy: 16 },      // (228,163) 아래
-  supply_run: { dx: -16, dy: -8 },     // (269,135) 좌상
-  checkpoint_edge: { dx: 16, dy: 14 }, // (316,187) 우하
-  outside_message: { dx: -18, dy: -8 }, // (337,199) 좌상
-  community: { dx: 18, dy: -8 },       // (234,131) 우상
-  night_meeting: { dx: 18, dy: -8 },   // (295,149) 우상
-  last_night: { dx: 18, dy: 8 },       // (252,156) 우하
-  archive_ending: { dx: 0, dy: 14 },   // (237,155) 아래
-  memory_ending: { dx: 16, dy: 0 },    // (36,15) 우
+  start: { dx: 0, dy: -10 },
+  observe_street: { dx: 14, dy: -8 },
+  station_rumor: { dx: 0, dy: 14 },
+  call_family: { dx: -14, dy: -8 },
+  family_neighborhood: { dx: 18, dy: 0 },
+  radio_room: { dx: 18, dy: 0 },
+  leaflet_room: { dx: 18, dy: 8 },
+  side_alley_detour: { dx: -18, dy: -6 },
+  university_gate: { dx: 0, dy: -10 },
+  talk_students: { dx: 16, dy: -8 },
+  record_scene: { dx: -16, dy: -8 },
+  downtown: { dx: 0, dy: 16 },
+  market_people: { dx: 16, dy: -4 },
+  street_clinic: { dx: -16, dy: 0 },
+  citizen_voice: { dx: 16, dy: 8 },
+  citizen_debate: { dx: 18, dy: -8 },
+  help_people: { dx: 0, dy: 16 },
+  supply_run: { dx: -16, dy: -8 },
+  checkpoint_edge: { dx: 16, dy: 14 },
+  outside_message: { dx: -18, dy: -8 },
+  community: { dx: 18, dy: -8 },
+  night_meeting: { dx: 18, dy: -8 },
+  last_night: { dx: 18, dy: 8 },
+  archive_ending: { dx: 0, dy: 14 },
+  memory_ending: { dx: 16, dy: 0 },
 };
 
 const FALLBACK_LABEL_LAYOUTS: LabelLayout[] = [
@@ -121,7 +121,6 @@ function getLabelCandidates(nodeId: string) {
   );
 }
 
-// 노드 사각형 경계까지 선을 클리핑
 function clipLine(
   x1: number,
   y1: number,
@@ -140,15 +139,6 @@ function clipLine(
   return [x1 + ux * t, y1 + uy * t, x2 - ux * t, y2 - uy * t];
 }
 
-// ─── 광주시 구 경계 배경 ───────────────────────────────────────────────────────
-// 좌표계: OSM 위경도 → 선형 변환된 실제 지리 좌표
-//   변환식: x = (svg_x - 301.0) * 4.5 + 15,  y = (svg_y - 108.2) * 1.8 + 15
-//   노드 범위: x 15–337, y 15–199  →  viewBox 약 1 1 350 222
-// 구 경계 (근사):
-//   북구: y ≤ 122  (광주역·전남대·묘지)
-//   서구: x < 120, y > 122  (양동시장 일대)
-//   동구: x ≥ 120, 122 < y ≤ 172  (충장로·금남로·전남도청)
-//   남구: x ≥ 120, y > 172  (지원동 일대)
 function GwangjuMapBackground() {
   const FILL = "#1e3418";
   const BORDER = "#2a4c1c";
@@ -156,31 +146,21 @@ function GwangjuMapBackground() {
 
   return (
     <g>
-      {/* ── 구 면 ─────────────────────────────────────────────────── */}
-      {/* 북구 */}
       <path d="M 1,1 L 352,1 L 352,122 L 1,122 Z"
         fill={FILL} fillOpacity="0.16" stroke="none" />
-      {/* 서구 */}
       <path d="M 1,122 L 120,122 L 120,224 L 1,224 Z"
         fill={FILL} fillOpacity="0.14" stroke="none" />
-      {/* 동구 */}
       <path d="M 120,122 L 352,122 L 352,172 L 120,172 Z"
         fill={FILL} fillOpacity="0.18" stroke="none" />
-      {/* 남구 */}
       <path d="M 120,172 L 352,172 L 352,224 L 120,224 Z"
         fill={FILL} fillOpacity="0.14" stroke="none" />
 
-      {/* ── 구 경계선 (점선) ────────────────────────────────────── */}
       <g stroke={BORDER} strokeWidth="0.7" strokeDasharray="3,2" fill="none" opacity="0.38">
-        {/* 북구 / 서구·동구 경계 (E-W) */}
         <line x1="1" y1="122" x2="352" y2="122" />
-        {/* 서구 / 동구·남구 경계 (N-S) */}
         <line x1="120" y1="122" x2="120" y2="224" />
-        {/* 동구 / 남구 경계 (E-W) */}
         <line x1="120" y1="172" x2="352" y2="172" />
       </g>
 
-      {/* ── 구 이름 라벨 ─────────────────────────────────────────── */}
       <g fontFamily="monospace" textAnchor="middle" fontSize="6" fill={LABEL} opacity="0.5">
         <text x="180" y="42">북구</text>
         <text x="60" y="160">서구</text>
@@ -302,10 +282,8 @@ export default function MiniMap({
   return (
     <svg viewBox={vb} className="w-full h-full">
       <title>게임 활동 지도</title>
-      {/* 1. 지도 배경 (가장 아래 레이어) */}
       {!compact && <GwangjuMapBackground />}
 
-      {/* 2. 간선 */}
       {mapNodes.flatMap((node) =>
         node.connections.map((toId) => {
           const edgeKey = [node.id, toId].sort().join("--");
@@ -339,7 +317,6 @@ export default function MiniMap({
         }),
       )}
 
-      {/* 3. 노드 */}
       {mapNodes.map((node) => {
         const isCurrent = node.id === currentSceneId;
         const isVisited = visitedSceneIds.has(node.id);
@@ -403,7 +380,6 @@ export default function MiniMap({
         );
       })}
 
-      {/* 4. 현재 위치 화살표 */}
       {(() => {
         const cur = nodeById[currentSceneId];
         if (!cur) return null;
@@ -415,7 +391,6 @@ export default function MiniMap({
         );
       })()}
 
-      {/* 5. 라벨 */}
       {labelPlacements.map((label) => (
         <g key={`${label.id}-label`}>
           <line

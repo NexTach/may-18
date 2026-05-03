@@ -144,7 +144,6 @@ export function getReachedEndingIds(progress: GameProgress) {
 }
 
 export function getAchievementState(progress: GameProgress) {
-  // 누적 방문 기록 기준 (리셋과 무관)
   const visited = new Set(
     progress.allVisitedSceneIds.length > 0
       ? progress.allVisitedSceneIds
@@ -158,7 +157,6 @@ export function getAchievementState(progress: GameProgress) {
   const { courage, record, trust, safety } = progress.stats;
   const unlocked = new Set<string>();
 
-  // 스탯 기반
   if (record >= 1) unlocked.add("first_record");
   if (record >= 6) unlocked.add("deep_record");
   if (record >= 3 && courage >= 3) unlocked.add("courageous_record");
@@ -171,7 +169,6 @@ export function getAchievementState(progress: GameProgress) {
   if (courage >= 2 && record >= 2 && trust >= 2 && safety >= 2)
     unlocked.add("balanced_eye");
 
-  // 방문 기반
   if (visitedCount >= 12) unlocked.add("many_paths");
   if (visitedCount >= 18) unlocked.add("explorer");
   if (visited.has("university_gate")) unlocked.add("at_the_gate");

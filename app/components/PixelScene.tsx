@@ -4,7 +4,6 @@ import Image from "next/image";
 import { SCENE_IMAGES } from "../lib/asset-cache";
 import type { SceneType } from "../types";
 
-// Per-scene image fit override for scenes that need different cropping anchors.
 const SCENE_IMAGE_CLASS: Partial<Record<SceneType, string>> = {
   corridor: "object-contain object-bottom",
   notebook: "object-cover object-top",

@@ -8,6 +8,7 @@ import {
   preloadSceneTypes,
   scheduleIdlePreload,
 } from "../lib/asset-cache";
+import { AVATAR_COLORS, STAT_LABELS } from "../lib/constants";
 import { TEXT_SPEED_MS } from "../lib/game-state";
 import type {
   Choice,
@@ -75,18 +76,8 @@ const LOCATION_DESCS: Record<string, string> = {
     "남겨진 기록이 훗날 역사를 증언하는 장소다. 기억을 지키는 힘이 모여 있다.",
   국립5·18민주묘지:
     "오늘의 우리가 5·18을 기억하고 되새기는 자리다. 시간이 지나도 질문은 남아 있다.",
-};
+}
 
-const STAT_LABELS: Record<StatKey, string> = {
-  courage: "용기",
-  record: "기록",
-  trust: "신뢰",
-  safety: "안전",
-};
-
-// NPC anchor slots per scene type (tail of speech bubble points here)
-// Slots ordered left → right. Player dialogue is skipped.
-// university/home have no visible NPCs in background → empty
 const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   street: [
     { x: 16, y: 56 },
@@ -153,19 +144,15 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 29, y: 40 },
     { x: 70, y: 43 },
   ],
-  // 광주 외곽 검문소: 친구 1명, 도로 좌측
   corridor: [
     { x: 28, y: 65 },
     { x: 65, y: 62 },
   ],
-  // 골목 기록 씬: 곁에 있는 시민 1명
   notebook: [{ x: 13, y: 28 }],
-  // 공중전화: 어머니 목소리가 수화기에서 들려오는 위치
   phonebooth: [
     { x: 52, y: 40 },
     { x: 52, y: 50 },
   ],
-  // 도청 새벽: 남은 시민 한 명, 광장 우측
   plaza_night: [
     { x: 72.5, y: 49 },
     { x: 35, y: 68 },
@@ -174,18 +161,6 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 35, y: 68 },
     { x: 62, y: 68 },
   ],
-};
-
-const AVATAR_COLORS: Record<string, { bg: string; border: string }> = {
-  player: { bg: "#1a2a0c", border: "#4a6a1a" },
-  friend: { bg: "#0c1a1a", border: "#1a5a5a" },
-  citizen: { bg: "#1a180c", border: "#5a4a1a" },
-  student: { bg: "#0c0c1a", border: "#2a2a6a" },
-  mother: { bg: "#1a0c0c", border: "#5a2a2a" },
-  elder: { bg: "#18180c", border: "#5a5a1a" },
-  youth: { bg: "#0c1a0c", border: "#2a5a2a" },
-  merchant: { bg: "#1a100c", border: "#5a3a1a" },
-  soldier: { bg: "#0c1208", border: "#3a5a1a" },
 };
 
 const SCENE_ASPECT_RATIO = 16 / 9;
@@ -258,7 +233,6 @@ export default function GameScreen({
     (choice: Choice) => {
       if (getChoiceDisabledReason(choice, stats)) return;
 
-      // 엔딩 씬에서 start로 돌아가는 선택 → 현재 회차만 초기화, 누적 기록 유지
       const scene = scenes.find((s) => s.id === currentSceneId);
       if (scene?.isEnding && choice.nextSceneId === "start") {
         setCurrentSceneId("start");
@@ -286,7 +260,6 @@ export default function GameScreen({
     [stats, currentSceneId],
   );
 
-  // keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -406,13 +379,11 @@ export default function GameScreen({
   if (!currentScene) return null;
 
   const slots = NPC_SLOTS[currentScene.sceneType] ?? [];
-  const choiceViews = currentScene.choices.map((choice) => ({
-    ...choice,
-    disabled: Boolean(getChoiceDisabledReason(choice, stats)),
-    disabledReason: getChoiceDisabledReason(choice, stats) ?? undefined,
-  }));
+  const choiceViews = currentScene.choices.map((choice) => {
+    const reason = getChoiceDisabledReason(choice, stats);
+    return { ...choice, disabled: Boolean(reason), disabledReason: reason ?? undefined };
+  });
   const historyMedia = historyMediaBySceneId[currentScene.id];
-  // Only non-player dialogue lines get speech bubbles
   const npcLines = currentScene.dialogue.filter((d) => d.avatar !== "player");
   const locationDesc = LOCATION_DESCS[currentScene.location] ?? "";
 
@@ -440,9 +411,7 @@ export default function GameScreen({
       />
 
       <div className="flex flex-1 min-h-0 gap-4">
-        {/* ── 왼쪽 열: 씬(상단 16:9) + 정보(하단) ── */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-4">
-          {/* 씬 — 상단 슬롯 안에서만 16:9로 맞추고 남는 공간은 레터박스로 처리 */}
           <div
             ref={sceneSlotRef}
             className="relative flex-[1.45] min-h-0 overflow-hidden border border-[#2c3f12] bg-[#060907]"
@@ -489,9 +458,7 @@ export default function GameScreen({
             </div>
           </div>
 
-          {/* 하단 정보: 목표+위치(좌) + 지역 지도(우) */}
           <div className="flex flex-[0.66] min-h-0 border border-[#2c3f12] overflow-hidden">
-            {/* 목표 + 현재 위치 */}
             <div
               className="flex flex-col gap-4 p-4 border-r border-[#2c3f12] bg-[#0b1208] overflow-y-auto"
               style={{ minWidth: 0, flex: "0 0 38%" }}
@@ -546,7 +513,6 @@ export default function GameScreen({
               </div>
             </div>
 
-            {/* 지역 지도 — compact 해제로 노드 라벨 표시 */}
             <div className="flex flex-col p-4 bg-[#090d06] flex-1 min-w-0">
               <div
                 className="text-[10px] text-[#4a6a1a] mb-2 pb-1.5 border-b border-[#1e2e0e] flex-shrink-0"
@@ -564,7 +530,6 @@ export default function GameScreen({
           </div>
         </div>
 
-        {/* ── 오른쪽 열: 내러티브 + 대화 + 선택지 ── */}
         <RightPanel
           key={currentSceneId}
           text={currentScene.text}
@@ -637,7 +602,6 @@ export default function GameScreen({
                   setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
                   setSceneIndex(1);
                   setMenuOpen(false);
-                  // allVisitedSceneIds / allChoiceLog 는 유지
                 },
               },
               {

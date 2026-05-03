@@ -47,7 +47,6 @@ export default function HistoryModal({
           boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208, 0 0 0 6px #1a2a0c",
         }}
       >
-        {/* header */}
         <div className="border-b border-[#2c3f12] pb-4 mb-5">
           <div
             className="text-[12px] text-[#4a6a1a] mb-2"
@@ -151,7 +150,6 @@ export default function HistoryModal({
           </div>
         </div>
 
-        {/* source */}
         <div className="mb-5">
           <p
             className="text-[12px] text-[#3a5010]"
@@ -161,7 +159,6 @@ export default function HistoryModal({
           </p>
         </div>
 
-        {/* close */}
         <button
           type="button"
           onClick={onClose}

@@ -79,8 +79,6 @@ export type Stats = {
   safety: number;
 };
 
-export type GameScreen = "menu" | "game";
-
 export type TextSpeed = "instant" | "normal" | "slow";
 
 export type MapDefaultMode = "activity" | "city";
@@ -100,7 +98,6 @@ export type GameProgress = {
   stats: Stats;
   sceneIndex: number;
   updatedAt: string | null;
-  // 플레이 초기화와 무관하게 누적되는 필드
   allVisitedSceneIds: string[];
   allChoiceLog: string[];
 };

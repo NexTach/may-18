@@ -1,8 +1,8 @@
 "use client";
 
 type Props = {
-  x: number; // center x percent
-  y: number; // NPC anchor y percent — tail points here
+  x: number;
+  y: number;
   name: string;
   line: string;
   borderColor: string;
@@ -27,13 +27,11 @@ export default function SpeechBubble({
         position: "absolute",
         left: `${x}%`,
         top: `${y}%`,
-        // bottom of this div (tail) sits at the NPC anchor point
         transform: "translate(-50%, -100%)",
         zIndex: 15,
         pointerEvents: "none",
       }}
     >
-      {/* bubble box */}
       <div
         style={{
           background: `${bgColor}f0`,
@@ -45,7 +43,6 @@ export default function SpeechBubble({
           boxShadow: `0 0 0 1px rgba(0,0,0,0.6), inset 0 0 6px ${bgColor}`,
         }}
       >
-        {/* speaker name */}
         <div
           style={{
             fontSize: 9,
@@ -58,7 +55,6 @@ export default function SpeechBubble({
         >
           {name}
         </div>
-        {/* dialogue text */}
         <div
           style={{
             fontSize: 11,
@@ -70,7 +66,6 @@ export default function SpeechBubble({
           {truncate(line)}
         </div>
       </div>
-      {/* downward-pointing tail */}
       <div
         style={{
           width: 0,
