@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { playSfx } from "../lib/sfx";
 import type { GameProgress, GameSettings, SyncStatus } from "../types";
 import AchievementModal from "./AchievementModal";
 import ArchiveModal from "./ArchiveModal";
@@ -30,6 +31,7 @@ type Props = {
   onPull: () => void;
   onPush: () => void;
   onResetProgress: () => void;
+  onResetServerData: () => Promise<void>;
 };
 type MenuItem = {
   label: string;
@@ -51,6 +53,7 @@ export default function MainMenu({
   onPull,
   onPush,
   onResetProgress,
+  onResetServerData,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
@@ -100,33 +103,6 @@ export default function MainMenu({
           }}
         />
 
-        {/* 상단 아이콘 */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-          {[
-            {
-              label: settings.soundOn ? "🔊" : "🔇",
-              title: "효과음",
-              onClick: () => onSettingsChange({ soundOn: !settings.soundOn }),
-            },
-            {
-              label: settings.musicOn ? "♪" : "♩",
-              title: "음악",
-              onClick: () => onSettingsChange({ musicOn: !settings.musicOn }),
-            },
-            { label: "⚙", title: "설정", onClick: () => setSettingsOpen(true) },
-          ].map(({ label, title, onClick }) => (
-            <button
-              key={title}
-              type="button"
-              onClick={onClick}
-              title={title}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center border border-[#2c3f12] bg-[#0b1208]/80 transition-colors hover:bg-[#162010]"
-              style={{ fontFamily: "monospace", fontSize: 15 }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
 
         {/* 중앙 콘텐츠 */}
         <div className="relative z-10 flex h-full flex-col items-center justify-center">
@@ -192,7 +168,7 @@ export default function MainMenu({
               <button
                 key={label}
                 type="button"
-                onClick={action}
+                onClick={() => { if (settings.soundOn) playSfx("click"); action(); }}
                 onMouseEnter={() => setHovered(label)}
                 onMouseLeave={() => setHovered(null)}
                 className="w-full flex items-center gap-4 px-6 py-4 border transition-all"
@@ -274,6 +250,7 @@ export default function MainMenu({
           onPull={onPull}
           onPush={onPush}
           onResetProgress={onResetProgress}
+          onResetServerData={onResetServerData}
         />
       )}
       {exitHint && (

@@ -71,3 +71,9 @@ export async function writeUserBundle(userId: string, bundle: SyncBundle) {
       updated_at = now()
   `;
 }
+
+export async function deleteUserBundle(userId: string) {
+  await ensureSyncTable();
+  const sql = getDb();
+  await sql`delete from user_sync where user_id = ${userId}`;
+}

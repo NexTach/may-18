@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { playSfx } from "../lib/sfx";
 import type { Choice, DialogueLine, StatKey } from "../types";
 
 type ChoiceView = Choice & {
@@ -14,6 +15,7 @@ type Props = {
   dialogue: DialogueLine[];
   choices: ChoiceView[];
   typingSpeed: number;
+  soundOn: boolean;
   onChoice: (choice: Choice) => void;
 };
 
@@ -95,6 +97,7 @@ export default function RightPanel({
   dialogue,
   choices,
   typingSpeed,
+  soundOn,
   onChoice,
 }: Props) {
   const { displayed, done, skip } = useTypingText(text, typingSpeed);
@@ -108,7 +111,7 @@ export default function RightPanel({
       <button
         type="button"
         className="p-4 border-b border-[#1e2e0e] cursor-pointer flex-shrink-0 text-left"
-        onClick={skip}
+        onClick={() => { if (soundOn) playSfx("click"); skip(); }}
         style={{ minHeight: 110 }}
       >
         <p
@@ -192,7 +195,7 @@ export default function RightPanel({
               key={`${choice.nextSceneId}-${choice.text}`}
               type="button"
               disabled={choice.disabled}
-              onClick={() => onChoice(choice)}
+              onClick={() => { if (soundOn) playSfx("select"); onChoice(choice); }}
               className={`w-full flex items-start gap-3 px-3 py-2.5 border transition-all text-left group ${
                 choice.disabled
                   ? "border-[#1f2b10] bg-[#0a1006] cursor-not-allowed opacity-60"

@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GameScreen from "./components/GameScreen";
 import MainMenu from "./components/MainMenu";
 import ToastLayer, { type ToastItem } from "./components/ToastLayer";
+import { useBgm } from "./hooks/useBgm";
 import {
   createFreshProgress,
   DEFAULT_PROGRESS,
@@ -23,6 +24,41 @@ import type {
 } from "./types";
 
 type Screen = "menu" | "game";
+
+const SCREEN_STORAGE_KEY = "may18.screen";
+
+const MARCH = "/sounds/march.mp3";
+const MAY = "/sounds/may.mp3";
+
+// 씬별 BGM 매핑
+// 초반·성찰(1~6, 엔딩): 오월의 노래 / 항쟁 절정(7~13): 임을 위한 행진곡
+const SCENE_BGM: Record<string, string> = {
+  start:              MAY,
+  observe_street:     MAY,
+  station_rumor:      MAY,
+  call_family:        MAY,
+  family_neighborhood:MAY,
+  side_alley_detour:  MAY,
+  radio_room:         MAY,
+  leaflet_room:       MAY,
+  university_gate:    MARCH,
+  talk_students:      MARCH,
+  downtown:           MARCH,
+  market_people:      MARCH,
+  record_scene:       MARCH,
+  street_clinic:      MARCH,
+  citizen_voice:      MARCH,
+  citizen_debate:     MARCH,
+  help_people:        MARCH,
+  supply_run:         MARCH,
+  checkpoint_edge:    MARCH,
+  outside_message:    MARCH,
+  community:          MARCH,
+  night_meeting:      MARCH,
+  last_night:         MAY,
+  archive_ending:     MAY,
+  memory_ending:      MAY,
+};
 
 function readStoredJson<T>(key: string, fallback: T) {
   if (typeof window === "undefined") return fallback;
@@ -80,6 +116,7 @@ export default function GameApp() {
     setSettings(
       sanitizeSettings(readStoredJson(SETTINGS_STORAGE_KEY, DEFAULT_SETTINGS)),
     );
+    if (window.localStorage.getItem(SCREEN_STORAGE_KEY) === "game") setScreen("game");
     setBooted(true);
   }, []);
 
@@ -92,6 +129,11 @@ export default function GameApp() {
     if (!booted || typeof window === "undefined") return;
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   }, [booted, settings]);
+
+  useEffect(() => {
+    if (!booted || typeof window === "undefined") return;
+    window.localStorage.setItem(SCREEN_STORAGE_KEY, screen);
+  }, [booted, screen]);
 
   const refreshAuthStatus = useCallback(async (): Promise<SyncStatus> => {
     try {
@@ -344,6 +386,40 @@ export default function GameApp() {
 
   const achievements = useMemo(() => getAchievementState(progress), [progress]);
 
+  const prevUnlockedRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (!booted) return;
+    const currentUnlocked = new Set(
+      achievements.filter((a) => a.unlocked).map((a) => a.id),
+    );
+    if (prevUnlockedRef.current === null) {
+      prevUnlockedRef.current = currentUnlocked;
+      return;
+    }
+    for (const id of currentUnlocked) {
+      if (!prevUnlockedRef.current.has(id)) {
+        const ach = achievements.find((a) => a.id === id);
+        if (ach) {
+          const toastId = Date.now() + Math.floor(Math.random() * 1000);
+          setToasts((prev) => [
+            ...prev,
+            { id: toastId, message: ach.title, tone: "achievement", achievementIcon: ach.icon },
+          ]);
+          window.setTimeout(() => {
+            setToasts((prev) => prev.filter((t) => t.id !== toastId));
+          }, 5000);
+        }
+      }
+    }
+    prevUnlockedRef.current = currentUnlocked;
+  }, [booted, achievements]);
+
+  const bgmSrc =
+    screen === "menu"
+      ? MAY
+      : (SCENE_BGM[progress.currentSceneId] ?? MAY);
+  useBgm(bgmSrc, settings.musicOn);
+
   if (screen === "game") {
     return (
       <>
@@ -398,6 +474,22 @@ export default function GameApp() {
           const fresh = createFreshProgress();
           setProgress(fresh);
           pushToast("이 기기의 진행 기록을 초기화했습니다.", "success");
+        }}
+        onResetServerData={async () => {
+          try {
+            const res = await fetch("/api/sync", { method: "DELETE" });
+            if (!res.ok) {
+              const data = (await res.json()) as { message?: string };
+              throw new Error(data.message ?? "서버 데이터를 삭제하지 못했습니다.");
+            }
+            setSyncStatus((prev) => ({ ...prev, lastSyncedAt: null }));
+            pushToast("서버에 저장된 데이터를 삭제했습니다.", "success");
+          } catch (e) {
+            pushToast(
+              e instanceof Error ? e.message : "서버 데이터 삭제에 실패했습니다.",
+              "error",
+            );
+          }
         }}
       />
       <ToastLayer toasts={toasts} onDismiss={dismissToast} />

@@ -14,6 +14,7 @@ type Props = {
   onPull: () => void;
   onPush: () => void;
   onResetProgress: () => void;
+  onResetServerData: () => Promise<void>;
 };
 
 type SettingsTab = "display" | "sync" | "data";
@@ -354,54 +355,83 @@ function SyncTab({
   );
 }
 
-function DataTab({ onResetProgress }: Pick<Props, "onResetProgress">) {
-  const [confirmed, setConfirmed] = useState(false);
+type ConfirmState = "idle" | "confirm" | "busy";
+
+function DangerCard({
+  title,
+  description,
+  confirmLabel,
+  busyLabel,
+  disabled,
+  disabledReason,
+  onConfirm,
+}: {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  busyLabel: string;
+  disabled?: boolean;
+  disabledReason?: string;
+  onConfirm: () => Promise<void>;
+}) {
+  const [state, setState] = useState<ConfirmState>("idle");
+
+  const handleConfirm = async () => {
+    setState("busy");
+    try {
+      await onConfirm();
+    } finally {
+      setState("idle");
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-4 max-w-2xl">
-      <SectionTitle>위험 구역</SectionTitle>
-
-      <div className="border border-[#5a2a2a] bg-[#100808] p-6">
+    <div className="border border-[#5a2a2a] bg-[#100808] p-6">
+      <p
+        className="text-[14px] text-[#d37a7a]"
+        style={{ fontFamily: "monospace" }}
+      >
+        {title}
+      </p>
+      <p
+        className="mt-2 text-[12px] leading-relaxed text-[#8a4a4a]"
+        style={{ fontFamily: "monospace" }}
+      >
+        {description}
+      </p>
+      {disabled && disabledReason && (
         <p
-          className="text-[14px] text-[#d37a7a]"
+          className="mt-3 text-[12px] text-[#5a4a20]"
           style={{ fontFamily: "monospace" }}
         >
-          로컬 진행 기록 초기화
+          {disabledReason}
         </p>
-        <p
-          className="mt-2 text-[12px] leading-relaxed text-[#8a4a4a]"
-          style={{ fontFamily: "monospace" }}
-        >
-          이 기기에 저장된 모든 진행 상황, 선택 기록, 획득 업적을 삭제합니다.
-          <br />
-          서버에 동기화된 데이터는 영향을 받지 않습니다.
-        </p>
+      )}
+      {!disabled && (
         <div className="mt-5 flex items-center gap-3">
-          {!confirmed ? (
+          {state === "idle" && (
             <button
               type="button"
-              onClick={() => setConfirmed(true)}
+              onClick={() => setState("confirm")}
               className="border border-[#5a2a2a] bg-[#1a0b0b] px-5 py-2.5 text-[13px] text-[#d37a7a] transition-colors hover:bg-[#240e0e]"
               style={{ fontFamily: "monospace" }}
             >
               초기화 진행
             </button>
-          ) : (
+          )}
+          {state === "confirm" && (
             <>
               <button
                 type="button"
-                onClick={() => {
-                  onResetProgress();
-                  setConfirmed(false);
-                }}
+                onClick={handleConfirm}
                 className="border border-[#8a2a2a] bg-[#280e0e] px-5 py-2.5 text-[13px] text-[#f09090]"
                 style={{ fontFamily: "monospace" }}
               >
-                정말 초기화
+                {confirmLabel}
               </button>
               <button
                 type="button"
-                onClick={() => setConfirmed(false)}
+                onClick={() => setState("idle")}
                 className="border border-[#2c3f12] bg-[#0b1208] px-5 py-2.5 text-[13px] text-[#5a7a20]"
                 style={{ fontFamily: "monospace" }}
               >
@@ -409,8 +439,46 @@ function DataTab({ onResetProgress }: Pick<Props, "onResetProgress">) {
               </button>
             </>
           )}
+          {state === "busy" && (
+            <span
+              className="text-[13px] text-[#8a4a4a]"
+              style={{ fontFamily: "monospace" }}
+            >
+              {busyLabel}
+            </span>
+          )}
         </div>
-      </div>
+      )}
+    </div>
+  );
+}
+
+function DataTab({
+  syncStatus,
+  onResetProgress,
+  onResetServerData,
+}: Pick<Props, "syncStatus" | "onResetProgress" | "onResetServerData">) {
+  return (
+    <div className="flex flex-col gap-4 max-w-2xl">
+      <SectionTitle>위험 구역</SectionTitle>
+
+      <DangerCard
+        title="로컬 진행 기록 초기화"
+        description={`이 기기에 저장된 모든 진행 상황, 선택 기록, 획득 업적을 삭제합니다.\n서버에 동기화된 데이터는 영향을 받지 않습니다.`}
+        confirmLabel="정말 초기화"
+        busyLabel="초기화 중..."
+        onConfirm={async () => onResetProgress()}
+      />
+
+      <DangerCard
+        title="서버 저장 데이터 초기화"
+        description={`서버에 저장된 계정의 진행 기록과 설정을 영구 삭제합니다.\n이 기기의 로컬 데이터는 영향을 받지 않습니다.`}
+        confirmLabel="정말 삭제"
+        busyLabel="삭제 중..."
+        disabled={!syncStatus.authenticated}
+        disabledReason="로그인 후 사용할 수 있습니다."
+        onConfirm={onResetServerData}
+      />
     </div>
   );
 }
@@ -426,6 +494,7 @@ export default function SettingsModal({
   onPull,
   onPush,
   onResetProgress,
+  onResetServerData,
 }: Props) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("display");
 
@@ -509,7 +578,11 @@ export default function SettingsModal({
             />
           )}
           {activeTab === "data" && (
-            <DataTab onResetProgress={onResetProgress} />
+            <DataTab
+              syncStatus={syncStatus}
+              onResetProgress={onResetProgress}
+              onResetServerData={onResetServerData}
+            />
           )}
         </div>
       </div>

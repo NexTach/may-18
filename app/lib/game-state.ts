@@ -33,6 +33,8 @@ export const DEFAULT_PROGRESS: GameProgress = {
   stats: DEFAULT_STATS,
   sceneIndex: 1,
   updatedAt: null,
+  allVisitedSceneIds: ["start"],
+  allChoiceLog: [],
 };
 
 export const TEXT_SPEED_MS: Record<TextSpeed, number> = {
@@ -119,6 +121,16 @@ export function sanitizeProgress(value: unknown): GameProgress {
         ? raw.sceneIndex
         : 1,
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
+    allVisitedSceneIds: Array.isArray(raw.allVisitedSceneIds)
+      ? raw.allVisitedSceneIds.filter(
+          (id): id is string => typeof id === "string" && validSceneIds.has(id),
+        )
+      : uniqueVisited,
+    allChoiceLog: Array.isArray(raw.allChoiceLog)
+      ? raw.allChoiceLog.filter((item): item is string => typeof item === "string")
+      : (Array.isArray(raw.choiceLog)
+          ? raw.choiceLog.filter((item): item is string => typeof item === "string")
+          : []),
   };
 }
 
@@ -132,15 +144,44 @@ export function getReachedEndingIds(progress: GameProgress) {
 }
 
 export function getAchievementState(progress: GameProgress) {
-  const visitedCount = progress.visitedSceneIds.length;
-  const reachedEndings = new Set(getReachedEndingIds(progress));
+  // 누적 방문 기록 기준 (리셋과 무관)
+  const visited = new Set(
+    progress.allVisitedSceneIds.length > 0
+      ? progress.allVisitedSceneIds
+      : progress.visitedSceneIds,
+  );
+  const visitedCount = visited.size;
+  const endingIds = new Set(getEndingSceneIds());
+  const reachedEndings = new Set(
+    [...visited].filter((id) => endingIds.has(id)),
+  );
+  const { courage, record, trust, safety } = progress.stats;
   const unlocked = new Set<string>();
 
-  if (progress.stats.record >= 1) unlocked.add("first_record");
-  if (progress.stats.trust >= 3) unlocked.add("trusted_hands");
-  if (progress.stats.safety >= 3) unlocked.add("steady_steps");
-  if (progress.stats.courage >= 3) unlocked.add("witness");
+  // 스탯 기반
+  if (record >= 1) unlocked.add("first_record");
+  if (record >= 6) unlocked.add("deep_record");
+  if (record >= 3 && courage >= 3) unlocked.add("courageous_record");
+  if (courage >= 3) unlocked.add("witness");
+  if (courage >= 5) unlocked.add("brave_soul");
+  if (trust >= 3) unlocked.add("trusted_hands");
+  if (trust >= 6) unlocked.add("strong_trust");
+  if (safety >= 3) unlocked.add("steady_steps");
+  if (safety >= 5) unlocked.add("safe_keeper");
+  if (courage >= 2 && record >= 2 && trust >= 2 && safety >= 2)
+    unlocked.add("balanced_eye");
+
+  // 방문 기반
   if (visitedCount >= 12) unlocked.add("many_paths");
+  if (visitedCount >= 18) unlocked.add("explorer");
+  if (visited.has("university_gate")) unlocked.add("at_the_gate");
+  if (visited.has("radio_room")) unlocked.add("heard_radio");
+  if (visited.has("street_clinic") || visited.has("help_people"))
+    unlocked.add("helper");
+  if (visited.has("outside_message")) unlocked.add("messenger");
+  if (visited.has("last_night")) unlocked.add("last_witness");
+
+  // 엔딩 기반
   if (reachedEndings.has("archive_ending")) unlocked.add("archivist");
   if (reachedEndings.has("memory_ending")) unlocked.add("memory_keeper");
 

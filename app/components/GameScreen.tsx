@@ -242,6 +242,18 @@ export default function GameScreen({
   );
   const [stats, setStats] = useState<Stats>(initialProgress.stats);
   const [sceneIndex, setSceneIndex] = useState(initialProgress.sceneIndex);
+  const [allVisitedSceneIds, setAllVisitedSceneIds] = useState<Set<string>>(
+    new Set(
+      initialProgress.allVisitedSceneIds.length > 0
+        ? initialProgress.allVisitedSceneIds
+        : initialProgress.visitedSceneIds,
+    ),
+  );
+  const [allChoiceLog, setAllChoiceLog] = useState<string[]>(
+    initialProgress.allChoiceLog.length > 0
+      ? initialProgress.allChoiceLog
+      : initialProgress.choiceLog,
+  );
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -254,7 +266,19 @@ export default function GameScreen({
     (choice: Choice) => {
       if (getChoiceDisabledReason(choice, stats)) return;
 
+      // 엔딩 씬에서 start로 돌아가는 선택 → 현재 회차만 초기화, 누적 기록 유지
+      const scene = scenes.find((s) => s.id === currentSceneId);
+      if (scene?.isEnding && choice.nextSceneId === "start") {
+        setCurrentSceneId("start");
+        setVisitedSceneIds(new Set(["start"]));
+        setChoiceLog([]);
+        setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
+        setSceneIndex(1);
+        return;
+      }
+
       setChoiceLog((prev) => [...prev, choice.text]);
+      setAllChoiceLog((prev) => [...prev, choice.text]);
       if (choice.stat && choice.statDelta) {
         const statKey = choice.stat;
         setStats((prev) => ({
@@ -264,9 +288,10 @@ export default function GameScreen({
       }
       setCurrentSceneId(choice.nextSceneId);
       setVisitedSceneIds((prev) => new Set([...prev, choice.nextSceneId]));
+      setAllVisitedSceneIds((prev) => new Set([...prev, choice.nextSceneId]));
       setSceneIndex((prev) => prev + 1);
     },
-    [stats],
+    [stats, currentSceneId],
   );
 
   // keyboard shortcuts
@@ -328,6 +353,8 @@ export default function GameScreen({
       stats,
       sceneIndex,
       updatedAt: new Date().toISOString(),
+      allVisitedSceneIds: Array.from(allVisitedSceneIds),
+      allChoiceLog,
     });
   }, [
     choiceLog,
@@ -336,6 +363,8 @@ export default function GameScreen({
     sceneIndex,
     stats,
     visitedSceneIds,
+    allVisitedSceneIds,
+    allChoiceLog,
   ]);
 
   if (!currentScene) return null;
@@ -501,6 +530,7 @@ export default function GameScreen({
           dialogue={currentScene.dialogue}
           choices={choiceViews}
           typingSpeed={TEXT_SPEED_MS[settings.textSpeed]}
+          soundOn={settings.soundOn}
           onChoice={handleChoice}
         />
       </div>
@@ -562,6 +592,7 @@ export default function GameScreen({
                   setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
                   setSceneIndex(1);
                   setMenuOpen(false);
+                  // allVisitedSceneIds / allChoiceLog 는 유지
                 },
               },
               {

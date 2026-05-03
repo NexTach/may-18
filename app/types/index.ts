@@ -100,6 +100,9 @@ export type GameProgress = {
   stats: Stats;
   sceneIndex: number;
   updatedAt: string | null;
+  // 플레이 초기화와 무관하게 누적되는 필드
+  allVisitedSceneIds: string[];
+  allChoiceLog: string[];
 };
 
 export type DataGsmUser = {

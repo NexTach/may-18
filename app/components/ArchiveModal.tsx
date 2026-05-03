@@ -38,9 +38,17 @@ export default function ArchiveModal({
   const currentScene = scenes.find(
     (scene) => scene.id === progress.currentSceneId,
   );
-  const recentChoiceStart = Math.max(0, progress.choiceLog.length - 12);
+  const cumulativeChoices =
+    progress.allChoiceLog.length > 0
+      ? progress.allChoiceLog
+      : progress.choiceLog;
+  const cumulativeVisited =
+    progress.allVisitedSceneIds.length > 0
+      ? progress.allVisitedSceneIds
+      : progress.visitedSceneIds;
+  const recentChoiceStart = Math.max(0, cumulativeChoices.length - 12);
   const endingScenes = scenes.filter(
-    (scene) => scene.isEnding && progress.visitedSceneIds.includes(scene.id),
+    (scene) => scene.isEnding && cumulativeVisited.includes(scene.id),
   );
   const unlockedAchievements = achievements.filter(
     (achievement) => achievement.unlocked,
@@ -98,7 +106,7 @@ export default function ArchiveModal({
             },
             {
               label: "방문 장소",
-              value: `${progress.visitedSceneIds.length} / ${scenes.length}`,
+              value: `${cumulativeVisited.length} / ${scenes.length}`,
             },
             {
               label: "도달한 엔딩",
@@ -137,7 +145,7 @@ export default function ArchiveModal({
             >
               최근 선택
             </div>
-            {progress.choiceLog.length === 0 ? (
+            {cumulativeChoices.length === 0 ? (
               <p
                 className="text-[12px] text-[#40511c]"
                 style={{ fontFamily: "monospace" }}
@@ -146,7 +154,7 @@ export default function ArchiveModal({
               </p>
             ) : (
               <div className="flex max-h-[280px] flex-col gap-1.5 overflow-y-auto pr-1">
-                {progress.choiceLog
+                {cumulativeChoices
                   .slice(recentChoiceStart)
                   .map((choice, index) => (
                     <div key={`${index}-${choice}`} className="flex gap-3">

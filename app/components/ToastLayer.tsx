@@ -3,12 +3,13 @@
 export type ToastItem = {
   id: number;
   message: string;
-  tone: "info" | "success" | "error";
+  tone: "info" | "success" | "error" | "achievement";
+  achievementIcon?: string;
 };
 
 const TOAST_STYLES: Record<
   ToastItem["tone"],
-  { border: string; glow: string; text: string; bg: string }
+  { border: string; glow: string; text: string; bg: string; label?: string; labelColor?: string }
 > = {
   info: {
     border: "#4a6a1a",
@@ -27,6 +28,14 @@ const TOAST_STYLES: Record<
     glow: "rgba(168,96,72,0.22)",
     text: "#f0c0b0",
     bg: "rgba(24,11,11,0.95)",
+  },
+  achievement: {
+    border: "#b08820",
+    glow: "rgba(200,160,32,0.35)",
+    text: "#f0d070",
+    bg: "rgba(18,13,2,0.97)",
+    label: "업적 해금",
+    labelColor: "#c8a020",
   },
 };
 
@@ -53,7 +62,43 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
               boxShadow: `0 0 18px ${style.glow}`,
             }}
           >
-            <div className="flex items-start gap-3">
+            {toast.tone === "achievement" ? (
+              <div className="flex items-center gap-3">
+                {toast.achievementIcon && (
+                  <span
+                    className="flex-shrink-0 text-[22px] leading-none"
+                    style={{ color: style.text }}
+                  >
+                    {toast.achievementIcon}
+                  </span>
+                )}
+                <div className="flex-1 min-w-0">
+                  {style.label && (
+                    <p
+                      className="text-[10px] mb-0.5 tracking-widest"
+                      style={{ fontFamily: "'Press Start 2P', monospace", color: style.labelColor }}
+                    >
+                      {style.label}
+                    </p>
+                  )}
+                  <p
+                    className="text-[13px] font-bold leading-snug"
+                    style={{ fontFamily: "monospace", color: style.text }}
+                  >
+                    {toast.message}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onDismiss(toast.id)}
+                  className="flex-shrink-0 text-[11px] transition-opacity hover:opacity-100"
+                  style={{ fontFamily: "'Press Start 2P', monospace", color: style.text, opacity: 0.6 }}
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-start gap-3">
               <p
                 className="flex-1 text-[12px] leading-relaxed"
                 style={{ fontFamily: "monospace", color: style.text }}
@@ -73,6 +118,7 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
                 ×
               </button>
             </div>
+            )}
           </div>
         );
       })}
