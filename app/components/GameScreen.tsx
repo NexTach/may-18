@@ -2,6 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { scenes, TOTAL_STAGES } from "../data/scenes";
+import {
+  preloadSceneType,
+  preloadSceneTypes,
+  scheduleIdlePreload,
+} from "../lib/asset-cache";
 import { TEXT_SPEED_MS } from "../lib/game-state";
 import type {
   Choice,
@@ -381,6 +386,21 @@ export default function GameScreen({
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!currentScene) return;
+
+    preloadSceneType(currentScene.sceneType);
+
+    const nextSceneTypes = currentScene.choices.flatMap((choice) => {
+      const nextScene = scenes.find((scene) => scene.id === choice.nextSceneId);
+      return nextScene ? [nextScene.sceneType] : [];
+    });
+
+    return scheduleIdlePreload(() => {
+      preloadSceneTypes(nextSceneTypes);
+    });
+  }, [currentScene]);
 
   if (!currentScene) return null;
 

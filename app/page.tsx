@@ -4,7 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GameScreen from "./components/GameScreen";
 import MainMenu from "./components/MainMenu";
 import ToastLayer, { type ToastItem } from "./components/ToastLayer";
+import { scenes } from "./data/scenes";
 import { useBgm } from "./hooks/useBgm";
+import {
+  preloadAudio,
+  preloadImage,
+  preloadSceneTypes,
+  scheduleIdlePreload,
+} from "./lib/asset-cache";
 import {
   createFreshProgress,
   DEFAULT_PROGRESS,
@@ -33,31 +40,31 @@ const MAY = "/sounds/may.mp3";
 // 씬별 BGM 매핑
 // 초반·성찰(1~6, 엔딩): 오월의 노래 / 항쟁 절정(7~13): 임을 위한 행진곡
 const SCENE_BGM: Record<string, string> = {
-  start:              MAY,
-  observe_street:     MAY,
-  station_rumor:      MAY,
-  call_family:        MAY,
-  family_neighborhood:MAY,
-  side_alley_detour:  MAY,
-  radio_room:         MAY,
-  leaflet_room:       MAY,
-  university_gate:    MARCH,
-  talk_students:      MARCH,
-  downtown:           MARCH,
-  market_people:      MARCH,
-  record_scene:       MARCH,
-  street_clinic:      MARCH,
-  citizen_voice:      MARCH,
-  citizen_debate:     MARCH,
-  help_people:        MARCH,
-  supply_run:         MARCH,
-  checkpoint_edge:    MARCH,
-  outside_message:    MARCH,
-  community:          MARCH,
-  night_meeting:      MARCH,
-  last_night:         MAY,
-  archive_ending:     MAY,
-  memory_ending:      MAY,
+  start: MAY,
+  observe_street: MAY,
+  station_rumor: MAY,
+  call_family: MAY,
+  family_neighborhood: MAY,
+  side_alley_detour: MAY,
+  radio_room: MAY,
+  leaflet_room: MAY,
+  university_gate: MARCH,
+  talk_students: MARCH,
+  downtown: MARCH,
+  market_people: MARCH,
+  record_scene: MARCH,
+  street_clinic: MARCH,
+  citizen_voice: MARCH,
+  citizen_debate: MARCH,
+  help_people: MARCH,
+  supply_run: MARCH,
+  checkpoint_edge: MARCH,
+  outside_message: MARCH,
+  community: MARCH,
+  night_meeting: MARCH,
+  last_night: MAY,
+  archive_ending: MAY,
+  memory_ending: MAY,
 };
 
 function readStoredJson<T>(key: string, fallback: T) {
@@ -116,7 +123,9 @@ export default function GameApp() {
     setSettings(
       sanitizeSettings(readStoredJson(SETTINGS_STORAGE_KEY, DEFAULT_SETTINGS)),
     );
-    if (window.localStorage.getItem(SCREEN_STORAGE_KEY) === "game") setScreen("game");
+    if (window.localStorage.getItem(SCREEN_STORAGE_KEY) === "game") {
+      setScreen("game");
+    }
     setBooted(true);
   }, []);
 
@@ -385,6 +394,10 @@ export default function GameApp() {
   ]);
 
   const achievements = useMemo(() => getAchievementState(progress), [progress]);
+  const sceneById = useMemo(
+    () => new Map(scenes.map((scene) => [scene.id, scene])),
+    [],
+  );
 
   const prevUnlockedRef = useRef<Set<string> | null>(null);
   useEffect(() => {
@@ -403,7 +416,12 @@ export default function GameApp() {
           const toastId = Date.now() + Math.floor(Math.random() * 1000);
           setToasts((prev) => [
             ...prev,
-            { id: toastId, message: ach.title, tone: "achievement", achievementIcon: ach.icon },
+            {
+              id: toastId,
+              message: ach.title,
+              tone: "achievement",
+              achievementIcon: ach.icon,
+            },
           ]);
           window.setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== toastId));
@@ -415,10 +433,33 @@ export default function GameApp() {
   }, [booted, achievements]);
 
   const bgmSrc =
-    screen === "menu"
-      ? MAY
-      : (SCENE_BGM[progress.currentSceneId] ?? MAY);
+    screen === "menu" ? MAY : (SCENE_BGM[progress.currentSceneId] ?? MAY);
   useBgm(bgmSrc, settings.musicOn);
+
+  useEffect(() => {
+    if (!booted) return;
+
+    preloadImage("/menu-bg.png");
+    preloadAudio(MAY);
+    preloadAudio(MARCH);
+  }, [booted]);
+
+  useEffect(() => {
+    if (!booted) return;
+
+    const activeScene =
+      sceneById.get(progress.currentSceneId) ?? sceneById.get("start");
+    if (!activeScene) return;
+
+    const nextSceneTypes = activeScene.choices.flatMap((choice) => {
+      const nextScene = sceneById.get(choice.nextSceneId);
+      return nextScene ? [nextScene.sceneType] : [];
+    });
+
+    return scheduleIdlePreload(() => {
+      preloadSceneTypes([activeScene.sceneType, ...nextSceneTypes]);
+    });
+  }, [booted, progress.currentSceneId, sceneById]);
 
   if (screen === "game") {
     return (
@@ -480,13 +521,17 @@ export default function GameApp() {
             const res = await fetch("/api/sync", { method: "DELETE" });
             if (!res.ok) {
               const data = (await res.json()) as { message?: string };
-              throw new Error(data.message ?? "서버 데이터를 삭제하지 못했습니다.");
+              throw new Error(
+                data.message ?? "서버 데이터를 삭제하지 못했습니다.",
+              );
             }
             setSyncStatus((prev) => ({ ...prev, lastSyncedAt: null }));
             pushToast("서버에 저장된 데이터를 삭제했습니다.", "success");
           } catch (e) {
             pushToast(
-              e instanceof Error ? e.message : "서버 데이터 삭제에 실패했습니다.",
+              e instanceof Error
+                ? e.message
+                : "서버 데이터 삭제에 실패했습니다.",
               "error",
             );
           }
