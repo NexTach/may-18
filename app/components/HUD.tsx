@@ -96,7 +96,7 @@ export default function HUD({
 
       {/* right: action buttons */}
       <div className="flex items-center gap-1.5">
-        <HUDButton label="기록" shortcut="X" onClick={onHistory} />
+        <HUDButton label="역사" shortcut="X" onClick={onHistory} />
         <HUDButton label="지도" shortcut="M" onClick={onMap} />
         <HUDButton label="가방" shortcut="Tab" onClick={onInventory} />
         <HUDButton label="메뉴" shortcut="ESC" onClick={onMenu} />

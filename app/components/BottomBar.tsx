@@ -4,7 +4,7 @@ type KeyHint = { key: string; label: string };
 
 const hints: KeyHint[] = [
   { key: "1/2/3", label: "선택" },
-  { key: "X", label: "기록 보기" },
+  { key: "X", label: "역사 보기" },
   { key: "M", label: "지도 보기" },
   { key: "Tab", label: "가방 열기" },
   { key: "ESC", label: "메뉴/일시정지" },
