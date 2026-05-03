@@ -35,7 +35,7 @@ const TEXT_SPEED_OPTIONS: { value: TextSpeed; label: string; desc: string }[] =
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="text-[11px] text-[#4a6a1a] mb-5 pb-2.5 border-b border-[#1e2e0e] tracking-widest"
+      className="text-[11px] text-game-border-bright mb-5 pb-2.5 border-b border-[#1e2e0e] tracking-widest"
       style={{ fontFamily: "'Press Start 2P', monospace" }}
     >
       {children}
@@ -58,13 +58,13 @@ function ToggleRow({
     <div className="flex items-center justify-between gap-6 border border-[#243410] bg-[#0d1608] px-6 py-4">
       <div>
         <p
-          className="text-[14px] text-[#c4d47a]"
+          className="text-[14px] text-game-text"
           style={{ fontFamily: "monospace" }}
         >
           {label}
         </p>
         <p
-          className="mt-1.5 text-[12px] leading-relaxed text-[#5a7a20]"
+          className="mt-1.5 text-[12px] leading-relaxed text-game-text-dim"
           style={{ fontFamily: "monospace" }}
         >
           {description}
@@ -73,7 +73,7 @@ function ToggleRow({
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className="min-w-[80px] border px-4 py-2.5 text-[13px] transition-colors"
+        className="min-w-20 border px-4 py-2.5 text-[13px] transition-colors"
         style={{
           fontFamily: "monospace",
           borderColor: checked ? "#6a9a2a" : "#2c3f12",
@@ -103,14 +103,14 @@ function SegmentedRow({
   return (
     <div className="border border-[#243410] bg-[#0d1608] px-6 py-4">
       <p
-        className="text-[14px] text-[#c4d47a]"
+        className="text-[14px] text-game-text"
         style={{ fontFamily: "monospace" }}
       >
         {label}
       </p>
       {description && (
         <p
-          className="mt-1.5 text-[12px] text-[#5a7a20]"
+          className="mt-1.5 text-[12px] text-game-text-dim"
           style={{ fontFamily: "monospace" }}
         >
           {description}
@@ -218,13 +218,13 @@ function SyncTab({
         <div className="flex items-start justify-between gap-6">
           <div className="flex-1">
             <p
-              className="text-[14px] text-[#c4d47a]"
+              className="text-[14px] text-game-text"
               style={{ fontFamily: "monospace" }}
             >
               DataGSM 로그인
             </p>
             <p
-              className="mt-1.5 text-[12px] leading-relaxed text-[#5a7a20]"
+              className="mt-1.5 text-[12px] leading-relaxed text-game-text-dim"
               style={{ fontFamily: "monospace" }}
             >
               로그인하면 현재 기기의 기록과 설정을 사용자 계정 기준으로
@@ -244,7 +244,7 @@ function SyncTab({
             <button
               type="button"
               onClick={onLogin}
-              className="min-w-[160px] border px-5 py-3 text-left"
+              className="min-w-40 border px-5 py-3 text-left"
               style={{
                 fontFamily: "monospace",
                 borderColor: "#dfe7f2",
@@ -261,9 +261,9 @@ function SyncTab({
         </div>
 
         {syncStatus.authenticated && syncStatus.user ? (
-          <div className="mt-4 border border-[#1e2e0e] bg-[#0b1208] px-4 py-3">
+          <div className="mt-4 border border-[#1e2e0e] bg-game-panel px-4 py-3">
             <p
-              className="text-[14px] text-[#c4d47a]"
+              className="text-[14px] text-game-text"
               style={{ fontFamily: "monospace" }}
             >
               {syncStatus.user.name}
@@ -299,7 +299,7 @@ function SyncTab({
 
       <div className="border border-[#243410] bg-[#0d1608] p-6">
         <p
-          className="text-[14px] text-[#c4d47a] mb-4"
+          className="text-[14px] text-game-text mb-4"
           style={{ fontFamily: "monospace" }}
         >
           수동 동기화
@@ -432,7 +432,7 @@ function DangerCard({
               <button
                 type="button"
                 onClick={() => setState("idle")}
-                className="border border-[#2c3f12] bg-[#0b1208] px-5 py-2.5 text-[13px] text-[#5a7a20]"
+                className="border border-game-border bg-game-panel px-5 py-2.5 text-[13px] text-game-text-dim"
                 style={{ fontFamily: "monospace" }}
               >
                 취소
@@ -511,9 +511,9 @@ export default function SettingsModal({
       className="fixed inset-0 z-50 flex flex-col"
       style={{ background: "#060907" }}
     >
-      <div className="flex items-center justify-between px-4 py-3 md:px-8 md:py-4 border-b-2 border-[#2c3f12] bg-[#0b1208] flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 md:px-8 md:py-4 border-b-2 border-game-border bg-game-panel shrink-0">
         <div
-          className="text-[13px] text-[#c4d47a]"
+          className="text-[13px] text-game-text"
           style={{ fontFamily: "'Press Start 2P', monospace" }}
         >
           ◈ 설정
@@ -521,7 +521,7 @@ export default function SettingsModal({
         <button
           type="button"
           onClick={onClose}
-          className="text-[13px] text-[#4a6a1a] transition-colors hover:text-[#c4d47a]"
+          className="text-[13px] text-game-border-bright transition-colors hover:text-game-text"
           style={{ fontFamily: "monospace" }}
         >
           [ESC] 닫기
@@ -529,7 +529,7 @@ export default function SettingsModal({
       </div>
 
       <div className="flex flex-1 min-h-0">
-        <div className="w-28 md:w-56 flex-shrink-0 border-r border-[#2c3f12] bg-[#090d06] flex flex-col p-2 md:p-4 gap-1.5">
+        <div className="w-28 md:w-56 shrink-0 border-r border-game-border bg-[#090d06] flex flex-col p-2 md:p-4 gap-1.5">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -545,10 +545,10 @@ export default function SettingsModal({
                 color: activeTab === tab.id ? "#c4d47a" : "#5a7a20",
               }}
             >
-              <span className="text-[15px] w-5 text-center flex-shrink-0">{tab.icon}</span>
+              <span className="text-[15px] w-5 text-center shrink-0">{tab.icon}</span>
               <span className="text-[11px] md:text-[13px] leading-tight">{tab.label}</span>
               {activeTab === tab.id && (
-                <span className="hidden md:inline ml-auto text-[10px] text-[#4a6a1a]">▶</span>
+                <span className="hidden md:inline ml-auto text-[10px] text-game-border-bright">▶</span>
               )}
             </button>
           ))}

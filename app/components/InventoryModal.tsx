@@ -59,7 +59,7 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="text-[13px] text-[#4a6a1a] hover:text-[#c4d47a] transition-colors cursor-pointer"
+            className="text-[13px] text-game-border-bright hover:text-game-text transition-colors cursor-pointer"
             style={{ fontFamily: "monospace" }}
           >
             [Tab] 닫기
@@ -87,7 +87,7 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
                       {label}
                     </span>
                     <span
-                      className="text-[13px] text-[#3a5010]"
+                      className="text-[13px] text-game-text-muted"
                       style={{ fontFamily: "monospace" }}
                     >
                       {val}
@@ -142,7 +142,7 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
               >
                 <span className="text-2xl">{icon}</span>
                 <span
-                  className="text-[12px] text-[#5a7a20] mt-1"
+                  className="text-[12px] text-game-text-dim mt-1"
                   style={{ fontFamily: "monospace" }}
                 >
                   {label}
@@ -155,10 +155,10 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
         <button
           type="button"
           onClick={onClose}
-          className="w-full border border-[#4a6a1a] bg-[#0d1608] hover:bg-[#162010] py-3 transition-colors cursor-pointer"
+          className="w-full border border-game-border-bright bg-[#0d1608] hover:bg-[#162010] py-3 transition-colors cursor-pointer"
           style={{ fontFamily: "'Press Start 2P', monospace" }}
         >
-          <span className="text-[12px] text-[#c4d47a]">[ 닫기 ]</span>
+          <span className="text-[12px] text-game-text">[ 닫기 ]</span>
         </button>
       </div>
     </div>

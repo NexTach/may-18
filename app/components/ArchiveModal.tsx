@@ -60,23 +60,23 @@ export default function ArchiveModal({
         onClick={onClose}
       />
       <div
-        className="relative mx-4 w-full max-w-3xl border-2 border-[#4a6a1a] bg-[#0b1208] p-6"
+        className="relative mx-4 w-full max-w-3xl border-2 border-game-border-bright bg-game-panel p-6"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="기록 보기"
         aria-modal="true"
         role="dialog"
       >
-        <div className="mb-4 flex items-center justify-between border-b border-[#2c3f12] pb-3">
+        <div className="mb-4 flex items-center justify-between border-b border-game-border pb-3">
           <div>
             <div
-              className="text-[12px] text-[#c4d47a]"
+              className="text-[12px] text-game-text"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               ▣ 기록 보기
             </div>
             <p
-              className="mt-2 text-[12px] text-[#5a7a20]"
+              className="mt-2 text-[12px] text-game-text-dim"
               style={{ fontFamily: "monospace" }}
             >
               남겨 둔 선택과 도달한 장면을 다시 살펴봅니다.
@@ -85,7 +85,7 @@ export default function ArchiveModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-[13px] text-[#4a6a1a] transition-colors hover:text-[#c4d47a]"
+            className="text-[13px] text-game-border-bright transition-colors hover:text-game-text"
             style={{ fontFamily: "monospace" }}
           >
             [ESC] 닫기
@@ -116,13 +116,13 @@ export default function ArchiveModal({
               className="border border-[#243410] bg-[#0d1608] p-3"
             >
               <div
-                className="text-[10px] text-[#4a6a1a]"
+                className="text-[10px] text-game-border-bright"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
                 {item.label}
               </div>
               <p
-                className="mt-2 text-[13px] text-[#c4d47a]"
+                className="mt-2 text-[13px] text-game-text"
                 style={{ fontFamily: "monospace" }}
               >
                 {item.value}
@@ -132,9 +132,9 @@ export default function ArchiveModal({
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="border border-[#2c3f12] bg-[#090d06] p-4">
+          <div className="border border-game-border bg-[#090d06] p-4">
             <div
-              className="mb-3 text-[11px] text-[#4a6a1a]"
+              className="mb-3 text-[11px] text-game-border-bright"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               최근 선택
@@ -147,19 +147,19 @@ export default function ArchiveModal({
                 아직 남겨진 선택이 없습니다.
               </p>
             ) : (
-              <div className="flex max-h-[280px] flex-col gap-1.5 overflow-y-auto pr-1">
+              <div className="flex max-h-70 flex-col gap-1.5 overflow-y-auto pr-1">
                 {cumulativeChoices
                   .slice(recentChoiceStart)
                   .map((choice, index) => (
                     <div key={`${index}-${choice}`} className="flex gap-3">
                       <span
-                        className="text-[12px] text-[#3a5010]"
+                        className="text-[12px] text-game-text-muted"
                         style={{ fontFamily: "monospace" }}
                       >
                         {String(recentChoiceStart + index + 1).padStart(2, "0")}
                       </span>
                       <p
-                        className="flex-1 text-[12px] leading-relaxed text-[#8aa040]"
+                        className="flex-1 text-[12px] leading-relaxed text-game-accent"
                         style={{ fontFamily: "monospace" }}
                       >
                         {choice}
@@ -171,9 +171,9 @@ export default function ArchiveModal({
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="border border-[#2c3f12] bg-[#090d06] p-4">
+            <div className="border border-game-border bg-[#090d06] p-4">
               <div
-                className="mb-3 text-[11px] text-[#4a6a1a]"
+                className="mb-3 text-[11px] text-game-border-bright"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
                 선택 성향
@@ -183,19 +183,19 @@ export default function ArchiveModal({
                   <div key={key}>
                     <div className="mb-1 flex items-center justify-between">
                       <span
-                        className="text-[12px] text-[#8aa040]"
+                        className="text-[12px] text-game-accent"
                         style={{ fontFamily: "monospace" }}
                       >
                         {STAT_LABELS[key]}
                       </span>
                       <span
-                        className="text-[12px] text-[#c4d47a]"
+                        className="text-[12px] text-game-text"
                         style={{ fontFamily: "monospace" }}
                       >
                         {progress.stats[key]}
                       </span>
                     </div>
-                    <div className="h-[8px] border border-[#1e2e0e] bg-[#0b1208]">
+                    <div className="h-2 border border-[#1e2e0e] bg-game-panel">
                       <div
                         className="h-full bg-[#5a8a2a]"
                         style={{
@@ -208,9 +208,9 @@ export default function ArchiveModal({
               </div>
             </div>
 
-            <div className="border border-[#2c3f12] bg-[#090d06] p-4">
+            <div className="border border-game-border bg-[#090d06] p-4">
               <div
-                className="mb-3 text-[11px] text-[#4a6a1a]"
+                className="mb-3 text-[11px] text-game-border-bright"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
                 도달한 엔딩
@@ -230,7 +230,7 @@ export default function ArchiveModal({
                       className="border border-[#243410] bg-[#0d1608] px-3 py-2"
                     >
                       <p
-                        className="text-[12px] text-[#c4d47a]"
+                        className="text-[12px] text-game-text"
                         style={{ fontFamily: "monospace" }}
                       >
                         {scene.stageTitle}

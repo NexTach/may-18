@@ -39,23 +39,23 @@ export default function AchievementModal({ achievements, onClose }: Props) {
         onClick={onClose}
       />
       <div
-        className="relative mx-4 w-full max-w-2xl border-2 border-[#4a6a1a] bg-[#0b1208] p-6"
+        className="relative mx-4 w-full max-w-2xl border-2 border-game-border-bright bg-game-panel p-6"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="업적"
         aria-modal="true"
         role="dialog"
       >
-        <div className="mb-4 flex items-center justify-between border-b border-[#2c3f12] pb-3">
+        <div className="mb-4 flex items-center justify-between border-b border-game-border pb-3">
           <div>
             <div
-              className="text-[12px] text-[#c4d47a]"
+              className="text-[12px] text-game-text"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               ★ 업적
             </div>
             <p
-              className="mt-2 text-[12px] text-[#5a7a20]"
+              className="mt-2 text-[12px] text-game-text-dim"
               style={{ fontFamily: "monospace" }}
             >
               해금 {unlockedCount} / {achievements.length}
@@ -64,7 +64,7 @@ export default function AchievementModal({ achievements, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="text-[13px] text-[#4a6a1a] transition-colors hover:text-[#c4d47a]"
+            className="text-[13px] text-game-border-bright transition-colors hover:text-game-text"
             style={{ fontFamily: "monospace" }}
           >
             [ESC] 닫기

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR, Press_Start_2P } from "next/font/google";
 import "./globals.css";
+import React from "react";
 
 const pressStart2P = Press_Start_2P({
   weight: "400",
@@ -40,7 +41,7 @@ export default function RootLayout({
       lang="ko"
       className={`${pressStart2P.variable} ${notoSansKR.variable} h-full`}
     >
-      <body className="h-full overflow-hidden bg-[#060907]">{children}</body>
+      <body className="h-full overflow-hidden bg-game-bg">{children}</body>
     </html>
   );
 }

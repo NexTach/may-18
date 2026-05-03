@@ -13,19 +13,19 @@ const hints: KeyHint[] = [
 export default function BottomBar() {
   return (
     <div
-      className="flex items-center justify-center gap-5 px-4 py-2 border-2 border-[#2c3f12] bg-[#090d06]"
+      className="flex items-center justify-center gap-5 px-4 py-2 border-2 border-game-border bg-[#090d06]"
       style={{ minHeight: 38 }}
     >
       {hints.map(({ key, label }) => (
         <div key={key} className="flex items-center gap-1.5">
           <span
-            className="px-1.5 py-0.5 border border-[#3a5010] bg-[#0d1608] text-[11px] text-[#5a7a20] leading-none"
+            className="px-1.5 py-0.5 border border-game-text-muted bg-[#0d1608] text-[11px] text-game-text-dim leading-none"
             style={{ fontFamily: "monospace" }}
           >
             {key}
           </span>
           <span
-            className="text-[11px] text-[#3a5010]"
+            className="text-[11px] text-game-text-muted"
             style={{ fontFamily: "monospace" }}
           >
             : {label}

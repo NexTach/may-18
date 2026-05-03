@@ -268,7 +268,7 @@ export default function MainMenu({
             <button
               type="button"
               onClick={() => setExitHint(false)}
-              className="border border-game-border bg-[#0d1608] hover:bg-[#162010] px-6 py-2.5 text-[12px] text-[#8aa040]"
+              className="border border-game-border bg-[#0d1608] hover:bg-[#162010] px-6 py-2.5 text-[12px] text-game-accent"
               style={{ fontFamily: "monospace" }}
             >
               돌아가기
