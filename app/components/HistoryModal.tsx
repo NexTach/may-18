@@ -42,27 +42,27 @@ export default function HistoryModal({
         onClick={onClose}
       />
       <div
-        className="border-2 border-[#4a6a1a] bg-[#0b1208] p-7 max-w-4xl w-full mx-4 relative z-10 max-h-[86vh] overflow-y-auto"
+        className="border-2 border-game-border-bright bg-game-panel p-7 max-w-4xl w-full mx-4 relative z-10 max-h-[86vh] overflow-y-auto"
         style={{
           boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208, 0 0 0 6px #1a2a0c",
         }}
       >
-        <div className="border-b border-[#2c3f12] pb-4 mb-5">
+        <div className="border-b border-game-border pb-4 mb-5">
           <div
-            className="text-[12px] text-[#4a6a1a] mb-2"
+            className="text-[12px] text-game-border-bright mb-2"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
           >
             ▣ 실제 역사적 사실
           </div>
           <div className="flex items-center gap-4 mt-2">
             <span
-              className="text-[13px] text-[#c4d47a]"
+              className="text-[13px] text-game-text"
               style={{ fontFamily: "monospace" }}
             >
               {date}
             </span>
             <span
-              className="text-[13px] text-[#5a7a20]"
+              className="text-[13px] text-game-text-dim"
               style={{ fontFamily: "monospace" }}
             >
               · {location}
@@ -80,13 +80,13 @@ export default function HistoryModal({
           <div className="border border-[#1e2e0e] bg-[#090d06] overflow-hidden">
             <div className="px-4 py-3 border-b border-[#1e2e0e]">
               <div
-                className="text-[10px] text-[#4a6a1a]"
+                className="text-[10px] text-game-border-bright"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
                 관련 이미지
               </div>
             </div>
-            <div className="relative aspect-[16/10] bg-[#060907]">
+            <div className="relative aspect-16/10 bg-game-bg">
               {imageReady ? (
                 <Image
                   src={imageSrc}
@@ -119,7 +119,7 @@ export default function HistoryModal({
             </div>
             <div className="border-t border-[#1e2e0e] px-4 py-3">
               <div
-                className="text-[10px] text-[#4a6a1a] mb-1"
+                className="text-[10px] text-game-border-bright mb-1"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
                 이미지 설명
@@ -136,7 +136,7 @@ export default function HistoryModal({
 
           <div className="border border-[#1e2e0e] bg-[#090d06] p-5">
             <div
-              className="text-[10px] text-[#4a6a1a] mb-3"
+              className="text-[10px] text-game-border-bright mb-3"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               사실 설명
@@ -152,7 +152,7 @@ export default function HistoryModal({
 
         <div className="mb-5">
           <p
-            className="text-[12px] text-[#3a5010]"
+            className="text-[12px] text-game-text-muted"
             style={{ fontFamily: "monospace" }}
           >
             참고: 5·18기념재단 / 국가기록원 / 5·18민주화운동기록관
@@ -162,10 +162,10 @@ export default function HistoryModal({
         <button
           type="button"
           onClick={onClose}
-          className="w-full border border-[#4a6a1a] bg-[#0d1608] hover:bg-[#162010] py-3 transition-colors cursor-pointer"
+          className="w-full border border-game-border-bright bg-[#0d1608] hover:bg-[#162010] py-3 transition-colors cursor-pointer"
           style={{ fontFamily: "'Press Start 2P', monospace" }}
         >
-          <span className="text-[12px] text-[#c4d47a]">[ 닫기 ]</span>
+          <span className="text-[12px] text-game-text">[ 닫기 ]</span>
         </button>
       </div>
     </div>

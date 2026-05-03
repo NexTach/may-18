@@ -45,13 +45,13 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="border-2 border-[#4a6a1a] bg-[#0b1208] p-5 max-w-lg w-full mx-4"
+        className="border-2 border-game-border-bright bg-game-panel p-5 max-w-lg w-full mx-4"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#2c3f12]">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-game-border">
           <span
-            className="text-[12px] text-[#c4d47a]"
+            className="text-[12px] text-game-text"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
           >
             ▣ 가방 / 기록
@@ -68,7 +68,7 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
 
         <div className="mb-5">
           <div
-            className="text-[11px] text-[#4a6a1a] mb-3"
+            className="text-[11px] text-game-border-bright mb-3"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
           >
             나의 선택 통계
@@ -118,9 +118,9 @@ export default function InventoryModal({ stats, choiceLog, onClose }: Props) {
           </div>
         </div>
 
-        <div className="border border-[#2c3f12] bg-[#090d06] p-4 mb-4">
+        <div className="border border-game-border bg-[#090d06] p-4 mb-4">
           <div
-            className="text-[11px] text-[#4a6a1a] mb-3"
+            className="text-[11px] text-game-border-bright mb-3"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
           >
             소지품

@@ -82,7 +82,7 @@ export default function MainMenu({
 
   return (
     <>
-      <div className="relative h-screen w-full overflow-hidden bg-[#060907]">
+      <div className="relative h-screen w-full overflow-hidden bg-game-bg">
         <Image
           src="/menu-bg.png"
           alt=""
@@ -111,7 +111,7 @@ export default function MainMenu({
 
           <div className="relative mb-3 mx-4 md:mx-0">
             <div
-              className="px-6 py-4 md:px-10 md:py-5 border-2 border-[#4a6a1a]"
+              className="px-6 py-4 md:px-10 md:py-5 border-2 border-game-border-bright"
               style={{
                 background: "rgba(6,9,4,0.82)",
                 boxShadow:
@@ -119,7 +119,7 @@ export default function MainMenu({
               }}
             >
               <h1
-                className="text-3xl md:text-5xl font-bold text-center text-[#c4d47a]"
+                className="text-3xl md:text-5xl font-bold text-center text-game-text"
                 style={{
                   fontFamily: "'Press Start 2P', monospace",
                   textShadow:
@@ -140,7 +140,7 @@ export default function MainMenu({
             ).map((cls) => (
               <div
                 key={cls}
-                className={`absolute w-5 h-5 border-[#c4d47a] ${cls}`}
+                className={`absolute w-5 h-5 border-game-text ${cls}`}
                 style={{ margin: -7 }}
               />
             ))}
@@ -188,7 +188,7 @@ export default function MainMenu({
                   {label}
                 </span>
                 {hovered === label && (
-                  <span className="ml-auto text-[12px] text-[#4a6a1a]">▶</span>
+                  <span className="ml-auto text-[12px] text-game-border-bright">▶</span>
                 )}
               </button>
             ))}
@@ -250,17 +250,17 @@ export default function MainMenu({
           style={{ background: "rgba(0,0,0,0.88)" }}
         >
           <div
-            className="border-2 border-[#4a6a1a] bg-[#0b1208] p-8 w-80 text-center"
+            className="border-2 border-game-border-bright bg-game-panel p-8 w-80 text-center"
             style={{ boxShadow: "0 0 0 2px #2c3f12" }}
           >
             <p
-              className="text-[12px] text-[#c4d47a] mb-2"
+              className="text-[12px] text-game-text mb-2"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               종료
             </p>
             <p
-              className="text-[12px] text-[#5a7a20] leading-relaxed mt-4 mb-6"
+              className="text-[12px] text-game-text-dim leading-relaxed mt-4 mb-6"
               style={{ fontFamily: "monospace" }}
             >
               브라우저에서는 탭을 직접 닫아주세요.
@@ -268,7 +268,7 @@ export default function MainMenu({
             <button
               type="button"
               onClick={() => setExitHint(false)}
-              className="border border-[#2c3f12] bg-[#0d1608] hover:bg-[#162010] px-6 py-2.5 text-[12px] text-[#8aa040]"
+              className="border border-game-border bg-[#0d1608] hover:bg-[#162010] px-6 py-2.5 text-[12px] text-[#8aa040]"
               style={{ fontFamily: "monospace" }}
             >
               돌아가기

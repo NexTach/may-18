@@ -429,17 +429,17 @@ export default function MapModal({
         onClick={onClose}
       />
       <div
-        className="relative mx-4 w-full max-w-2xl border-2 border-[#4a6a1a] bg-[#0b1208] p-4 md:p-5 max-h-[90vh] overflow-y-auto"
+        className="relative mx-4 w-full max-w-2xl border-2 border-game-border-bright bg-game-panel p-4 md:p-5 max-h-[90vh] overflow-y-auto"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="지역 지도"
         aria-modal="true"
         role="dialog"
       >
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#2c3f12]">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-game-border">
           <div className="flex items-center gap-3">
             <span
-              className="text-[12px] text-[#c4d47a]"
+              className="text-[12px] text-game-text"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               ▣ 지역 지도
@@ -466,7 +466,7 @@ export default function MapModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-[13px] text-[#4a6a1a] hover:text-[#c4d47a] transition-colors cursor-pointer"
+            className="text-[13px] text-game-border-bright hover:text-game-text transition-colors cursor-pointer"
             style={{ fontFamily: "monospace" }}
           >
             [ESC] 닫기
@@ -474,7 +474,7 @@ export default function MapModal({
         </div>
 
         <div
-          className="border border-[#2c3f12] bg-[#060d04] mb-4 relative flex items-center justify-center"
+          className="border border-game-border bg-[#060d04] mb-4 relative flex items-center justify-center"
           style={{ height: 280 }}
         >
           {mode === "activity" ? (
@@ -511,9 +511,9 @@ export default function MapModal({
           )}
         </div>
 
-        <div className="border border-[#2c3f12] bg-[#090d06] p-4">
+        <div className="border border-game-border bg-[#090d06] p-4">
           <div
-            className="text-[11px] text-[#4a6a1a] mb-3"
+            className="text-[11px] text-game-border-bright mb-3"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
           >
             기록한 선택
@@ -530,7 +530,7 @@ export default function MapModal({
               {choiceLog.map((c, i) => (
                 <div key={`${i}-${c}`} className="flex items-start gap-3">
                   <span
-                    className="text-[12px] text-[#3a5010]"
+                    className="text-[12px] text-game-text-muted"
                     style={{ fontFamily: "monospace" }}
                   >
                     {String(i + 1).padStart(2, "0")}.
@@ -563,7 +563,7 @@ export default function MapModal({
                 style={{ background: color, borderColor: color }}
               />
               <span
-                className="text-[12px] text-[#3a5010]"
+                className="text-[12px] text-game-text-muted"
                 style={{ fontFamily: "monospace" }}
               >
                 {label}
@@ -573,13 +573,13 @@ export default function MapModal({
           {mode === "activity" && (
             <div className="flex items-center gap-1.5">
               <span
-                className="text-[12px] text-[#4a6a1a]"
+                className="text-[12px] text-game-border-bright"
                 style={{ fontFamily: "monospace" }}
               >
                 - - -
               </span>
               <span
-                className="text-[12px] text-[#3a5010]"
+                className="text-[12px] text-game-text-muted"
                 style={{ fontFamily: "monospace" }}
               >
                 경로
@@ -589,13 +589,13 @@ export default function MapModal({
           {mode === "city" && (
             <div className="flex items-center gap-1.5">
               <span
-                className="text-[11px] text-[#4a6a1a]"
+                className="text-[11px] text-game-border-bright"
                 style={{ fontFamily: "monospace" }}
               >
                 □ - -
               </span>
               <span
-                className="text-[12px] text-[#3a5010]"
+                className="text-[12px] text-game-text-muted"
                 style={{ fontFamily: "monospace" }}
               >
                 게임 무대
