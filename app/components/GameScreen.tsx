@@ -389,13 +389,8 @@ export default function GameScreen({
 
   return (
     <div
-      className="flex flex-col w-full h-screen overflow-hidden"
-      style={{
-        fontFamily: "monospace",
-        padding: "20px",
-        gap: "16px",
-        background: "#000000",
-      }}
+      className="flex flex-col w-full h-screen overflow-hidden bg-black p-2 gap-2 md:p-5 md:gap-4"
+      style={{ fontFamily: "monospace" }}
     >
       <HUD
         stageNum={currentScene.stageNum}
@@ -410,11 +405,11 @@ export default function GameScreen({
         onMenu={() => setMenuOpen(true)}
       />
 
-      <div className="flex flex-1 min-h-0 gap-4">
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-4">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-2 md:gap-4">
+        <div className="flex-shrink-0 md:flex-1 flex flex-col min-w-0 md:min-h-0 gap-2 md:gap-4">
           <div
             ref={sceneSlotRef}
-            className="relative flex-[1.45] min-h-0 overflow-hidden border border-[#2c3f12] bg-[#060907]"
+            className="relative aspect-video md:aspect-auto md:flex-[1.45] md:min-h-0 overflow-hidden border border-[#2c3f12] bg-[#060907]"
           >
             <div className="absolute inset-0 flex items-center justify-center p-3">
               <div
@@ -458,7 +453,7 @@ export default function GameScreen({
             </div>
           </div>
 
-          <div className="flex flex-[0.66] min-h-0 border border-[#2c3f12] overflow-hidden">
+          <div className="hidden md:flex flex-[0.66] min-h-0 border border-[#2c3f12] overflow-hidden">
             <div
               className="flex flex-col gap-4 p-4 border-r border-[#2c3f12] bg-[#0b1208] overflow-y-auto"
               style={{ minWidth: 0, flex: "0 0 38%" }}
@@ -542,7 +537,9 @@ export default function GameScreen({
         />
       </div>
 
-      <BottomBar />
+      <div className="hidden md:block flex-shrink-0">
+        <BottomBar />
+      </div>
 
       {historyOpen && (
         <HistoryModal

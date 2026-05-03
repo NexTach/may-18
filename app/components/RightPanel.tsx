@@ -88,8 +88,7 @@ export default function RightPanel({
 
   return (
     <div
-      className="flex flex-col bg-[#0b1208] border-2 border-[#2c3f12] overflow-hidden"
-      style={{ width: 340, minWidth: 340 }}
+      className="flex flex-col bg-[#0b1208] border-2 border-[#2c3f12] overflow-hidden flex-1 md:flex-none md:w-[340px] md:min-w-[340px]"
     >
       <button
         type="button"

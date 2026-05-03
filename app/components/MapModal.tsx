@@ -429,7 +429,7 @@ export default function MapModal({
         onClick={onClose}
       />
       <div
-        className="relative mx-4 w-full max-w-2xl border-2 border-[#4a6a1a] bg-[#0b1208] p-5"
+        className="relative mx-4 w-full max-w-2xl border-2 border-[#4a6a1a] bg-[#0b1208] p-4 md:p-5 max-h-[90vh] overflow-y-auto"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="지역 지도"

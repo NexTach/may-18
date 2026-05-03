@@ -103,15 +103,15 @@ export default function MainMenu({
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center">
           <p
-            className="text-[12px] tracking-widest mb-5"
+            className="text-[11px] md:text-[12px] tracking-widest mb-5 px-4 text-center"
             style={{ fontFamily: "monospace", color: "#7a9a40" }}
           >
             · 5·18민주화운동 인터랙티브 스토리 ·
           </p>
 
-          <div className="relative mb-3">
+          <div className="relative mb-3 mx-4 md:mx-0">
             <div
-              className="px-10 py-5 border-2 border-[#4a6a1a]"
+              className="px-6 py-4 md:px-10 md:py-5 border-2 border-[#4a6a1a]"
               style={{
                 background: "rgba(6,9,4,0.82)",
                 boxShadow:
@@ -119,7 +119,7 @@ export default function MainMenu({
               }}
             >
               <h1
-                className="text-5xl font-bold text-center text-[#c4d47a]"
+                className="text-3xl md:text-5xl font-bold text-center text-[#c4d47a]"
                 style={{
                   fontFamily: "'Press Start 2P', monospace",
                   textShadow:
@@ -147,14 +147,15 @@ export default function MainMenu({
           </div>
 
           <p
-            className="text-[13px] mb-12 tracking-widest"
+            className="hidden md:block text-[13px] mb-12 tracking-widest px-4 text-center"
             style={{ fontFamily: "monospace", color: "#5a7a20" }}
           >
             ◈ 1980년 5월 광주의 시간을 따라가며, 시민들의 선택과 기록을
             마주합니다. ◈
           </p>
+          <div className="md:hidden mb-8" />
 
-          <div className="flex flex-col items-center gap-2.5 w-96">
+          <div className="flex flex-col items-center gap-2.5 w-full max-w-sm px-4 md:w-96 md:max-w-none md:px-0">
             {menuItems.map(({ label, icon, action }) => (
               <button
                 key={label}

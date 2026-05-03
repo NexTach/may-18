@@ -511,7 +511,7 @@ export default function SettingsModal({
       className="fixed inset-0 z-50 flex flex-col"
       style={{ background: "#060907" }}
     >
-      <div className="flex items-center justify-between px-8 py-4 border-b-2 border-[#2c3f12] bg-[#0b1208] flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 md:px-8 md:py-4 border-b-2 border-[#2c3f12] bg-[#0b1208] flex-shrink-0">
         <div
           className="text-[13px] text-[#c4d47a]"
           style={{ fontFamily: "'Press Start 2P', monospace" }}
@@ -529,13 +529,13 @@ export default function SettingsModal({
       </div>
 
       <div className="flex flex-1 min-h-0">
-        <div className="w-56 flex-shrink-0 border-r border-[#2c3f12] bg-[#090d06] flex flex-col p-4 gap-1.5">
+        <div className="w-28 md:w-56 flex-shrink-0 border-r border-[#2c3f12] bg-[#090d06] flex flex-col p-2 md:p-4 gap-1.5">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className="flex items-center gap-3 px-4 py-3 text-left border transition-colors"
+              className="flex items-center gap-2 md:gap-3 px-2 md:px-4 py-3 text-left border transition-colors"
               style={{
                 fontFamily: "monospace",
                 borderColor:
@@ -545,16 +545,16 @@ export default function SettingsModal({
                 color: activeTab === tab.id ? "#c4d47a" : "#5a7a20",
               }}
             >
-              <span className="text-[15px] w-5 text-center">{tab.icon}</span>
-              <span className="text-[13px]">{tab.label}</span>
+              <span className="text-[15px] w-5 text-center flex-shrink-0">{tab.icon}</span>
+              <span className="text-[11px] md:text-[13px] leading-tight">{tab.label}</span>
               {activeTab === tab.id && (
-                <span className="ml-auto text-[10px] text-[#4a6a1a]">▶</span>
+                <span className="hidden md:inline ml-auto text-[10px] text-[#4a6a1a]">▶</span>
               )}
             </button>
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-10">
+        <div className="flex-1 overflow-y-auto p-5 md:p-10">
           {activeTab === "display" && (
             <DisplayTab
               settings={settings}
