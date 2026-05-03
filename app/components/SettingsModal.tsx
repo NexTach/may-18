@@ -302,6 +302,15 @@ export default function SettingsModal({
                     : "환경 변수 설정 전이라 로그인 버튼이 비활성화되어 있습니다."}
                 </p>
               )}
+              {!syncStatus.storageConfigured && (
+                <p
+                  className="mt-2 text-[11px] leading-relaxed text-[#8a7a40]"
+                  style={{ fontFamily: "monospace" }}
+                >
+                  Neon DB 연결이 아직 설정되지 않아 로그인 후에도 서버 동기화는
+                  비활성화됩니다.
+                </p>
+              )}
             </div>
 
             <ToggleRow
@@ -322,7 +331,11 @@ export default function SettingsModal({
                 <button
                   type="button"
                   onClick={onPull}
-                  disabled={!syncStatus.authenticated || syncBusy}
+                  disabled={
+                    !syncStatus.authenticated ||
+                    !syncStatus.storageConfigured ||
+                    syncBusy
+                  }
                   className="border px-3 py-2 text-[12px]"
                   style={{
                     fontFamily: "monospace",
@@ -339,7 +352,11 @@ export default function SettingsModal({
                 <button
                   type="button"
                   onClick={onPush}
-                  disabled={!syncStatus.authenticated || syncBusy}
+                  disabled={
+                    !syncStatus.authenticated ||
+                    !syncStatus.storageConfigured ||
+                    syncBusy
+                  }
                   className="border px-3 py-2 text-[12px]"
                   style={{
                     fontFamily: "monospace",
