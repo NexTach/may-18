@@ -128,9 +128,7 @@ export default function RightPanel({
     <div className="flex flex-col bg-game-panel border-2 border-game-border overflow-hidden flex-1 md:flex-none md:w-85 md:min-w-85">
       <button
         type="button"
-        className={`p-4 border-b border-[#1e2e0e] cursor-pointer text-left flex flex-col ${
-          done && situationOpen ? "shrink-0" : "flex-1 min-h-0"
-        } md:shrink-0 md:flex-none`}
+        className="p-4 border-b border-[#1e2e0e] cursor-pointer text-left flex flex-col shrink-0 md:flex-none"
         onClick={() => {
           if (soundOn) playSfx("click");
           skip();
@@ -138,9 +136,7 @@ export default function RightPanel({
         style={{ minHeight: 110 }}
       >
         <div
-          className={`overflow-y-auto ${
-            done && situationOpen ? "max-h-[38vh]" : "flex-1 min-h-0"
-          } md:flex-none md:max-h-none`}
+          className="overflow-y-auto max-h-[38vh] md:max-h-none md:flex-none"
         >
           <p
             className="text-[14px] text-game-text leading-relaxed"
@@ -198,30 +194,32 @@ export default function RightPanel({
       )}
       {done && (
         <div
-          className="md:hidden shrink-0 border-t border-game-border"
+          className={`md:hidden flex flex-col ${situationOpen ? "shrink-0" : "flex-1"}`}
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
-          <button
-            type="button"
-            onClick={() => {
-              if (soundOn) playSfx("click");
-              setSheetOpen(true);
-            }}
-            className="w-full px-4 py-3.5 active:bg-[#162010] transition-colors cursor-pointer text-left"
-          >
-            <div
-              className="text-[11px] text-game-text-muted mb-1"
-              style={{ fontFamily: "'Press Start 2P', monospace" }}
+          <div className="mt-auto border-t border-game-border">
+            <button
+              type="button"
+              onClick={() => {
+                if (soundOn) playSfx("click");
+                setSheetOpen(true);
+              }}
+              className="w-full px-4 py-3.5 active:bg-[#162010] transition-colors cursor-pointer text-left"
             >
-              ◆ 이제 어떻게 해야 할까
-            </div>
-            <div
-              className="text-[13px] text-game-accent"
-              style={{ fontFamily: "monospace" }}
-            >
-              선택하기 →
-            </div>
-          </button>
+              <div
+                className="text-[11px] text-game-text-muted mb-1"
+                style={{ fontFamily: "'Press Start 2P', monospace" }}
+              >
+                ◆ 이제 어떻게 해야 할까
+              </div>
+              <div
+                className="text-[13px] text-game-accent"
+                style={{ fontFamily: "monospace" }}
+              >
+                선택하기 →
+              </div>
+            </button>
+          </div>
         </div>
       )}
 
