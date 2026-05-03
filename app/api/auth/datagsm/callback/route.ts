@@ -5,7 +5,7 @@ import {
   getDataGsmOAuthConfig,
   normalizeDataGsmUser,
   signSession,
-} from "../../../../lib/datagsm-auth";
+} from "@/app/lib/datagsm-auth";
 
 function extractOAuthError(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;

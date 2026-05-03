@@ -4,7 +4,7 @@ import {
   createPkcePair,
   dataGsmCookieNames,
   getDataGsmOAuthConfig,
-} from "../../../../lib/datagsm-auth";
+} from "@/app/lib/datagsm-auth";
 
 export async function GET(request: NextRequest) {
   const config = getDataGsmOAuthConfig();

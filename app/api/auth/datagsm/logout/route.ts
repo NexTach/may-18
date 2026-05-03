@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { dataGsmCookieNames } from "../../../../lib/datagsm-auth";
+import { dataGsmCookieNames } from "@/app/lib/datagsm-auth";
 
 export async function POST() {
   const response = NextResponse.json({ ok: true });
