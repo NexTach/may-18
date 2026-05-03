@@ -48,7 +48,7 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed right-4 bottom-4 z-[80] flex w-[min(92vw,360px)] flex-col gap-2">
+    <div className="pointer-events-none fixed right-4 bottom-4 z-80 flex w-[min(92vw,360px)] flex-col gap-2">
       {toasts.map((toast) => {
         const style = TOAST_STYLES[toast.tone];
 
@@ -66,7 +66,7 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
               <div className="flex items-center gap-3">
                 {toast.achievementIcon && (
                   <span
-                    className="flex-shrink-0 text-[22px] leading-none"
+                    className="shrink-0 text-[22px] leading-none"
                     style={{ color: style.text }}
                   >
                     {toast.achievementIcon}
@@ -91,7 +91,7 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
                 <button
                   type="button"
                   onClick={() => onDismiss(toast.id)}
-                  className="flex-shrink-0 text-[11px] transition-opacity hover:opacity-100"
+                  className="shrink-0 text-[11px] transition-opacity hover:opacity-100"
                   style={{ fontFamily: "'Press Start 2P', monospace", color: style.text, opacity: 0.6 }}
                 >
                   ×
