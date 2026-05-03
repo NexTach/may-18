@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { scenes, TOTAL_STAGES } from "../data/scenes";
 import { TEXT_SPEED_MS } from "../lib/game-state";
 import type {
@@ -212,6 +212,20 @@ const AVATAR_COLORS: Record<string, { bg: string; border: string }> = {
   soldier: { bg: "#0c1208", border: "#3a5a1a" },
 };
 
+const SCENE_ASPECT_RATIO = 16 / 9;
+
+function getContainedFrame(width: number, height: number) {
+  if (width <= 0 || height <= 0) {
+    return { width: 0, height: 0 };
+  }
+
+  const frameWidth = Math.min(width, height * SCENE_ASPECT_RATIO);
+  return {
+    width: frameWidth,
+    height: frameWidth / SCENE_ASPECT_RATIO,
+  };
+}
+
 function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   if (!choice.requirements) return null;
 
@@ -259,6 +273,8 @@ export default function GameScreen({
   const [mapOpen, setMapOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const sceneSlotRef = useRef<HTMLDivElement | null>(null);
+  const [sceneFrame, setSceneFrame] = useState({ width: 0, height: 0 });
 
   const currentScene = scenes.find((s) => s.id === currentSceneId);
 
@@ -367,6 +383,35 @@ export default function GameScreen({
     allChoiceLog,
   ]);
 
+  useEffect(() => {
+    const node = sceneSlotRef.current;
+    if (!node) return;
+
+    const updateSceneFrame = () => {
+      const { width, height } = node.getBoundingClientRect();
+      const nextFrame = getContainedFrame(width, height);
+
+      setSceneFrame((prev) => {
+        if (
+          Math.abs(prev.width - nextFrame.width) < 1 &&
+          Math.abs(prev.height - nextFrame.height) < 1
+        ) {
+          return prev;
+        }
+        return nextFrame;
+      });
+    };
+
+    const observer = new ResizeObserver(() => {
+      updateSceneFrame();
+    });
+
+    observer.observe(node);
+    updateSceneFrame();
+
+    return () => observer.disconnect();
+  }, []);
+
   if (!currentScene) return null;
 
   const charPos = CHAR_POS[currentScene.sceneType];
@@ -406,44 +451,58 @@ export default function GameScreen({
       <div className="flex flex-1 min-h-0 gap-4">
         {/* ── 왼쪽 열: 씬(상단 16:9) + 정보(하단) ── */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-4">
-          {/* 씬 — 너비에 맞춰 16:9 비율 유지 */}
+          {/* 씬 — 상단 슬롯 안에서만 16:9로 맞추고 남는 공간은 레터박스로 처리 */}
           <div
-            className="relative overflow-hidden bg-[#060907] flex-shrink-0 border border-[#2c3f12]"
-            style={{ width: "100%", aspectRatio: "16/9" }}
+            ref={sceneSlotRef}
+            className="relative flex-[1.15] min-h-0 overflow-hidden border border-[#2c3f12] bg-[#060907]"
           >
-            <PixelScene sceneType={currentScene.sceneType} />
-
-            {npcLines.map((d, i) => {
-              const slot = slots[i];
-              if (!slot) return null;
-              const color = AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
-              return (
-                <SpeechBubble
-                  key={`${currentSceneId}-${d.avatar}-${d.name}-${d.line}`}
-                  x={slot.x}
-                  y={slot.y}
-                  name={d.name}
-                  line={d.line}
-                  borderColor={color.border}
-                  bgColor={color.bg}
-                />
-              );
-            })}
-
-            <Character
-              direction={charPos.direction}
-              x={charPos.x}
-              y={charPos.y}
-              size={120}
-            />
-
-            <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">
-              <span
-                className="text-[12px] text-[#5a7a20]"
-                style={{ fontFamily: "monospace" }}
+            <div className="absolute inset-0 flex items-center justify-center p-3">
+              <div
+                className="relative overflow-hidden bg-[#060907]"
+                style={{
+                  width: sceneFrame.width || undefined,
+                  height: sceneFrame.height || undefined,
+                  aspectRatio: "16 / 9",
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                }}
               >
-                {currentScene.date} · {currentScene.location}
-              </span>
+                <PixelScene sceneType={currentScene.sceneType} />
+
+                {npcLines.map((d, i) => {
+                  const slot = slots[i];
+                  if (!slot) return null;
+                  const color =
+                    AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
+                  return (
+                    <SpeechBubble
+                      key={`${currentSceneId}-${d.avatar}-${d.name}-${d.line}`}
+                      x={slot.x}
+                      y={slot.y}
+                      name={d.name}
+                      line={d.line}
+                      borderColor={color.border}
+                      bgColor={color.bg}
+                    />
+                  );
+                })}
+
+                <Character
+                  direction={charPos.direction}
+                  x={charPos.x}
+                  y={charPos.y}
+                  size={136}
+                />
+
+                <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">
+                  <span
+                    className="text-[12px] text-[#5a7a20]"
+                    style={{ fontFamily: "monospace" }}
+                  >
+                    {currentScene.date} · {currentScene.location}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 

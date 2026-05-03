@@ -12,22 +12,32 @@ const OFFSETS: Record<Direction, [number, number]> = {
   left: [0.5, 0.5],
 };
 
+const WHITE_THRESHOLD = 220;
+const TARGET_FILL_RATIO = 0.88;
+const BOTTOM_PADDING_RATIO = 0.04;
+
 // module-level so cache survives React re-renders
-const cache = new Map<Direction, string>();
+const cache = new Map<string, string>();
 let loadedImg: HTMLImageElement | null = null;
 
+function getCacheKey(dir: Direction, size: number) {
+  return `${dir}:${size}`;
+}
+
 function extractSprite(dir: Direction, size: number): string {
-  if (cache.has(dir)) return cache.get(dir)!;
+  const cacheKey = getCacheKey(dir, size);
+  const cached = cache.get(cacheKey);
+  if (cached) return cached;
   const img = loadedImg!;
   const [ox, oy] = OFFSETS[dir];
   const half = img.width / 2;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(
+  const sourceCanvas = document.createElement("canvas");
+  sourceCanvas.width = half;
+  sourceCanvas.height = half;
+  const sourceCtx = sourceCanvas.getContext("2d")!;
+  sourceCtx.imageSmoothingEnabled = false;
+  sourceCtx.drawImage(
     img,
     ox * img.width,
     oy * img.height,
@@ -35,34 +45,90 @@ function extractSprite(dir: Direction, size: number): string {
     half,
     0,
     0,
-    size,
-    size,
+    half,
+    half,
   );
 
-  const imgData = ctx.getImageData(0, 0, size, size);
+  const imgData = sourceCtx.getImageData(0, 0, half, half);
   const d = imgData.data;
+  let minX = half;
+  let minY = half;
+  let maxX = -1;
+  let maxY = -1;
+
   for (let i = 0; i < d.length; i += 4) {
-    // make near-white pixels transparent
-    if (d[i] > 220 && d[i + 1] > 220 && d[i + 2] > 220) d[i + 3] = 0;
+    const r = d[i];
+    const g = d[i + 1];
+    const b = d[i + 2];
+    const x = (i / 4) % half;
+    const y = Math.floor(i / 4 / half);
+
+    // Strip the generated white background while preserving sprite edges.
+    if (r > WHITE_THRESHOLD && g > WHITE_THRESHOLD && b > WHITE_THRESHOLD) {
+      d[i + 3] = 0;
+      continue;
+    }
+
+    if (d[i + 3] === 0) continue;
+    if (x < minX) minX = x;
+    if (y < minY) minY = y;
+    if (x > maxX) maxX = x;
+    if (y > maxY) maxY = y;
   }
-  ctx.putImageData(imgData, 0, 0);
+
+  sourceCtx.putImageData(imgData, 0, 0);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = false;
+
+  if (maxX < minX || maxY < minY) {
+    const emptyUrl = canvas.toDataURL("image/png");
+    cache.set(cacheKey, emptyUrl);
+    return emptyUrl;
+  }
+
+  const cropWidth = maxX - minX + 1;
+  const cropHeight = maxY - minY + 1;
+  const targetHeight = size * TARGET_FILL_RATIO;
+  const scale = targetHeight / cropHeight;
+  const drawWidth = cropWidth * scale;
+  const drawHeight = cropHeight * scale;
+  const drawX = (size - drawWidth) / 2;
+  const drawY = size - drawHeight - size * BOTTOM_PADDING_RATIO;
+
+  ctx.drawImage(
+    sourceCanvas,
+    minX,
+    minY,
+    cropWidth,
+    cropHeight,
+    drawX,
+    drawY,
+    drawWidth,
+    drawHeight,
+  );
 
   const url = canvas.toDataURL("image/png");
-  cache.set(dir, url);
+  cache.set(cacheKey, url);
   return url;
 }
 
 async function loadAndProcess(size: number): Promise<void> {
-  if (loadedImg) return;
-  await new Promise<void>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      loadedImg = img;
-      resolve();
-    };
-    img.onerror = reject;
-    img.src = "/sprites/character.png";
-  });
+  if (!loadedImg) {
+    await new Promise<void>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImg = img;
+        resolve();
+      };
+      img.onerror = reject;
+      img.src = "/sprites/character.png";
+    });
+  }
+
   // pre-process all 4 directions at once
   (Object.keys(OFFSETS) as Direction[]).forEach((d) => extractSprite(d, size));
 }
@@ -79,16 +145,18 @@ export default function Character({
   size?: number;
 }) {
   const [url, setUrl] = useState<string | null>(
-    () => cache.get(direction) ?? null,
+    () => cache.get(getCacheKey(direction, size)) ?? null,
   );
 
   useEffect(() => {
-    const cached = cache.get(direction);
+    const cacheKey = getCacheKey(direction, size);
+    const cached = cache.get(cacheKey);
     if (cached) {
       setUrl(cached);
       return;
     }
-    loadAndProcess(size).then(() => setUrl(cache.get(direction) ?? null));
+
+    loadAndProcess(size).then(() => setUrl(cache.get(cacheKey) ?? null));
   }, [direction, size]);
 
   if (!url) return null;

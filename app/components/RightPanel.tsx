@@ -66,7 +66,9 @@ function useTypingText(text: string, speed = 22) {
       i++;
       setDisplayed(text.slice(0, i));
       if (i >= text.length) {
-        clearInterval(timerRef.current!);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
         timerRef.current = null;
         setDone(true);
       }
@@ -111,7 +113,10 @@ export default function RightPanel({
       <button
         type="button"
         className="p-4 border-b border-[#1e2e0e] cursor-pointer flex-shrink-0 text-left"
-        onClick={() => { if (soundOn) playSfx("click"); skip(); }}
+        onClick={() => {
+          if (soundOn) playSfx("click");
+          skip();
+        }}
         style={{ minHeight: 110 }}
       >
         <p
@@ -195,7 +200,10 @@ export default function RightPanel({
               key={`${choice.nextSceneId}-${choice.text}`}
               type="button"
               disabled={choice.disabled}
-              onClick={() => { if (soundOn) playSfx("select"); onChoice(choice); }}
+              onClick={() => {
+                if (soundOn) playSfx("select");
+                onChoice(choice);
+              }}
               className={`w-full flex items-start gap-3 px-3 py-2.5 border transition-all text-left group ${
                 choice.disabled
                   ? "border-[#1f2b10] bg-[#0a1006] cursor-not-allowed opacity-60"
