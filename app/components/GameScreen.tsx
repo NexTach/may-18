@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { historyMediaBySceneId } from "../data/history-media";
 import { scenes, TOTAL_STAGES } from "../data/scenes";
 import {
   preloadSceneType,
@@ -93,13 +94,13 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 50, y: 54 },
   ],
   station: [
-    { x: 67.4, y: 42 },
+    { x: 66.4, y: 42 },
     { x: 18.3, y: 48 },
   ],
   university: [],
   downtown: [
-    { x: 12.4, y: 53.4 },
-    { x: 51, y: 47 },
+    { x: 11.8, y: 56  },
+    { x: 50.2, y: 48 },
     { x: 42, y: 60 },
   ],
   home: [],
@@ -137,7 +138,7 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   ],
   citizen_debate: [
     { x: 25, y: 56.5 },
-    { x: 49, y: 54 },
+    { x: 49, y: 53.3 },
     { x: 50, y: 56 },
   ],
   supply_run: [
@@ -158,7 +159,7 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
     { x: 65, y: 62 },
   ],
   // 골목 기록 씬: 곁에 있는 시민 1명
-  notebook: [{ x: 13, y: 23 }],
+  notebook: [{ x: 13, y: 28 }],
   // 공중전화: 어머니 목소리가 수화기에서 들려오는 위치
   phonebooth: [
     { x: 52, y: 40 },
@@ -166,7 +167,7 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   ],
   // 도청 새벽: 남은 시민 한 명, 광장 우측
   plaza_night: [
-    { x: 72.2, y: 53 },
+    { x: 72.5, y: 49 },
     { x: 35, y: 68 },
   ],
   ending: [
@@ -410,6 +411,7 @@ export default function GameScreen({
     disabled: Boolean(getChoiceDisabledReason(choice, stats)),
     disabledReason: getChoiceDisabledReason(choice, stats) ?? undefined,
   }));
+  const historyMedia = historyMediaBySceneId[currentScene.id];
   // Only non-player dialogue lines get speech bubbles
   const npcLines = currentScene.dialogue.filter((d) => d.avatar !== "player");
   const locationDesc = LOCATION_DESCS[currentScene.location] ?? "";
@@ -579,6 +581,9 @@ export default function GameScreen({
 
       {historyOpen && (
         <HistoryModal
+          sceneId={currentScene.id}
+          stageTitle={currentScene.stageTitle}
+          imageCaption={historyMedia?.caption ?? ""}
           history={currentScene.history}
           location={currentScene.location}
           date={currentScene.date}
