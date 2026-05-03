@@ -119,6 +119,7 @@ export type SyncBundle = {
 
 export type SyncStatus = {
   configured: boolean;
+  storageConfigured: boolean;
   authenticated: boolean;
   user: DataGsmUser | null;
   lastSyncedAt: string | null;

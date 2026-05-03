@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import GameScreen from "./components/GameScreen";
 import MainMenu from "./components/MainMenu";
 import {
+  createFreshProgress,
   DEFAULT_PROGRESS,
   DEFAULT_SETTINGS,
-  PROGRESS_STORAGE_KEY,
-  SETTINGS_STORAGE_KEY,
-  createFreshProgress,
   getAchievementState,
   hasContinuableProgress,
+  PROGRESS_STORAGE_KEY,
+  SETTINGS_STORAGE_KEY,
   sanitizeProgress,
   sanitizeSettings,
 } from "./lib/game-state";
@@ -41,6 +41,7 @@ export default function GameApp() {
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     configured: false,
+    storageConfigured: false,
     authenticated: false,
     user: null,
     lastSyncedAt: null,
@@ -69,7 +70,7 @@ export default function GameApp() {
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   }, [booted, settings]);
 
-  async function refreshAuthStatus() {
+  const refreshAuthStatus = useCallback(async () => {
     try {
       const response = await fetch("/api/auth/datagsm/me", {
         cache: "no-store",
@@ -79,16 +80,17 @@ export default function GameApp() {
     } catch {
       setSyncStatus({
         configured: false,
+        storageConfigured: false,
         authenticated: false,
         user: null,
         lastSyncedAt: null,
       });
     }
-  }
+  }, []);
 
   useEffect(() => {
     void refreshAuthStatus();
-  }, []);
+  }, [refreshAuthStatus]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -108,9 +110,9 @@ export default function GameApp() {
     setSyncMessage(messages[authCode] ?? `로그인 처리 상태: ${authCode}`);
     window.history.replaceState({}, "", "/");
     void refreshAuthStatus();
-  }, []);
+  }, [refreshAuthStatus]);
 
-  async function pushSyncBundle(bundle: SyncBundle) {
+  const pushSyncBundle = useCallback(async (bundle: SyncBundle) => {
     const response = await fetch("/api/sync", {
       method: "POST",
       headers: {
@@ -129,7 +131,7 @@ export default function GameApp() {
       lastSyncedAt: data.bundle.savedAt,
     }));
     return data.bundle;
-  }
+  }, []);
 
   async function pullSyncBundle() {
     const response = await fetch("/api/sync", { cache: "no-store" });
@@ -142,7 +144,7 @@ export default function GameApp() {
   }
 
   async function handleManualPush() {
-    if (!syncStatus.authenticated) return;
+    if (!syncStatus.authenticated || !syncStatus.storageConfigured) return;
     setSyncBusy(true);
     try {
       await pushSyncBundle({
@@ -161,7 +163,7 @@ export default function GameApp() {
   }
 
   async function handleManualPull() {
-    if (!syncStatus.authenticated) return;
+    if (!syncStatus.authenticated || !syncStatus.storageConfigured) return;
     setSyncBusy(true);
     try {
       const bundle = await pullSyncBundle();
@@ -189,7 +191,14 @@ export default function GameApp() {
   }
 
   useEffect(() => {
-    if (!booted || !syncStatus.authenticated || !settings.autoSync) return;
+    if (
+      !booted ||
+      !syncStatus.authenticated ||
+      !syncStatus.storageConfigured ||
+      !settings.autoSync
+    ) {
+      return;
+    }
 
     const timer = window.setTimeout(() => {
       void pushSyncBundle({
@@ -202,7 +211,14 @@ export default function GameApp() {
     }, 900);
 
     return () => window.clearTimeout(timer);
-  }, [booted, progress, settings, syncStatus.authenticated]);
+  }, [
+    booted,
+    progress,
+    pushSyncBundle,
+    settings,
+    syncStatus.authenticated,
+    syncStatus.storageConfigured,
+  ]);
 
   const achievements = useMemo(() => getAchievementState(progress), [progress]);
 
