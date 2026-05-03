@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Choice, DialogueLine, StatKey } from "../types";
 
 type ChoiceView = Choice & {
@@ -46,8 +46,11 @@ const STAT_COLORS: Record<StatKey, string> = {
 function useTypingText(text: string, speed = 22) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
     if (speed <= 0) {
       setDisplayed(text);
       setDone(true);
@@ -57,18 +60,28 @@ function useTypingText(text: string, speed = 22) {
     setDisplayed("");
     setDone(false);
     let i = 0;
-    const timer = setInterval(() => {
+    timerRef.current = setInterval(() => {
       i++;
       setDisplayed(text.slice(0, i));
       if (i >= text.length) {
-        clearInterval(timer);
+        clearInterval(timerRef.current!);
+        timerRef.current = null;
         setDone(true);
       }
     }, speed);
-    return () => clearInterval(timer);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
   }, [text, speed]);
 
   const skip = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     setDisplayed(text);
     setDone(true);
   };
