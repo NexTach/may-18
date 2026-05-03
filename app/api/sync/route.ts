@@ -1,11 +1,19 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { dataGsmCookieNames, verifySession } from "../../lib/datagsm-auth";
+import { isDatabaseConfigured } from "../../lib/db";
 import { sanitizeProgress, sanitizeSettings } from "../../lib/game-state";
 import { readUserBundle, writeUserBundle } from "../../lib/sync-storage";
 import type { SyncBundle } from "../../types";
 
 export async function GET() {
+  if (!isDatabaseConfigured()) {
+    return NextResponse.json(
+      { message: "Sync storage is not configured" },
+      { status: 503 },
+    );
+  }
+
   const cookieStore = await cookies();
   const session = verifySession(
     cookieStore.get(dataGsmCookieNames.session)?.value,
@@ -20,6 +28,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!isDatabaseConfigured()) {
+    return NextResponse.json(
+      { message: "Sync storage is not configured" },
+      { status: 503 },
+    );
+  }
+
   const cookieStore = await cookies();
   const session = verifySession(
     cookieStore.get(dataGsmCookieNames.session)?.value,

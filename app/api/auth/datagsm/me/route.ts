@@ -4,11 +4,13 @@ import {
   dataGsmCookieNames,
   getDataGsmOAuthConfig,
   verifySession,
-} from "../../../../lib/datagsm-auth";
-import { readUserBundle } from "../../../../lib/sync-storage";
+} from "@/app/lib/datagsm-auth";
+import { isDatabaseConfigured } from "@/app/lib/db";
+import { readUserBundle } from "@/app/lib/sync-storage";
 
 export async function GET() {
   const config = getDataGsmOAuthConfig();
+  const storageConfigured = isDatabaseConfigured();
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(dataGsmCookieNames.session)?.value;
   const session = verifySession(sessionToken);
@@ -16,6 +18,7 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({
       configured: config.configured,
+      storageConfigured,
       authenticated: false,
       user: null,
       lastSyncedAt: null,
@@ -26,6 +29,7 @@ export async function GET() {
 
   return NextResponse.json({
     configured: config.configured,
+    storageConfigured,
     authenticated: true,
     user: session.user,
     lastSyncedAt: bundle?.savedAt ?? null,

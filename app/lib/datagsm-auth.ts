@@ -11,7 +11,11 @@ type SessionPayload = {
 };
 
 function getSessionSecret() {
-  return process.env.APP_SESSION_SECRET ?? "may18-dev-session-secret";
+  const secret = process.env.APP_SESSION_SECRET;
+  if (!secret) {
+    throw new Error("APP_SESSION_SECRET is not set.");
+  }
+  return secret;
 }
 
 function toBase64Url(input: Buffer | string) {
@@ -49,7 +53,7 @@ export function getDataGsmOAuthConfig() {
     userInfoUrl:
       process.env.DATAGSM_OAUTH_USERINFO_URL ??
       "https://oauth.resource.datagsm.kr/userinfo",
-    configured: clientId.length > 0,
+    configured: clientId.length > 0 && clientSecret.length > 0,
   };
 }
 
