@@ -12,7 +12,6 @@ import type {
   Stats,
 } from "../types";
 import BottomBar from "./BottomBar";
-import Character, { type Direction } from "./Character";
 import HistoryModal from "./HistoryModal";
 import HUD from "./HUD";
 import InventoryModal from "./InventoryModal";
@@ -77,35 +76,6 @@ const STAT_LABELS: Record<StatKey, string> = {
   record: "기록",
   trust: "신뢰",
   safety: "안전",
-};
-
-// Fixed player character position + facing direction per scene type
-const CHAR_POS: Record<
-  SceneType,
-  { x: number; y: number; direction: Direction }
-> = {
-  street: { x: 44, y: 80, direction: "up" },
-  station: { x: 44, y: 82, direction: "up" },
-  university: { x: 45, y: 79, direction: "up" },
-  downtown: { x: 47, y: 79, direction: "up" },
-  home: { x: 50, y: 82, direction: "down" },
-  plaza: { x: 50, y: 79, direction: "up" },
-  square: { x: 48, y: 80, direction: "down" },
-  corridor: { x: 50, y: 80, direction: "up" },
-  phonebooth: { x: 36, y: 83, direction: "down" },
-  plaza_night: { x: 50, y: 80, direction: "up" },
-  notebook: { x: 45, y: 82, direction: "down" },
-  station_rumor: { x: 44, y: 82, direction: "up" },
-  side_alley_detour: { x: 43, y: 82, direction: "up" },
-  family_neighborhood: { x: 42, y: 84, direction: "down" },
-  leaflet_room: { x: 49, y: 82, direction: "down" },
-  market_people: { x: 48, y: 79, direction: "up" },
-  street_clinic: { x: 46, y: 82, direction: "down" },
-  citizen_debate: { x: 48, y: 79, direction: "up" },
-  supply_run: { x: 47, y: 82, direction: "down" },
-  checkpoint_edge: { x: 49, y: 80, direction: "up" },
-  night_meeting: { x: 50, y: 80, direction: "down" },
-  ending: { x: 50, y: 76, direction: "down" },
 };
 
 // NPC anchor slots per scene type (tail of speech bubble points here)
@@ -414,7 +384,6 @@ export default function GameScreen({
 
   if (!currentScene) return null;
 
-  const charPos = CHAR_POS[currentScene.sceneType];
   const slots = NPC_SLOTS[currentScene.sceneType] ?? [];
   const choiceViews = currentScene.choices.map((choice) => ({
     ...choice,
@@ -454,7 +423,7 @@ export default function GameScreen({
           {/* 씬 — 상단 슬롯 안에서만 16:9로 맞추고 남는 공간은 레터박스로 처리 */}
           <div
             ref={sceneSlotRef}
-            className="relative flex-[1.15] min-h-0 overflow-hidden border border-[#2c3f12] bg-[#060907]"
+            className="relative flex-[1.45] min-h-0 overflow-hidden border border-[#2c3f12] bg-[#060907]"
           >
             <div className="absolute inset-0 flex items-center justify-center p-3">
               <div
@@ -486,14 +455,6 @@ export default function GameScreen({
                     />
                   );
                 })}
-
-                <Character
-                  direction={charPos.direction}
-                  x={charPos.x}
-                  y={charPos.y}
-                  size={136}
-                />
-
                 <div className="absolute top-3 left-3 border border-[#2c3f12] bg-[#0b1208]/90 px-3 py-1.5">
                   <span
                     className="text-[12px] text-[#5a7a20]"
@@ -507,7 +468,7 @@ export default function GameScreen({
           </div>
 
           {/* 하단 정보: 목표+위치(좌) + 지역 지도(우) */}
-          <div className="flex flex-1 min-h-0 border border-[#2c3f12] overflow-hidden">
+          <div className="flex flex-[0.66] min-h-0 border border-[#2c3f12] overflow-hidden">
             {/* 목표 + 현재 위치 */}
             <div
               className="flex flex-col gap-4 p-4 border-r border-[#2c3f12] bg-[#0b1208] overflow-y-auto"

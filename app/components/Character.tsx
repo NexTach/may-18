@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export type Direction = "down" | "up" | "right" | "left";
@@ -28,14 +29,16 @@ function extractSprite(dir: Direction, size: number): string {
   const cacheKey = getCacheKey(dir, size);
   const cached = cache.get(cacheKey);
   if (cached) return cached;
-  const img = loadedImg!;
+  const img = loadedImg;
+  if (!img) return "";
   const [ox, oy] = OFFSETS[dir];
   const half = img.width / 2;
 
   const sourceCanvas = document.createElement("canvas");
   sourceCanvas.width = half;
   sourceCanvas.height = half;
-  const sourceCtx = sourceCanvas.getContext("2d")!;
+  const sourceCtx = sourceCanvas.getContext("2d");
+  if (!sourceCtx) return "";
   sourceCtx.imageSmoothingEnabled = false;
   sourceCtx.drawImage(
     img,
@@ -81,7 +84,8 @@ function extractSprite(dir: Direction, size: number): string {
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
   ctx.imageSmoothingEnabled = false;
 
   if (maxX < minX || maxY < minY) {
@@ -130,7 +134,9 @@ async function loadAndProcess(size: number): Promise<void> {
   }
 
   // pre-process all 4 directions at once
-  (Object.keys(OFFSETS) as Direction[]).forEach((d) => extractSprite(d, size));
+  (Object.keys(OFFSETS) as Direction[]).forEach((d) => {
+    extractSprite(d, size);
+  });
 }
 
 export default function Character({
@@ -162,9 +168,12 @@ export default function Character({
   if (!url) return null;
 
   return (
-    <img
+    <Image
       src={url}
       alt=""
+      width={size}
+      height={size}
+      unoptimized
       draggable={false}
       style={{
         position: "absolute",
