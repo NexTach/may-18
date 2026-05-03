@@ -128,14 +128,20 @@ export default function RightPanel({
     <div className="flex flex-col bg-game-panel border-2 border-game-border overflow-hidden flex-1 md:flex-none md:w-85 md:min-w-85">
       <button
         type="button"
-        className="p-4 border-b border-[#1e2e0e] cursor-pointer shrink-0 text-left"
+        className={`p-4 border-b border-[#1e2e0e] cursor-pointer text-left flex flex-col ${
+          done && situationOpen ? "shrink-0" : "flex-1 min-h-0"
+        } md:shrink-0 md:flex-none`}
         onClick={() => {
           if (soundOn) playSfx("click");
           skip();
         }}
         style={{ minHeight: 110 }}
       >
-        <div className="overflow-y-auto max-h-[38vh] md:max-h-none">
+        <div
+          className={`overflow-y-auto ${
+            done && situationOpen ? "max-h-[38vh]" : "flex-1 min-h-0"
+          } md:flex-none md:max-h-none`}
+        >
           <p
             className="text-[14px] text-game-text leading-relaxed"
             style={{ fontFamily: "monospace" }}
@@ -153,8 +159,9 @@ export default function RightPanel({
           )}
         </div>
       </button>
+
       {done && (
-        <div className="flex-1 flex flex-col min-h-0 md:hidden">
+        <div className={`md:hidden ${situationOpen ? "flex-1 flex flex-col min-h-0" : "shrink-0"}`}>
           <button
             type="button"
             onClick={() => setSituationOpen((v) => !v)}
@@ -189,10 +196,11 @@ export default function RightPanel({
           )}
         </div>
       )}
-
-      {/* 선택하기 트리거: 항상 하단 고정 */}
       {done && (
-        <div className="md:hidden flex-shrink-0 border-t border-[#2c3f12]">
+        <div
+          className="md:hidden shrink-0 border-t border-game-border"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        >
           <button
             type="button"
             onClick={() => {
@@ -221,7 +229,7 @@ export default function RightPanel({
         <div className="hidden md:flex flex-1 flex-col p-3 gap-3 overflow-y-auto min-h-0">
           <div className="border border-[#243410] bg-[#0d1608] px-3 py-2.5">
             <div
-              className="text-[10px] text-[#5a7a20] mb-1"
+              className="text-[10px] text-game-text-dim mb-1"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
             >
               눈앞의 상황
@@ -259,7 +267,7 @@ export default function RightPanel({
               className={`w-full flex items-start gap-3 px-3 py-2.5 border transition-all text-left group ${
                 choice.disabled
                   ? "border-[#1f2b10] bg-[#0a1006] cursor-not-allowed opacity-60"
-                  : "border-game-border bg-[#0d1608] hover:bg-[#162010] hover:border-[#4a6a1a] cursor-pointer"
+                  : "border-game-border bg-[#0d1608] hover:bg-[#162010] hover:border-game-border-bright cursor-pointer"
               }`}
             >
               <span
