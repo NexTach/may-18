@@ -33,6 +33,7 @@ function fromBase64Url(input: string) {
       normalized.length + ((4 - (normalized.length % 4)) % 4),
       "=",
     ),
+    "base64",
   );
 }
 
@@ -100,6 +101,10 @@ function readNestedNumber(record: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
     const value = record[key];
     if (typeof value === "number") return value;
+    if (typeof value === "string" && value.trim()) {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed)) return parsed;
+    }
   }
   return undefined;
 }
@@ -108,46 +113,76 @@ function readNestedString(record: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
     const value = record[key];
     if (typeof value === "string" && value.trim()) return value;
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return String(value);
+    }
   }
   return undefined;
+}
+
+function readNestedBoolean(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+      if (normalized === "true") return true;
+      if (normalized === "false") return false;
+    }
+  }
+  return undefined;
+}
+
+function resolveAcademicState(
+  studentRole: string | undefined,
+  isLeaveSchool: boolean,
+) {
+  const normalizedRole = studentRole?.trim().toUpperCase() ?? "";
+
+  if (isLeaveSchool || normalizedRole === "WITHDRAWN") {
+    return "dropout" as const;
+  }
+
+  if (normalizedRole === "GRADUATE") {
+    return "graduate" as const;
+  }
+
+  return "enrolled" as const;
 }
 
 export function normalizeDataGsmUser(raw: unknown): DataGsmUser {
   const root =
     raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
-  const account =
-    root.account && typeof root.account === "object"
-      ? (root.account as Record<string, unknown>)
-      : root;
   const student =
     root.student && typeof root.student === "object"
       ? (root.student as Record<string, unknown>)
-      : account.student && typeof account.student === "object"
-        ? (account.student as Record<string, unknown>)
-        : {};
+      : {};
 
   const id =
     readNestedString(root, ["id", "userId", "uuid", "sub"]) ??
-    readNestedString(account, ["id", "userId", "uuid", "sub"]) ??
     readNestedString(student, ["id", "studentId"]) ??
     "unknown";
   const name =
-    readNestedString(root, ["name", "nickname"]) ??
-    readNestedString(account, ["name", "nickname"]) ??
     readNestedString(student, ["name"]) ??
+    readNestedString(root, ["name", "nickname", "email"]) ??
     "DataGSM 사용자";
-  const role =
-    readNestedString(root, ["role"]) ??
-    readNestedString(account, ["role"]) ??
-    readNestedString(student, ["role"]) ??
-    "학생";
+  const studentRole = readNestedString(student, ["role"]);
+  const isLeaveSchool = readNestedBoolean(student, ["isLeaveSchool"]) ?? false;
+  const academicState = resolveAcademicState(studentRole, isLeaveSchool);
+  const role = academicState === "graduate" ? "졸업생" : "재학생";
 
   return {
     id,
     name,
     role,
+    academicState,
     grade: readNestedNumber(student, ["grade"]),
-    classRoom: readNestedNumber(student, ["class", "classRoom", "room"]),
+    classRoom: readNestedNumber(student, [
+      "class",
+      "classNum",
+      "classRoom",
+      "room",
+    ]),
     number: readNestedNumber(student, ["number", "studentNumber"]),
   };
 }

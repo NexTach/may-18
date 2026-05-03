@@ -106,6 +106,7 @@ export type DataGsmUser = {
   id: string;
   name: string;
   role: string;
+  academicState: "enrolled" | "graduate" | "dropout";
   grade?: number;
   classRoom?: number;
   number?: number;
@@ -118,8 +119,6 @@ export type SyncBundle = {
 };
 
 export type SyncStatus = {
-  configured: boolean;
-  storageConfigured: boolean;
   authenticated: boolean;
   user: DataGsmUser | null;
   lastSyncedAt: string | null;

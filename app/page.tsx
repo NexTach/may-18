@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import GameScreen from "./components/GameScreen";
 import MainMenu from "./components/MainMenu";
+import ToastLayer, { type ToastItem } from "./components/ToastLayer";
 import {
   createFreshProgress,
   DEFAULT_PROGRESS,
@@ -35,20 +36,42 @@ function readStoredJson<T>(key: string, fallback: T) {
   }
 }
 
+function formatUserSummary(user: SyncStatus["user"]) {
+  if (!user) return "계정 정보를 확인했습니다.";
+  return `${user.name} · ${user.role} · ${user.grade ?? "-"}학년 ${user.classRoom ?? "-"}반 ${user.number ?? "-"}번`;
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 export default function GameApp() {
   const [screen, setScreen] = useState<Screen>("menu");
   const [progress, setProgress] = useState<GameProgress>(DEFAULT_PROGRESS);
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
-    configured: false,
-    storageConfigured: false,
     authenticated: false,
     user: null,
     lastSyncedAt: null,
   });
   const [syncBusy, setSyncBusy] = useState(false);
-  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [booted, setBooted] = useState(false);
+
+  const dismissToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  const pushToast = useCallback(
+    (message: string, tone: ToastItem["tone"] = "info") => {
+      const id = Date.now() + Math.floor(Math.random() * 1000);
+      setToasts((prev) => [...prev, { id, message, tone }]);
+      window.setTimeout(() => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+      }, 3600);
+    },
+    [],
+  );
 
   useEffect(() => {
     setProgress(
@@ -70,45 +93,26 @@ export default function GameApp() {
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   }, [booted, settings]);
 
-  const refreshAuthStatus = useCallback(async () => {
+  const refreshAuthStatus = useCallback(async (): Promise<SyncStatus> => {
     try {
       const response = await fetch("/api/auth/datagsm/me", {
         cache: "no-store",
       });
       const data = (await response.json()) as SyncStatus;
       setSyncStatus(data);
+      return data;
     } catch {
-      setSyncStatus({
-        configured: false,
-        storageConfigured: false,
+      const fallback = {
         authenticated: false,
         user: null,
         lastSyncedAt: null,
-      });
+      };
+      setSyncStatus(fallback);
+      return fallback;
     }
   }, []);
 
   useEffect(() => {
-    void refreshAuthStatus();
-  }, [refreshAuthStatus]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const authCode = new URLSearchParams(window.location.search).get("auth");
-    if (!authCode) return;
-
-    const messages: Record<string, string> = {
-      success: "DataGSM 로그인에 성공했습니다.",
-      "not-configured": "DataGSM OAuth 환경 변수가 설정되지 않았습니다.",
-      "invalid-state": "로그인 상태 검증에 실패했습니다. 다시 시도해 주세요.",
-      "token-failed": "토큰 교환에 실패했습니다.",
-      "token-missing": "응답에서 액세스 토큰을 찾지 못했습니다.",
-      "userinfo-failed": "사용자 정보를 불러오지 못했습니다.",
-      "network-failed": "로그인 도중 네트워크 오류가 발생했습니다.",
-    };
-
-    setSyncMessage(messages[authCode] ?? `로그인 처리 상태: ${authCode}`);
-    window.history.replaceState({}, "", "/");
     void refreshAuthStatus();
   }, [refreshAuthStatus]);
 
@@ -122,7 +126,14 @@ export default function GameApp() {
     });
 
     if (!response.ok) {
-      throw new Error("동기화 업로드에 실패했습니다.");
+      let message = "서버에 기록을 저장하지 못했습니다.";
+      try {
+        const data = (await response.json()) as { message?: string };
+        if (data.message) {
+          message = data.message;
+        }
+      } catch {}
+      throw new Error(message);
     }
 
     const data = (await response.json()) as { bundle: SyncBundle };
@@ -133,18 +144,137 @@ export default function GameApp() {
     return data.bundle;
   }, []);
 
-  async function pullSyncBundle() {
+  const pullSyncBundle = useCallback(async () => {
     const response = await fetch("/api/sync", { cache: "no-store" });
     if (!response.ok) {
-      throw new Error("동기화 데이터를 불러오지 못했습니다.");
+      let message = "서버 기록을 불러오지 못했습니다.";
+      try {
+        const data = (await response.json()) as { message?: string };
+        if (data.message) {
+          message = data.message;
+        }
+      } catch {}
+      throw new Error(message);
     }
 
     const data = (await response.json()) as { bundle: SyncBundle | null };
     return data.bundle;
-  }
+  }, []);
+
+  const applyRemoteBundle = useCallback((bundle: SyncBundle) => {
+    setProgress(sanitizeProgress(bundle.progress));
+    setSettings(sanitizeSettings(bundle.settings));
+    setSyncStatus((prev) => ({
+      ...prev,
+      lastSyncedAt: bundle.savedAt,
+    }));
+  }, []);
+
+  const reconcileSyncAfterLogin = useCallback(
+    async (status: SyncStatus) => {
+      if (!status.authenticated) return;
+
+      setSyncBusy(true);
+      try {
+        const bundle = await pullSyncBundle();
+        if (bundle) {
+          applyRemoteBundle(bundle);
+          pushToast("서버 기록을 불러와 이어서 시작할 수 있습니다.", "success");
+          return;
+        }
+
+        const uploaded = await pushSyncBundle({
+          progress,
+          settings,
+          savedAt: new Date().toISOString(),
+        });
+        setSyncStatus((prev) => ({
+          ...prev,
+          lastSyncedAt: uploaded.savedAt,
+        }));
+        pushToast(
+          "처음 로그인한 계정입니다. 지금 기록을 서버에 저장했습니다.",
+          "success",
+        );
+      } catch (error) {
+        pushToast(
+          error instanceof Error
+            ? error.message
+            : "로그인 후 기록을 확인하는 중 문제가 생겼습니다.",
+          "error",
+        );
+      } finally {
+        setSyncBusy(false);
+      }
+    },
+    [
+      applyRemoteBundle,
+      progress,
+      pullSyncBundle,
+      pushSyncBundle,
+      pushToast,
+      settings,
+    ],
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !booted) return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const authCode = searchParams.get("auth");
+    const authReason = searchParams.get("reason");
+    if (!authCode) return;
+
+    const messages: Record<string, string> = {
+      success: "DataGSM 로그인이 완료되었습니다.",
+      "invalid-state":
+        "로그인 확인 과정이 올바르지 않았습니다. 다시 시도해 주세요.",
+      "token-failed": "로그인을 마무리하지 못했습니다.",
+      "token-missing": "로그인 토큰을 받지 못했습니다.",
+      "userinfo-failed": "계정 정보를 불러오지 못했습니다.",
+      "network-failed": "로그인 중 네트워크 문제가 발생했습니다.",
+      "unauthorized-role": "자퇴한 계정은 로그인할 수 없습니다.",
+    };
+
+    const message = messages[authCode] ?? `로그인 처리 상태: ${authCode}`;
+    const detailedMessage =
+      authCode === "token-failed" && authReason
+        ? `${message} (${authReason})`
+        : message;
+
+    window.history.replaceState({}, "", "/");
+
+    if (authCode === "success") {
+      void (async () => {
+        let status = await refreshAuthStatus();
+
+        if (!status.authenticated) {
+          await delay(250);
+          status = await refreshAuthStatus();
+        }
+
+        if (!status.authenticated) {
+          pushToast(
+            "로그인은 완료됐지만 계정 상태를 확인하지 못했습니다.",
+            "error",
+          );
+          return;
+        }
+
+        pushToast(
+          `${formatUserSummary(status.user)} 계정으로 로그인했습니다.`,
+          "success",
+        );
+        await reconcileSyncAfterLogin(status);
+      })();
+      return;
+    }
+
+    pushToast(detailedMessage, "error");
+    void refreshAuthStatus();
+  }, [booted, pushToast, reconcileSyncAfterLogin, refreshAuthStatus]);
 
   async function handleManualPush() {
-    if (!syncStatus.authenticated || !syncStatus.storageConfigured) return;
+    if (!syncStatus.authenticated) return;
     setSyncBusy(true);
     try {
       await pushSyncBundle({
@@ -152,10 +282,11 @@ export default function GameApp() {
         settings,
         savedAt: new Date().toISOString(),
       });
-      setSyncMessage("현재 기기의 기록을 서버에 저장했습니다.");
+      pushToast("현재 기록을 서버에 저장했습니다.", "success");
     } catch (error) {
-      setSyncMessage(
-        error instanceof Error ? error.message : "동기화 저장에 실패했습니다.",
+      pushToast(
+        error instanceof Error ? error.message : "서버 저장에 실패했습니다.",
+        "error",
       );
     } finally {
       setSyncBusy(false);
@@ -163,27 +294,23 @@ export default function GameApp() {
   }
 
   async function handleManualPull() {
-    if (!syncStatus.authenticated || !syncStatus.storageConfigured) return;
+    if (!syncStatus.authenticated) return;
     setSyncBusy(true);
     try {
       const bundle = await pullSyncBundle();
       if (!bundle) {
-        setSyncMessage("서버에 저장된 기록이 아직 없습니다.");
+        pushToast("서버에 저장된 기록이 아직 없습니다.");
         return;
       }
 
-      setProgress(sanitizeProgress(bundle.progress));
-      setSettings(sanitizeSettings(bundle.settings));
-      setSyncStatus((prev) => ({
-        ...prev,
-        lastSyncedAt: bundle.savedAt,
-      }));
-      setSyncMessage("서버에 저장된 기록과 설정을 불러왔습니다.");
+      applyRemoteBundle(bundle);
+      pushToast("서버 기록과 설정을 불러왔습니다.", "success");
     } catch (error) {
-      setSyncMessage(
+      pushToast(
         error instanceof Error
           ? error.message
-          : "동기화 데이터를 불러오지 못했습니다.",
+          : "서버 기록을 불러오지 못했습니다.",
+        "error",
       );
     } finally {
       setSyncBusy(false);
@@ -191,12 +318,7 @@ export default function GameApp() {
   }
 
   useEffect(() => {
-    if (
-      !booted ||
-      !syncStatus.authenticated ||
-      !syncStatus.storageConfigured ||
-      !settings.autoSync
-    ) {
+    if (!booted || !syncStatus.authenticated || !settings.autoSync) {
       return;
     }
 
@@ -206,7 +328,7 @@ export default function GameApp() {
         settings,
         savedAt: new Date().toISOString(),
       }).catch(() => {
-        setSyncMessage("자동 동기화 중 오류가 발생했습니다.");
+        pushToast("자동 동기화 중 문제가 생겼습니다.", "error");
       });
     }, 900);
 
@@ -214,62 +336,71 @@ export default function GameApp() {
   }, [
     booted,
     progress,
+    pushToast,
     pushSyncBundle,
     settings,
     syncStatus.authenticated,
-    syncStatus.storageConfigured,
   ]);
 
   const achievements = useMemo(() => getAchievementState(progress), [progress]);
 
   if (screen === "game") {
     return (
-      <GameScreen
-        initialProgress={progress}
-        settings={settings}
-        onProgressChange={setProgress}
-        onBackToMenu={() => setScreen("menu")}
-      />
+      <>
+        <GameScreen
+          initialProgress={progress}
+          settings={settings}
+          onProgressChange={setProgress}
+          onBackToMenu={() => setScreen("menu")}
+        />
+        <ToastLayer toasts={toasts} onDismiss={dismissToast} />
+      </>
     );
   }
 
   return (
-    <MainMenu
-      onStart={() => setScreen("game")}
-      canContinue={hasContinuableProgress(progress)}
-      progress={progress}
-      settings={settings}
-      achievements={achievements}
-      syncStatus={syncStatus}
-      syncBusy={syncBusy}
-      syncMessage={syncMessage}
-      onSettingsChange={(patch) => {
-        setSettings((prev) => ({ ...prev, ...patch }));
-      }}
-      onLogin={() => {
-        window.location.href = "/api/auth/datagsm/login";
-      }}
-      onLogout={() => {
-        void fetch("/api/auth/datagsm/logout", { method: "POST" }).then(() => {
-          setSyncMessage("DataGSM 계정에서 로그아웃했습니다.");
-          setSyncStatus((prev) => ({
-            ...prev,
-            authenticated: false,
-            user: null,
-          }));
-        });
-      }}
-      onPull={() => {
-        void handleManualPull();
-      }}
-      onPush={() => {
-        void handleManualPush();
-      }}
-      onResetProgress={() => {
-        const fresh = createFreshProgress();
-        setProgress(fresh);
-        setSyncMessage("이 기기의 진행 기록을 초기화했습니다.");
-      }}
-    />
+    <>
+      <MainMenu
+        onStart={() => setScreen("game")}
+        canContinue={hasContinuableProgress(progress)}
+        progress={progress}
+        settings={settings}
+        achievements={achievements}
+        syncStatus={syncStatus}
+        syncBusy={syncBusy}
+        onSettingsChange={(patch) => {
+          setSettings((prev) => ({ ...prev, ...patch }));
+        }}
+        onLogin={() => {
+          window.location.href = "/api/auth/datagsm/login";
+        }}
+        onLogout={() => {
+          void fetch("/api/auth/datagsm/logout", { method: "POST" })
+            .then(() => {
+              pushToast("DataGSM 계정에서 로그아웃했습니다.", "success");
+              setSyncStatus((prev) => ({
+                ...prev,
+                authenticated: false,
+                user: null,
+              }));
+            })
+            .catch(() => {
+              pushToast("로그아웃 중 문제가 생겼습니다.", "error");
+            });
+        }}
+        onPull={() => {
+          void handleManualPull();
+        }}
+        onPush={() => {
+          void handleManualPush();
+        }}
+        onResetProgress={() => {
+          const fresh = createFreshProgress();
+          setProgress(fresh);
+          pushToast("이 기기의 진행 기록을 초기화했습니다.", "success");
+        }}
+      />
+      <ToastLayer toasts={toasts} onDismiss={dismissToast} />
+    </>
   );
 }

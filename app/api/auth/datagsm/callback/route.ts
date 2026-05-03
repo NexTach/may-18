@@ -7,6 +7,54 @@ import {
   signSession,
 } from "../../../../lib/datagsm-auth";
 
+function extractOAuthError(payload: unknown) {
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as Record<string, unknown>;
+  const error =
+    typeof record.error === "string" ? record.error.trim() : undefined;
+  const description =
+    typeof record.error_description === "string"
+      ? record.error_description.trim()
+      : typeof record.message === "string"
+        ? record.message.trim()
+        : undefined;
+
+  if (!error && !description) return null;
+  return [error, description].filter(Boolean).join(": ");
+}
+
+async function exchangeToken(
+  tokenUrl: string,
+  payload: Record<string, string>,
+) {
+  const formBody = new URLSearchParams(payload);
+  let response = await fetch(tokenUrl, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: formBody,
+    cache: "no-store",
+  });
+
+  if (response.status !== 415) {
+    return response;
+  }
+
+  response = await fetch(tokenUrl, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    cache: "no-store",
+  });
+
+  return response;
+}
+
 export async function GET(request: NextRequest) {
   const config = getDataGsmOAuthConfig();
   if (!config.configured) {
@@ -35,27 +83,40 @@ export async function GET(request: NextRequest) {
     "/api/auth/datagsm/callback",
     request.url,
   ).toString();
-  const body = new URLSearchParams({
+  const tokenPayload: Record<string, string> = {
     grant_type: "authorization_code",
     client_id: config.clientId,
     redirect_uri: redirectUri,
     code,
     code_verifier: verifier,
-  });
-  if (config.clientSecret) body.set("client_secret", config.clientSecret);
+  };
+  if (config.clientSecret) {
+    tokenPayload.client_secret = config.clientSecret;
+  }
 
   try {
-    const tokenResponse = await fetch(config.tokenUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body,
-      cache: "no-store",
-    });
+    const tokenResponse = await exchangeToken(config.tokenUrl, tokenPayload);
 
     if (!tokenResponse.ok) {
-      return NextResponse.redirect(new URL("/?auth=token-failed", request.url));
+      let reason = `HTTP ${tokenResponse.status}`;
+
+      try {
+        const tokenErrorJson = await tokenResponse.json();
+        reason = extractOAuthError(tokenErrorJson) ?? reason;
+      } catch {
+        try {
+          const tokenErrorText = (await tokenResponse.text()).trim();
+          if (tokenErrorText) {
+            reason = tokenErrorText;
+          }
+        } catch {
+          // Ignore secondary parsing failures and keep the status-only reason.
+        }
+      }
+
+      const redirectUrl = new URL("/?auth=token-failed", request.url);
+      redirectUrl.searchParams.set("reason", reason.slice(0, 180));
+      return NextResponse.redirect(redirectUrl);
     }
 
     const tokenJson = (await tokenResponse.json()) as { access_token?: string };
@@ -80,6 +141,13 @@ export async function GET(request: NextRequest) {
 
     const rawUser = await userResponse.json();
     const user = normalizeDataGsmUser(rawUser);
+
+    if (user.academicState === "dropout") {
+      return NextResponse.redirect(
+        new URL("/?auth=unauthorized-role", request.url),
+      );
+    }
+
     const session = signSession({
       user,
       createdAt: new Date().toISOString(),

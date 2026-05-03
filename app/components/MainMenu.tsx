@@ -24,7 +24,6 @@ type Props = {
   achievements: AchievementView[];
   syncStatus: SyncStatus;
   syncBusy: boolean;
-  syncMessage: string | null;
   onSettingsChange: (patch: Partial<GameSettings>) => void;
   onLogin: () => void;
   onLogout: () => void;
@@ -46,7 +45,6 @@ export default function MainMenu({
   achievements,
   syncStatus,
   syncBusy,
-  syncMessage,
   onSettingsChange,
   onLogin,
   onLogout,
@@ -261,7 +259,6 @@ export default function MainMenu({
           settings={settings}
           syncStatus={syncStatus}
           syncBusy={syncBusy}
-          syncMessage={syncMessage}
           onClose={() => setSettingsOpen(false)}
           onSettingsChange={onSettingsChange}
           onLogin={onLogin}

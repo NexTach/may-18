@@ -6,7 +6,6 @@ type Props = {
   settings: GameSettings;
   syncStatus: SyncStatus;
   syncBusy: boolean;
-  syncMessage: string | null;
   onClose: () => void;
   onSettingsChange: (patch: Partial<GameSettings>) => void;
   onLogin: () => void;
@@ -70,7 +69,6 @@ export default function SettingsModal({
   settings,
   syncStatus,
   syncBusy,
-  syncMessage,
   onClose,
   onSettingsChange,
   onLogin,
@@ -254,16 +252,12 @@ export default function SettingsModal({
                   <button
                     type="button"
                     onClick={onLogin}
-                    disabled={!syncStatus.configured}
                     className="min-w-[156px] border px-4 py-2.5 text-left"
                     style={{
                       fontFamily: "monospace",
-                      borderColor: syncStatus.configured
-                        ? "#dfe7f2"
-                        : "#3a4a18",
-                      background: syncStatus.configured ? "#f3f7fb" : "#10170b",
-                      color: syncStatus.configured ? "#12263f" : "#506124",
-                      opacity: syncStatus.configured ? 1 : 0.65,
+                      borderColor: "#dfe7f2",
+                      background: "#f3f7fb",
+                      color: "#12263f",
                     }}
                   >
                     <span className="block text-[10px] tracking-wide opacity-70">
@@ -286,10 +280,9 @@ export default function SettingsModal({
                     className="mt-1 text-[11px] text-[#6d8240]"
                     style={{ fontFamily: "monospace" }}
                   >
-                    {syncStatus.user.role}
-                    {syncStatus.user.grade
-                      ? ` · ${syncStatus.user.grade}학년 ${syncStatus.user.classRoom ?? "-"}반 ${syncStatus.user.number ?? "-"}번`
-                      : ""}
+                    {syncStatus.user.role} · {syncStatus.user.grade ?? "-"}학년{" "}
+                    {syncStatus.user.classRoom ?? "-"}반{" "}
+                    {syncStatus.user.number ?? "-"}번
                   </p>
                 </div>
               ) : (
@@ -297,18 +290,7 @@ export default function SettingsModal({
                   className="text-[11px] text-[#4e6123]"
                   style={{ fontFamily: "monospace" }}
                 >
-                  {syncStatus.configured
-                    ? "로그인 전에는 기기 안에만 기록이 저장됩니다."
-                    : "환경 변수 설정 전이라 로그인 버튼이 비활성화되어 있습니다."}
-                </p>
-              )}
-              {!syncStatus.storageConfigured && (
-                <p
-                  className="mt-2 text-[11px] leading-relaxed text-[#8a7a40]"
-                  style={{ fontFamily: "monospace" }}
-                >
-                  Neon DB 연결이 아직 설정되지 않아 로그인 후에도 서버 동기화는
-                  비활성화됩니다.
+                  로그인 전에는 기기 안에만 기록이 저장됩니다.
                 </p>
               )}
             </div>
@@ -331,11 +313,7 @@ export default function SettingsModal({
                 <button
                   type="button"
                   onClick={onPull}
-                  disabled={
-                    !syncStatus.authenticated ||
-                    !syncStatus.storageConfigured ||
-                    syncBusy
-                  }
+                  disabled={!syncStatus.authenticated || syncBusy}
                   className="border px-3 py-2 text-[12px]"
                   style={{
                     fontFamily: "monospace",
@@ -352,11 +330,7 @@ export default function SettingsModal({
                 <button
                   type="button"
                   onClick={onPush}
-                  disabled={
-                    !syncStatus.authenticated ||
-                    !syncStatus.storageConfigured ||
-                    syncBusy
-                  }
+                  disabled={!syncStatus.authenticated || syncBusy}
                   className="border px-3 py-2 text-[12px]"
                   style={{
                     fontFamily: "monospace",
@@ -377,14 +351,6 @@ export default function SettingsModal({
               >
                 마지막 동기화: {syncStatus.lastSyncedAt ?? "없음"}
               </p>
-              {syncMessage && (
-                <p
-                  className="mt-2 text-[11px] leading-relaxed text-[#9ab048]"
-                  style={{ fontFamily: "monospace" }}
-                >
-                  {syncMessage}
-                </p>
-              )}
             </div>
 
             <button
