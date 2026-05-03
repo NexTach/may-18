@@ -20,6 +20,14 @@ export const metadata: Metadata = {
   title: "그날의 선택 — 5.18 민주화운동",
   description:
     "1980년 5월 광주의 시민들이 마주한 상황과 기록을 따라가는 5·18민주화운동 인터랙티브 스토리",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
