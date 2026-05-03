@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import NextImage from "next/image";
 import { useEffect, useState } from "react";
 
 export type Direction = "down" | "up" | "right" | "left";
@@ -123,7 +123,7 @@ function extractSprite(dir: Direction, size: number): string {
 async function loadAndProcess(size: number): Promise<void> {
   if (!loadedImg) {
     await new Promise<void>((resolve, reject) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         loadedImg = img;
         resolve();
@@ -168,7 +168,7 @@ export default function Character({
   if (!url) return null;
 
   return (
-    <Image
+    <NextImage
       src={url}
       alt=""
       width={size}
