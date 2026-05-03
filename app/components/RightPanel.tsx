@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AVATAR_COLORS, STAT_LABELS } from "../lib/constants";
 import { playSfx } from "../lib/sfx";
 import type { Choice, DialogueLine, StatKey } from "../types";
+import ChoiceBottomSheet from "./ChoiceBottomSheet";
 
 type ChoiceView = Choice & {
   disabled?: boolean;
@@ -85,6 +86,7 @@ export default function RightPanel({
   onChoice,
 }: Props) {
   const { displayed, done, skip } = useTypingText(text, typingSpeed);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
     <div
@@ -165,8 +167,36 @@ export default function RightPanel({
 
       {done && <div className="border-t border-[#2c3f12] mx-3 mb-1" />}
 
+      {/* 모바일: 선택하기 트리거 버튼 */}
       {done && (
-        <div className="p-3 flex flex-col gap-2 flex-shrink-0">
+        <div className="md:hidden p-3 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              if (soundOn) playSfx("click");
+              setSheetOpen(true);
+            }}
+            className="w-full border border-[#2c3f12] bg-[#0d1608] active:bg-[#162010] active:border-[#4a6a1a] px-4 py-3.5 transition-all cursor-pointer"
+          >
+            <div
+              className="text-[11px] text-[#3a5010] mb-1"
+              style={{ fontFamily: "'Press Start 2P', monospace" }}
+            >
+              ◆ 이제 어떻게 해야 할까
+            </div>
+            <div
+              className="text-[13px] text-[#8aa040]"
+              style={{ fontFamily: "monospace" }}
+            >
+              선택하기 →
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* 데스크탑: 인라인 선택지 */}
+      {done && (
+        <div className="hidden md:flex p-3 flex-col gap-2 flex-shrink-0">
           <div
             className="text-[11px] text-[#3a5010] mb-1"
             style={{ fontFamily: "'Press Start 2P', monospace" }}
@@ -228,7 +258,7 @@ export default function RightPanel({
               </span>
               {choice.stat && choice.statDelta !== undefined && (
                 <span
-                  className="flex-shrink-0 text-[11px] font-bold mt-0.5"
+                  className="flex-shrink-0 text-[11px] font-bold mt.0.5"
                   style={{
                     color: STAT_COLORS[choice.stat],
                     fontFamily: "monospace",
@@ -240,6 +270,15 @@ export default function RightPanel({
             </button>
           ))}
         </div>
+      )}
+
+      {sheetOpen && (
+        <ChoiceBottomSheet
+          choices={choices}
+          soundOn={soundOn}
+          onChoice={onChoice}
+          onClose={() => setSheetOpen(false)}
+        />
       )}
     </div>
   );
