@@ -230,25 +230,25 @@ function GwangjuCityMap({
       <g
         fontFamily="monospace"
         textAnchor="middle"
-        fill="#4a7228"
-        opacity="0.75"
+        fill="#5a8a30"
+        opacity="0.9"
         stroke="#060a04"
-        strokeWidth="1.5"
+        strokeWidth="2"
         paintOrder="stroke fill"
       >
-        <text x="138" y="172" fontSize="9">
+        <text x="138" y="172" fontSize="15">
           광산구
         </text>
-        <text x="370" y="80" fontSize="9">
+        <text x="370" y="80" fontSize="15">
           북구
         </text>
-        <text x="280" y="210" fontSize="9">
+        <text x="280" y="210" fontSize="15">
           서구
         </text>
-        <text x="415" y="230" fontSize="9">
+        <text x="415" y="230" fontSize="15">
           동구
         </text>
-        <text x="295" y="300" fontSize="9">
+        <text x="295" y="300" fontSize="15">
           남구
         </text>
       </g>
@@ -304,6 +304,21 @@ function GwangjuCityMap({
               stroke={pinStroke}
               strokeWidth="0.6"
             />
+            {isFrontier && (
+              <text
+                x={px}
+                y={py + r + 9}
+                textAnchor="middle"
+                fontSize="8.5"
+                fontFamily="monospace"
+                fill={STK_FRONTIER}
+                stroke="#060a04"
+                strokeWidth="1.8"
+                paintOrder="stroke fill"
+              >
+                {node.label}
+              </text>
+            )}
           </g>
         );
       })}
@@ -314,8 +329,8 @@ function GwangjuCityMap({
         const node = mapNodes.find((n) => n.id === currentSceneId);
         if (!pos || !node) return null;
         const [px, py] = pos;
-        const LW = 30; // 라벨 박스 절반 너비
-        const LH = 10; // 라벨 박스 높이
+        const LW = 42; // 라벨 박스 절반 너비
+        const LH = 15; // 라벨 박스 높이
         return (
           <g>
             {/* 바깥 펄스 링 (SVG animate) */}
@@ -386,11 +401,14 @@ function GwangjuCityMap({
             {/* 라벨 텍스트 */}
             <text
               x={px}
-              y={py + 9 + LH - 2}
+              y={py + 9 + LH - 3}
               textAnchor="middle"
-              fontSize="6.5"
+              fontSize="10"
               fontFamily="monospace"
               fill="#c4d47a"
+              stroke="#060a04"
+              strokeWidth="1.8"
+              paintOrder="stroke fill"
             >
               {node.label}
             </text>
