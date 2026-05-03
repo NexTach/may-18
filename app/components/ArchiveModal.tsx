@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { scenes } from "../data/scenes";
 import type { GameProgress, Stats } from "../types";
 
@@ -28,6 +29,12 @@ export default function ArchiveModal({
   achievements,
   onClose,
 }: Props) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   const currentScene = scenes.find(
     (scene) => scene.id === progress.currentSceneId,
   );

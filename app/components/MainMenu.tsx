@@ -56,6 +56,7 @@ export default function MainMenu({
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [achievementOpen, setAchievementOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [exitHint, setExitHint] = useState(false);
 
   const menuItems: MenuItem[] = [
     {
@@ -66,7 +67,14 @@ export default function MainMenu({
     { label: "기록 보기", icon: "▣", action: () => setArchiveOpen(true) },
     { label: "업적", icon: "★", action: () => setAchievementOpen(true) },
     { label: "설정", icon: "◈", action: () => setSettingsOpen(true) },
-    { label: "종료", icon: "✕", action: () => window.close() },
+    {
+      label: "종료",
+      icon: "✕",
+      action: () => {
+        window.close();
+        setExitHint(true);
+      },
+    },
   ];
 
   return (
@@ -267,6 +275,38 @@ export default function MainMenu({
           onPush={onPush}
           onResetProgress={onResetProgress}
         />
+      )}
+      {exitHint && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.88)" }}
+        >
+          <div
+            className="border-2 border-[#4a6a1a] bg-[#0b1208] p-8 w-80 text-center"
+            style={{ boxShadow: "0 0 0 2px #2c3f12" }}
+          >
+            <p
+              className="text-[12px] text-[#c4d47a] mb-2"
+              style={{ fontFamily: "'Press Start 2P', monospace" }}
+            >
+              종료
+            </p>
+            <p
+              className="text-[12px] text-[#5a7a20] leading-relaxed mt-4 mb-6"
+              style={{ fontFamily: "monospace" }}
+            >
+              브라우저에서는 탭을 직접 닫아주세요.
+            </p>
+            <button
+              type="button"
+              onClick={() => setExitHint(false)}
+              className="border border-[#2c3f12] bg-[#0d1608] hover:bg-[#162010] px-6 py-2.5 text-[12px] text-[#8aa040]"
+              style={{ fontFamily: "monospace" }}
+            >
+              돌아가기
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

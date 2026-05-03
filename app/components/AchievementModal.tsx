@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 type AchievementView = {
   id: string;
   icon: string;
@@ -15,6 +17,12 @@ type Props = {
 };
 
 export default function AchievementModal({ achievements, onClose }: Props) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   const unlockedCount = achievements.filter(
     (achievement) => achievement.unlocked,
   ).length;
