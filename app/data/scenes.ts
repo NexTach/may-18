@@ -198,6 +198,7 @@ export const scenes: Scene[] = [
         nextSceneId: "family_neighborhood",
         stat: "trust",
         statDelta: 1,
+        collectible: "letter",
       },
       {
         text: "바로 시내 쪽으로 나간다",
@@ -300,6 +301,7 @@ export const scenes: Scene[] = [
         nextSceneId: "leaflet_room",
         stat: "record",
         statDelta: 1,
+        collectible: "radio_note",
       },
       {
         text: "이웃에게 상황을 설명한다",
@@ -346,6 +348,7 @@ export const scenes: Scene[] = [
         stat: "record",
         statDelta: 1,
         requirements: { record: 2 },
+        collectible: "leaflet",
       },
       {
         text: "사람들이 모인 곳으로 가서 직접 전한다",
@@ -507,6 +510,7 @@ export const scenes: Scene[] = [
         nextSceneId: "downtown",
         stat: "courage",
         statDelta: 1,
+        collectible: "badge",
       },
       {
         text: "현장을 기록한다",
@@ -665,6 +669,7 @@ export const scenes: Scene[] = [
         nextSceneId: "citizen_voice",
         stat: "record",
         statDelta: 1,
+        collectible: "notebook",
       },
     ],
   },
@@ -702,6 +707,7 @@ export const scenes: Scene[] = [
         nextSceneId: "help_people",
         stat: "trust",
         statDelta: 1,
+        collectible: "bandage",
       },
       {
         text: "물자 전달을 맡아 더 바깥까지 움직인다",
@@ -1008,6 +1014,7 @@ export const scenes: Scene[] = [
         nextSceneId: "archive_ending",
         stat: "record",
         statDelta: 1,
+        collectible: "bulletin",
       },
       {
         text: "도청 인근의 마지막 논의 자리로 돌아간다",
@@ -1158,6 +1165,7 @@ export const scenes: Scene[] = [
         text: "엔딩 보기",
         detail: "그날 이후에도 이어지는 기억과 기록의 의미를 돌아본다.",
         nextSceneId: "memory_ending",
+        collectible: "last_memo",
       },
     ],
   },
