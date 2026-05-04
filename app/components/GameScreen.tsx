@@ -219,6 +219,9 @@ export default function GameScreen({
       ? initialProgress.allChoiceLog
       : initialProgress.choiceLog,
   );
+  const [collectedItems, setCollectedItems] = useState<string[]>(
+    initialProgress.collectedItems ?? [],
+  );
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -251,6 +254,12 @@ export default function GameScreen({
           ...prev,
           [statKey]: prev[statKey] + (choice.statDelta ?? 1),
         }));
+      }
+      if (choice.collectible) {
+        const itemId = choice.collectible;
+        setCollectedItems((prev) =>
+          prev.includes(itemId) ? prev : [...prev, itemId],
+        );
       }
       setCurrentSceneId(choice.nextSceneId);
       setVisitedSceneIds((prev) => new Set([...prev, choice.nextSceneId]));
@@ -320,6 +329,7 @@ export default function GameScreen({
       updatedAt: new Date().toISOString(),
       allVisitedSceneIds: Array.from(allVisitedSceneIds),
       allChoiceLog,
+      collectedItems,
     });
   }, [
     choiceLog,
@@ -330,6 +340,7 @@ export default function GameScreen({
     visitedSceneIds,
     allVisitedSceneIds,
     allChoiceLog,
+    collectedItems,
   ]);
 
   useEffect(() => {
@@ -569,6 +580,7 @@ export default function GameScreen({
         <InventoryModal
           stats={stats}
           choiceLog={choiceLog}
+          collectedItems={collectedItems}
           onClose={() => setInventoryOpen(false)}
         />
       )}

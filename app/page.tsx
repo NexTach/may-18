@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import GameScreen from "./components/GameScreen";
 import MainMenu from "./components/MainMenu";
 import ToastLayer, { type ToastItem } from "./components/ToastLayer";
+import { collectibleDefs } from "./data/collectibles";
 import { scenes } from "./data/scenes";
 import { useBgm } from "./hooks/useBgm";
 import {
@@ -397,6 +398,36 @@ export default function GameApp() {
     () => new Map(scenes.map((scene) => [scene.id, scene])),
     [],
   );
+
+  const prevCollectedRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (!booted) return;
+    const currentCollected = new Set(progress.collectedItems ?? []);
+    if (prevCollectedRef.current === null) {
+      prevCollectedRef.current = currentCollected;
+      return;
+    }
+    for (const id of currentCollected) {
+      if (!prevCollectedRef.current.has(id)) {
+        const item = collectibleDefs.find((c) => c.id === id);
+        if (item) {
+          const toastId = Date.now() + Math.floor(Math.random() * 1000);
+          setToasts((prev) => [
+            ...prev,
+            {
+              id: toastId,
+              message: `${item.name} 획득`,
+              tone: "success" as const,
+            },
+          ]);
+          window.setTimeout(() => {
+            setToasts((prev) => prev.filter((t) => t.id !== toastId));
+          }, 4000);
+        }
+      }
+    }
+    prevCollectedRef.current = currentCollected;
+  }, [booted, progress.collectedItems]);
 
   const prevUnlockedRef = useRef<Set<string> | null>(null);
   useEffect(() => {
