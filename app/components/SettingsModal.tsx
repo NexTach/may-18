@@ -55,16 +55,16 @@ function ToggleRow({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-6 border border-[#243410] bg-[#0d1608] px-6 py-4">
+    <div className="flex items-center justify-between gap-3 md:gap-6 border border-[#243410] bg-[#0d1608] px-3 py-3 md:px-6 md:py-4">
       <div>
         <p
-          className="text-[14px] text-game-text"
+          className="text-[13px] md:text-[14px] text-game-text"
           style={{ fontFamily: "monospace" }}
         >
           {label}
         </p>
         <p
-          className="mt-1.5 text-[12px] leading-relaxed text-game-text-dim"
+          className="mt-1 md:mt-1.5 text-[11px] md:text-[12px] leading-relaxed text-game-text-dim"
           style={{ fontFamily: "monospace" }}
         >
           {description}
@@ -73,7 +73,7 @@ function ToggleRow({
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className="min-w-20 border px-4 py-2.5 text-[13px] transition-colors"
+        className="shrink-0 min-w-14 md:min-w-20 border px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-[13px] transition-colors"
         style={{
           fontFamily: "monospace",
           borderColor: checked ? "#6a9a2a" : "#2c3f12",
@@ -101,28 +101,28 @@ function SegmentedRow({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="border border-[#243410] bg-[#0d1608] px-6 py-4">
+    <div className="border border-[#243410] bg-[#0d1608] px-3 py-3 md:px-6 md:py-4">
       <p
-        className="text-[14px] text-game-text"
+        className="text-[13px] md:text-[14px] text-game-text"
         style={{ fontFamily: "monospace" }}
       >
         {label}
       </p>
       {description && (
         <p
-          className="mt-1.5 text-[12px] text-game-text-dim"
+          className="mt-1 md:mt-1.5 text-[11px] md:text-[12px] text-game-text-dim"
           style={{ fontFamily: "monospace" }}
         >
           {description}
         </p>
       )}
-      <div className="mt-4 flex gap-3">
+      <div className="mt-3 md:mt-4 flex gap-2 md:gap-3">
         {options.map((opt) => (
           <button
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
-            className="flex-1 border px-4 py-3 text-left transition-colors"
+            className="flex-1 border px-2 md:px-4 py-2.5 md:py-3 text-left transition-colors"
             style={{
               fontFamily: "monospace",
               borderColor: value === opt.value ? "#6a9a2a" : "#2c3f12",
@@ -130,9 +130,9 @@ function SegmentedRow({
               color: value === opt.value ? "#c4d47a" : "#5a7a20",
             }}
           >
-            <span className="block text-[13px]">{opt.label}</span>
+            <span className="block text-[12px] md:text-[13px]">{opt.label}</span>
             {opt.desc && (
-              <span className="block mt-1 text-[11px] opacity-70">
+              <span className="hidden md:block mt-1 text-[11px] opacity-70">
                 {opt.desc}
               </span>
             )}
@@ -214,8 +214,8 @@ function SyncTab({
     <div className="flex flex-col gap-4 max-w-2xl">
       <SectionTitle>계정</SectionTitle>
 
-      <div className="border border-[#243410] bg-[#0d1608] p-6">
-        <div className="flex items-start justify-between gap-6">
+      <div className="border border-[#243410] bg-[#0d1608] p-3 md:p-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
           <div className="flex-1">
             <p
               className="text-[14px] text-game-text"
@@ -297,14 +297,14 @@ function SyncTab({
         onChange={(autoSync) => onSettingsChange({ autoSync })}
       />
 
-      <div className="border border-[#243410] bg-[#0d1608] p-6">
+      <div className="border border-[#243410] bg-[#0d1608] p-3 md:p-6">
         <p
-          className="text-[14px] text-game-text mb-4"
+          className="text-[13px] md:text-[14px] text-game-text mb-3 md:mb-4"
           style={{ fontFamily: "monospace" }}
         >
           수동 동기화
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 md:gap-3">
           <button
             type="button"
             onClick={onPull}
@@ -386,7 +386,7 @@ function DangerCard({
   };
 
   return (
-    <div className="border border-[#5a2a2a] bg-[#100808] p-6">
+    <div className="border border-[#5a2a2a] bg-[#100808] p-3 md:p-6">
       <p
         className="text-[14px] text-[#d37a7a]"
         style={{ fontFamily: "monospace" }}
@@ -524,7 +524,7 @@ export default function SettingsModal({
           className="text-[13px] text-game-border-bright transition-colors hover:text-game-text"
           style={{ fontFamily: "monospace" }}
         >
-          [ESC] 닫기
+          <span className="hidden md:inline">[ESC] </span>닫기
         </button>
       </div>
 
