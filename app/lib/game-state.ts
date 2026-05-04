@@ -1,4 +1,5 @@
 import { achievementDefs } from "../data/achievements";
+import { collectibleDefs } from "../data/collectibles";
 import { scenes } from "../data/scenes";
 import type {
   GameProgress,
@@ -35,6 +36,7 @@ export const DEFAULT_PROGRESS: GameProgress = {
   updatedAt: null,
   allVisitedSceneIds: ["start"],
   allChoiceLog: [],
+  collectedItems: [],
 };
 
 export const TEXT_SPEED_MS: Record<TextSpeed, number> = {
@@ -50,6 +52,7 @@ export function createFreshProgress(): GameProgress {
     choiceLog: [],
     stats: { ...DEFAULT_STATS },
     updatedAt: null,
+    collectedItems: [],
   };
 }
 
@@ -131,6 +134,13 @@ export function sanitizeProgress(value: unknown): GameProgress {
       : (Array.isArray(raw.choiceLog)
           ? raw.choiceLog.filter((item): item is string => typeof item === "string")
           : []),
+    collectedItems: (() => {
+      const validIds = new Set(collectibleDefs.map((c) => c.id));
+      const raw_items = Array.isArray(raw.collectedItems) ? raw.collectedItems : [];
+      return Array.from(new Set(
+        raw_items.filter((id): id is string => typeof id === "string" && validIds.has(id))
+      ));
+    })(),
   };
 }
 
