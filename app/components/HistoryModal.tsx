@@ -42,7 +42,7 @@ export default function HistoryModal({
         onClick={onClose}
       />
       <div
-        className="border-2 border-game-border-bright bg-game-panel p-4 md:p-7 max-w-4xl w-full mx-4 relative z-10 max-h-[86vh] overflow-y-auto"
+        className="border-2 border-game-border-bright bg-game-panel p-4 md:p-7 max-w-4xl w-full mx-4 relative z-10 max-h-[85dvh] overflow-y-auto"
         style={{
           boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208, 0 0 0 6px #1a2a0c",
         }}
@@ -86,7 +86,7 @@ export default function HistoryModal({
                 관련 이미지
               </div>
             </div>
-            <div className="relative aspect-16/10 bg-game-bg">
+            <div className="relative h-[160px] md:h-auto md:aspect-16/10 bg-game-bg">
               {imageReady ? (
                 <Image
                   src={imageSrc}
