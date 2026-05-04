@@ -92,7 +92,7 @@ export default function HUD({
         </span>
       </div>
 
-      <div className="flex items-center gap-1 md:gap-1.5 shrink-0">
+      <div className="flex items-center gap-1 md:gap-1.5 shrink-0 md:ml-4">
         <HUDButton label="역사" shortcut="X" onClick={onHistory} />
         <HUDButton label="지도" shortcut="M" onClick={onMap} />
         <HUDButton label="가방" shortcut="Tab" onClick={onInventory} />
