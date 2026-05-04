@@ -42,7 +42,7 @@ export default function HistoryModal({
         onClick={onClose}
       />
       <div
-        className="border-2 border-game-border-bright bg-game-panel p-7 max-w-4xl w-full mx-4 relative z-10 max-h-[86vh] overflow-y-auto"
+        className="border-2 border-game-border-bright bg-game-panel p-4 md:p-7 max-w-4xl w-full mx-4 relative z-10 max-h-[86vh] overflow-y-auto"
         style={{
           boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208, 0 0 0 6px #1a2a0c",
         }}
@@ -134,7 +134,7 @@ export default function HistoryModal({
             </div>
           </div>
 
-          <div className="border border-[#1e2e0e] bg-[#090d06] p-5">
+          <div className="border border-[#1e2e0e] bg-[#090d06] p-3 md:p-5">
             <div
               className="text-[10px] text-game-border-bright mb-3"
               style={{ fontFamily: "'Press Start 2P', monospace" }}

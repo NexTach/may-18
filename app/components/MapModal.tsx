@@ -469,7 +469,7 @@ export default function MapModal({
             className="text-[13px] text-game-border-bright hover:text-game-text transition-colors cursor-pointer"
             style={{ fontFamily: "monospace" }}
           >
-            [ESC] 닫기
+            <span className="hidden md:inline">[ESC] </span>닫기
           </button>
         </div>
 

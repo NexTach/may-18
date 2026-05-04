@@ -60,7 +60,7 @@ export default function ArchiveModal({
         onClick={onClose}
       />
       <div
-        className="relative mx-4 w-full max-w-3xl border-2 border-game-border-bright bg-game-panel p-6"
+        className="relative mx-4 w-full max-w-3xl border-2 border-game-border-bright bg-game-panel p-3 md:p-6"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="기록 보기"
@@ -88,7 +88,7 @@ export default function ArchiveModal({
             className="text-[13px] text-game-border-bright transition-colors hover:text-game-text"
             style={{ fontFamily: "monospace" }}
           >
-            [ESC] 닫기
+            <span className="hidden md:inline">[ESC] </span>닫기
           </button>
         </div>
 
@@ -132,7 +132,7 @@ export default function ArchiveModal({
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.1fr_0.9fr]">
-          <div className="border border-game-border bg-[#090d06] p-4">
+          <div className="border border-game-border bg-[#090d06] p-3 md:p-4">
             <div
               className="mb-3 text-[11px] text-game-border-bright"
               style={{ fontFamily: "'Press Start 2P', monospace" }}
@@ -171,7 +171,7 @@ export default function ArchiveModal({
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="border border-game-border bg-[#090d06] p-4">
+            <div className="border border-game-border bg-[#090d06] p-3 md:p-4">
               <div
                 className="mb-3 text-[11px] text-game-border-bright"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}
@@ -208,7 +208,7 @@ export default function ArchiveModal({
               </div>
             </div>
 
-            <div className="border border-game-border bg-[#090d06] p-4">
+            <div className="border border-game-border bg-[#090d06] p-3 md:p-4">
               <div
                 className="mb-3 text-[11px] text-game-border-bright"
                 style={{ fontFamily: "'Press Start 2P', monospace" }}

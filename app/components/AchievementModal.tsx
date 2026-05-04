@@ -39,7 +39,7 @@ export default function AchievementModal({ achievements, onClose }: Props) {
         onClick={onClose}
       />
       <div
-        className="relative mx-4 w-full max-w-2xl border-2 border-game-border-bright bg-game-panel p-6"
+        className="relative mx-4 w-full max-w-2xl border-2 border-game-border-bright bg-game-panel p-3 md:p-6"
         style={{ boxShadow: "0 0 0 2px #2c3f12, 0 0 0 4px #0b1208" }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="업적"
@@ -67,7 +67,7 @@ export default function AchievementModal({ achievements, onClose }: Props) {
             className="text-[13px] text-game-border-bright transition-colors hover:text-game-text"
             style={{ fontFamily: "monospace" }}
           >
-            [ESC] 닫기
+            <span className="hidden md:inline">[ESC] </span>닫기
           </button>
         </div>
 
@@ -75,7 +75,7 @@ export default function AchievementModal({ achievements, onClose }: Props) {
           {achievements.map((achievement) => (
             <div
               key={achievement.id}
-              className="border p-4"
+              className="border p-3 md:p-4"
               style={{
                 borderColor: achievement.unlocked ? "#4a6a1a" : "#1f2b10",
                 background: achievement.unlocked ? "#0d1608" : "#090d06",
