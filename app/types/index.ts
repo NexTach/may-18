@@ -22,6 +22,7 @@ export type Choice = {
   stat?: StatKey;
   statDelta?: number;
   requirements?: Partial<Record<StatKey, number>>;
+  collectible?: string;
 };
 
 export type SceneType =
@@ -100,6 +101,7 @@ export type GameProgress = {
   updatedAt: string | null;
   allVisitedSceneIds: string[];
   allChoiceLog: string[];
+  collectedItems: string[];
 };
 
 export type DataGsmUser = {
