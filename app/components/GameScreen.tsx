@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useGame } from "../context/GameContext";
 import { historyMediaBySceneId } from "../data/history-media";
 import { scenes, TOTAL_STAGES } from "../data/scenes";
 import {
@@ -10,10 +11,11 @@ import {
 } from "../lib/asset-cache";
 import { AVATAR_COLORS, STAT_LABELS } from "../lib/constants";
 import { TEXT_SPEED_MS } from "../lib/game-state";
+import { useKeyboardControls } from "../hooks/useKeyboardControls";
+import { useSceneFrame } from "../hooks/useSceneFrame";
 import type {
   Choice,
-  GameProgress,
-  GameSettings,
+  SceneId,
   SceneType,
   StatKey,
   Stats,
@@ -24,16 +26,10 @@ import HUD from "./HUD";
 import InventoryModal from "./InventoryModal";
 import MapModal from "./MapModal";
 import MiniMap from "./MiniMap";
+import PauseMenu from "./PauseMenu";
 import PixelScene from "./PixelScene";
 import RightPanel from "./RightPanel";
 import SpeechBubble from "./SpeechBubble";
-
-type Props = {
-  onBackToMenu: () => void;
-  initialProgress: GameProgress;
-  settings: GameSettings;
-  onProgressChange: (progress: GameProgress) => void;
-};
 
 const LOCATION_DESCS: Record<string, string> = {
   "광주역 앞 거리":
@@ -163,19 +159,7 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   ],
 };
 
-const SCENE_ASPECT_RATIO = 16 / 9;
 
-function getContainedFrame(width: number, height: number) {
-  if (width <= 0 || height <= 0) {
-    return { width: 0, height: 0 };
-  }
-
-  const frameWidth = Math.min(width, height * SCENE_ASPECT_RATIO);
-  return {
-    width: frameWidth,
-    height: frameWidth / SCENE_ASPECT_RATIO,
-  };
-}
 
 function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   if (!choice.requirements) return null;
@@ -190,16 +174,15 @@ function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   return null;
 }
 
-export default function GameScreen({
-  onBackToMenu,
-  initialProgress,
-  settings,
-  onProgressChange,
-}: Props) {
-  const [currentSceneId, setCurrentSceneId] = useState(
+export default function GameScreen() {
+  const { state, dispatch } = useGame();
+  const { settings } = state;
+  const initialProgress = state.progress;
+
+  const [currentSceneId, setCurrentSceneId] = useState<SceneId>(
     initialProgress.currentSceneId,
   );
-  const [visitedSceneIds, setVisitedSceneIds] = useState<Set<string>>(
+  const [visitedSceneIds, setVisitedSceneIds] = useState<Set<SceneId>>(
     new Set(initialProgress.visitedSceneIds),
   );
   const [choiceLog, setChoiceLog] = useState<string[]>(
@@ -207,7 +190,7 @@ export default function GameScreen({
   );
   const [stats, setStats] = useState<Stats>(initialProgress.stats);
   const [sceneIndex, setSceneIndex] = useState(initialProgress.sceneIndex);
-  const [allVisitedSceneIds, setAllVisitedSceneIds] = useState<Set<string>>(
+  const [allVisitedSceneIds, setAllVisitedSceneIds] = useState<Set<SceneId>>(
     new Set(
       initialProgress.allVisitedSceneIds.length > 0
         ? initialProgress.allVisitedSceneIds
@@ -227,8 +210,7 @@ export default function GameScreen({
   const [mapOpen, setMapOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const sceneSlotRef = useRef<HTMLDivElement | null>(null);
-  const [sceneFrame, setSceneFrame] = useState({ width: 0, height: 0 });
+  const { slotRef: sceneSlotRef, sceneFrame } = useSceneFrame();
 
   const currentScene = scenes.find((s) => s.id === currentSceneId);
 
@@ -269,72 +251,48 @@ export default function GameScreen({
     [stats, currentSceneId],
   );
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (historyOpen) {
-          setHistoryOpen(false);
-          return;
-        }
-        if (mapOpen) {
-          setMapOpen(false);
-          return;
-        }
-        if (inventoryOpen) {
-          setInventoryOpen(false);
-          return;
-        }
-        setMenuOpen((v) => !v);
-      }
-      if (e.key === "x" || e.key === "X") setHistoryOpen((v) => !v);
-      if (e.key === "m" || e.key === "M") setMapOpen((v) => !v);
-      if (e.key === "Tab") {
-        e.preventDefault();
-        setInventoryOpen((v) => !v);
-      }
-      if (!historyOpen && !mapOpen && !inventoryOpen && !menuOpen) {
-        const canUseChoice = (choice?: Choice): choice is Choice =>
-          choice !== undefined && !getChoiceDisabledReason(choice, stats);
-        const firstChoice = currentScene?.choices[0];
-        const secondChoice = currentScene?.choices[1];
-        const thirdChoice = currentScene?.choices[2];
+  const isChoiceDisabled = useCallback(
+    (choice: Choice) => Boolean(getChoiceDisabledReason(choice, stats)),
+    [stats],
+  );
 
-        if (e.key === "1" && canUseChoice(firstChoice))
-          handleChoice(firstChoice);
-        if (e.key === "2" && canUseChoice(secondChoice))
-          handleChoice(secondChoice);
-        if (e.key === "3" && canUseChoice(thirdChoice))
-          handleChoice(thirdChoice);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [
+  useKeyboardControls({
     historyOpen,
     mapOpen,
     inventoryOpen,
     menuOpen,
-    currentScene,
-    handleChoice,
+    choices: currentScene?.choices,
     stats,
-  ]);
+    isChoiceDisabled,
+    onChoice: handleChoice,
+    onToggleHistory: () => setHistoryOpen((v) => !v),
+    onToggleMap: () => setMapOpen((v) => !v),
+    onToggleInventory: () => setInventoryOpen((v) => !v),
+    onToggleMenu: () => setMenuOpen((v) => !v),
+    onCloseHistory: () => setHistoryOpen(false),
+    onCloseMap: () => setMapOpen(false),
+    onCloseInventory: () => setInventoryOpen(false),
+  });
 
   useEffect(() => {
-    onProgressChange({
-      currentSceneId,
-      visitedSceneIds: Array.from(visitedSceneIds),
-      choiceLog,
-      stats,
-      sceneIndex,
-      updatedAt: new Date().toISOString(),
-      allVisitedSceneIds: Array.from(allVisitedSceneIds),
-      allChoiceLog,
-      collectedItems,
+    dispatch({
+      type: "SET_PROGRESS",
+      progress: {
+        currentSceneId,
+        visitedSceneIds: Array.from(visitedSceneIds),
+        choiceLog,
+        stats,
+        sceneIndex,
+        updatedAt: new Date().toISOString(),
+        allVisitedSceneIds: Array.from(allVisitedSceneIds),
+        allChoiceLog,
+        collectedItems,
+      },
     });
   }, [
     choiceLog,
     currentSceneId,
-    onProgressChange,
+    dispatch,
     sceneIndex,
     stats,
     visitedSceneIds,
@@ -343,34 +301,6 @@ export default function GameScreen({
     collectedItems,
   ]);
 
-  useEffect(() => {
-    const node = sceneSlotRef.current;
-    if (!node) return;
-
-    const updateSceneFrame = () => {
-      const { width, height } = node.getBoundingClientRect();
-      const nextFrame = getContainedFrame(width, height);
-
-      setSceneFrame((prev) => {
-        if (
-          Math.abs(prev.width - nextFrame.width) < 1 &&
-          Math.abs(prev.height - nextFrame.height) < 1
-        ) {
-          return prev;
-        }
-        return nextFrame;
-      });
-    };
-
-    const observer = new ResizeObserver(() => {
-      updateSceneFrame();
-    });
-
-    observer.observe(node);
-    updateSceneFrame();
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!currentScene) return;
@@ -399,10 +329,7 @@ export default function GameScreen({
   const locationDesc = LOCATION_DESCS[currentScene.location] ?? "";
 
   return (
-    <div
-      className="flex flex-col w-full h-dvh overflow-hidden bg-black p-2 gap-2 md:p-5 md:gap-4"
-      style={{ fontFamily: "monospace" }}
-    >
+    <div className="flex flex-col w-full h-dvh overflow-hidden bg-black p-2 gap-2 md:p-5 md:gap-4 xl:p-6 xl:gap-5 font-mono">
       <HUD
         stageNum={currentScene.stageNum}
         stageTitle={currentScene.stageTitle}
@@ -416,7 +343,7 @@ export default function GameScreen({
         onMenu={() => setMenuOpen(true)}
       />
 
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-2 md:gap-4">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-2 md:gap-4 xl:gap-5">
         <div className="shrink-0 md:flex-1 flex flex-col min-w-0 md:min-h-0 gap-2 md:gap-4">
           <div
             ref={sceneSlotRef}
@@ -453,10 +380,7 @@ export default function GameScreen({
                   );
                 })}
                 <div className="absolute top-3 left-3 border border-game-border bg-game-panel/90 px-3 py-1.5">
-                  <span
-                    className="text-[12px] text-game-text-dim"
-                    style={{ fontFamily: "monospace" }}
-                  >
+                  <span className="text-[12px] text-game-text-dim font-mono">
                     {currentScene.date} · {currentScene.location}
                   </span>
                 </div>
@@ -466,64 +390,40 @@ export default function GameScreen({
 
           <div className="hidden md:flex flex-[0.66] min-h-0 border border-game-border overflow-hidden">
             <div
-              className="flex flex-col gap-4 p-4 border-r border-game-border bg-game-panel overflow-y-auto"
+              className="flex flex-col gap-4 p-4 xl:p-5 border-r border-game-border bg-game-panel overflow-y-auto"
               style={{ minWidth: 0, flex: "0 0 38%" }}
             >
               <div>
-                <div
-                  className="text-[10px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e]"
-                  style={{ fontFamily: "'Press Start 2P', monospace" }}
-                >
+                <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] font-pixel">
                   해야 할 일
                 </div>
-                <p
-                  className="text-[12px] text-game-accent leading-relaxed mt-1"
-                  style={{ fontFamily: "monospace" }}
-                >
+                <p className="text-[12px] xl:text-[14px] text-game-accent leading-relaxed mt-1 font-mono">
                   {currentScene.objective}
                 </p>
               </div>
               <div>
-                <div
-                  className="text-[10px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e]"
-                  style={{ fontFamily: "'Press Start 2P', monospace" }}
-                >
+                <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] font-pixel">
                   현재 위치
                 </div>
-                <p
-                  className="text-[12px] text-[#6a8a30] font-bold mt-1 mb-1.5"
-                  style={{ fontFamily: "monospace" }}
-                >
+                <p className="text-[12px] xl:text-[14px] text-[#6a8a30] font-bold mt-1 mb-1.5 font-mono">
                   {currentScene.location}
                 </p>
-                <p
-                  className="text-[11px] text-[#4a6a20] leading-relaxed"
-                  style={{ fontFamily: "monospace" }}
-                >
+                <p className="text-[11px] xl:text-[13px] text-[#4a6a20] leading-relaxed font-mono">
                   {locationDesc}
                 </p>
               </div>
               <div>
-                <div
-                  className="text-[10px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e]"
-                  style={{ fontFamily: "'Press Start 2P', monospace" }}
-                >
+                <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] font-pixel">
                   눈앞의 상황
                 </div>
-                <p
-                  className="text-[11px] text-[#7f9440] leading-relaxed mt-1"
-                  style={{ fontFamily: "monospace" }}
-                >
+                <p className="text-[11px] xl:text-[13px] text-[#7f9440] leading-relaxed mt-1 font-mono">
                   {currentScene.situation}
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col p-4 bg-[#090d06] flex-1 min-w-0">
-              <div
-                className="text-[10px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] shrink-0"
-                style={{ fontFamily: "'Press Start 2P', monospace" }}
-              >
+            <div className="flex flex-col p-4 xl:p-5 bg-[#090d06] flex-1 min-w-0">
+              <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] shrink-0 font-pixel">
                 지역 지도
               </div>
               <div className="flex-1 min-h-0">
@@ -586,53 +486,21 @@ export default function GameScreen({
       )}
 
       {menuOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{ background: "rgba(0,0,0,0.85)" }}
-        >
-          <div
-            className="border-2 border-game-border-bright bg-game-panel p-7 w-80"
-            style={{ boxShadow: "0 0 0 2px #2c3f12" }}
-          >
-            <div
-              className="text-[13px] text-game-text text-center mb-5 pb-3 border-b border-game-border"
-              style={{ fontFamily: "'Press Start 2P', monospace" }}
-            >
-              일시정지
-            </div>
-            {[
-              { label: "계속하기", action: () => setMenuOpen(false) },
-              {
-                label: "처음부터",
-                action: () => {
-                  setCurrentSceneId("start");
-                  setVisitedSceneIds(new Set(["start"]));
-                  setChoiceLog([]);
-                  setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
-                  setSceneIndex(1);
-                  setMenuOpen(false);
-                },
-              },
-              {
-                label: "메인 메뉴",
-                action: () => {
-                  setMenuOpen(false);
-                  onBackToMenu();
-                },
-              },
-            ].map(({ label, action }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={action}
-                className="w-full border border-game-border bg-[#0d1608] hover:bg-[#162010] hover:border-game-border-bright py-3 mb-2.5 transition-all cursor-pointer"
-                style={{ fontFamily: "'Press Start 2P', monospace" }}
-              >
-                <span className="text-[12px] text-game-accent">{label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <PauseMenu
+          onResume={() => setMenuOpen(false)}
+          onRestart={() => {
+            setCurrentSceneId("start");
+            setVisitedSceneIds(new Set(["start"]));
+            setChoiceLog([]);
+            setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
+            setSceneIndex(1);
+            setMenuOpen(false);
+          }}
+          onMainMenu={() => {
+            setMenuOpen(false);
+            dispatch({ type: "SET_SCREEN", screen: "menu" });
+          }}
+        />
       )}
     </div>
   );
