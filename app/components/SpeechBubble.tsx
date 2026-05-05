@@ -23,6 +23,7 @@ export default function SpeechBubble({
 }: Props) {
   return (
     <div
+      className="hidden md:block"
       style={{
         position: "absolute",
         left: `${x}%`,
