@@ -17,19 +17,14 @@ type Props = {
   onClose: () => void;
 };
 
-const STAT_COLORS: Record<StatKey, string> = {
-  courage: "#cc4420",
-  record: "#2080cc",
-  trust: "#20aa60",
-  safety: "#c8a020",
+const STAT_COLOR_VAR: Record<StatKey, string> = {
+  courage: "var(--color-stat-courage)",
+  record:  "var(--color-stat-record)",
+  trust:   "var(--color-stat-trust)",
+  safety:  "var(--color-stat-safety)",
 };
 
-export default function ChoiceBottomSheet({
-  choices,
-  soundOn,
-  onChoice,
-  onClose,
-}: Props) {
+export default function ChoiceBottomSheet({ choices, soundOn, onChoice, onClose }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -54,32 +49,23 @@ export default function ChoiceBottomSheet({
       <button
         type="button"
         aria-label="선택지 닫기"
-        className="absolute inset-0 cursor-default"
-        style={{ background: "rgba(0,0,0,0.65)" }}
+        className="absolute inset-0 cursor-default bg-black/65"
         onClick={handleClose}
       />
 
       <div
-        className="relative transition-transform duration-300 ease-out"
+        className="relative transition-transform duration-300 ease-out bg-game-panel border-t-2 border-game-border-bright"
         style={{
           transform: visible ? "translateY(0)" : "translateY(100%)",
-          background: "#0b1208",
-          borderTop: "2px solid #4a6a1a",
           boxShadow: "0 -4px 32px rgba(74,106,26,0.18)",
         }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-game-border">
-          <span
-            className="text-[11px] text-game-text-muted"
-            style={{ fontFamily: "'Press Start 2P', monospace" }}
-          >
-            ◆ 이제 어떻게 해야 할까
-          </span>
+          <span className="text-[11px] text-game-text-muted font-pixel">◆ 이제 어떻게 해야 할까</span>
           <button
             type="button"
             onClick={handleClose}
-            className="text-[12px] text-game-border-bright hover:text-game-text transition-colors cursor-pointer"
-            style={{ fontFamily: "monospace" }}
+            className="text-[12px] text-game-border-bright hover:text-game-text transition-colors cursor-pointer font-mono"
           >
             닫기
           </button>
@@ -98,50 +84,41 @@ export default function ChoiceBottomSheet({
               className={`w-full flex items-start gap-3 px-3 py-3 border transition-all text-left group ${
                 choice.disabled
                   ? "border-[#1f2b10] bg-[#0a1006] cursor-not-allowed opacity-60"
-                  : "border-game-border bg-[#0d1608] active:bg-[#162010] active:border-game-border-bright cursor-pointer"
+                  : "border-game-border bg-game-panel active:bg-[#162010] active:border-game-border-bright cursor-pointer"
               }`}
             >
               <span
-                className={`shrink-0 text-[13px] font-bold ${
+                className={`shrink-0 text-[13px] font-bold font-pixel ${
                   choice.disabled ? "text-[#66752e]" : "text-game-text"
                 }`}
-                style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
                 {i + 1}.
               </span>
               <span className="flex-1">
                 <span
-                  className={`block text-[13px] leading-relaxed ${
+                  className={`block text-[13px] leading-relaxed font-mono ${
                     choice.disabled ? "text-[#62712f]" : "text-game-accent"
                   }`}
-                  style={{ fontFamily: "monospace" }}
                 >
                   {choice.text}
                 </span>
                 <span
-                  className={`block mt-1 text-[11px] leading-relaxed ${
+                  className={`block mt-1 text-[11px] leading-relaxed font-mono ${
                     choice.disabled ? "text-[#48591f]" : "text-[#5d7227]"
                   }`}
-                  style={{ fontFamily: "monospace" }}
                 >
                   {choice.detail}
                 </span>
                 {choice.disabledReason && (
-                  <span
-                    className="block mt-1 text-[11px] text-[#8f6e2a] leading-relaxed"
-                    style={{ fontFamily: "monospace" }}
-                  >
+                  <span className="block mt-1 text-[11px] text-[#8f6e2a] leading-relaxed font-mono">
                     필요 조건: {choice.disabledReason}
                   </span>
                 )}
               </span>
               {choice.stat && choice.statDelta !== undefined && (
                 <span
-                  className="shrink-0 text-[11px] font-bold mt-0.5"
-                  style={{
-                    color: STAT_COLORS[choice.stat],
-                    fontFamily: "monospace",
-                  }}
+                  className="shrink-0 text-[11px] font-bold mt-0.5 font-mono"
+                  style={{ color: STAT_COLOR_VAR[choice.stat] }}
                 >
                   {STAT_LABELS[choice.stat]} +{choice.statDelta}
                 </span>

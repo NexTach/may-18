@@ -12,9 +12,9 @@ const TOAST_STYLES: Record<
   { border: string; glow: string; text: string; bg: string; label?: string; labelColor?: string }
 > = {
   info: {
-    border: "#4a6a1a",
+    border: "var(--color-game-border-bright)",
     glow: "rgba(138,160,64,0.22)",
-    text: "#c4d47a",
+    text: "var(--color-game-text)",
     bg: "rgba(11,18,8,0.94)",
   },
   success: {
@@ -35,7 +35,7 @@ const TOAST_STYLES: Record<
     text: "#f0d070",
     bg: "rgba(18,13,2,0.97)",
     label: "업적 해금",
-    labelColor: "#c8a020",
+    labelColor: "var(--color-game-gold)",
   },
 };
 
@@ -50,74 +50,56 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
   return (
     <div className="pointer-events-none fixed right-4 bottom-4 z-80 flex w-[min(92vw,360px)] flex-col gap-2">
       {toasts.map((toast) => {
-        const style = TOAST_STYLES[toast.tone];
-
+        const s = TOAST_STYLES[toast.tone];
         return (
           <div
             key={toast.id}
             className="pointer-events-auto border px-4 py-3 backdrop-blur-sm"
-            style={{
-              borderColor: style.border,
-              background: style.bg,
-              boxShadow: `0 0 18px ${style.glow}`,
-            }}
+            style={{ borderColor: s.border, background: s.bg, boxShadow: `0 0 18px ${s.glow}` }}
           >
             {toast.tone === "achievement" ? (
               <div className="flex items-center gap-3">
                 {toast.achievementIcon && (
-                  <span
-                    className="shrink-0 text-[22px] leading-none"
-                    style={{ color: style.text }}
-                  >
+                  <span className="shrink-0 text-[22px] leading-none" style={{ color: s.text }}>
                     {toast.achievementIcon}
                   </span>
                 )}
                 <div className="flex-1 min-w-0">
-                  {style.label && (
+                  {s.label && (
                     <p
-                      className="text-[10px] mb-0.5 tracking-widest"
-                      style={{ fontFamily: "'Press Start 2P', monospace", color: style.labelColor }}
+                      className="text-[10px] mb-0.5 tracking-widest font-pixel"
+                      style={{ color: s.labelColor }}
                     >
-                      {style.label}
+                      {s.label}
                     </p>
                   )}
-                  <p
-                    className="text-[13px] font-bold leading-snug"
-                    style={{ fontFamily: "monospace", color: style.text }}
-                  >
+                  <p className="text-[13px] font-bold leading-snug font-mono" style={{ color: s.text }}>
                     {toast.message}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => onDismiss(toast.id)}
-                  className="shrink-0 text-[11px] transition-opacity hover:opacity-100"
-                  style={{ fontFamily: "'Press Start 2P', monospace", color: style.text, opacity: 0.6 }}
+                  className="shrink-0 text-[11px] opacity-60 hover:opacity-100 transition-opacity font-pixel"
+                  style={{ color: s.text }}
                 >
                   ×
                 </button>
               </div>
             ) : (
               <div className="flex items-start gap-3">
-              <p
-                className="flex-1 text-[12px] leading-relaxed"
-                style={{ fontFamily: "monospace", color: style.text }}
-              >
-                {toast.message}
-              </p>
-              <button
-                type="button"
-                onClick={() => onDismiss(toast.id)}
-                className="text-[11px] transition-opacity hover:opacity-100"
-                style={{
-                  fontFamily: "'Press Start 2P', monospace",
-                  color: style.text,
-                  opacity: 0.7,
-                }}
-              >
-                ×
-              </button>
-            </div>
+                <p className="flex-1 text-[12px] leading-relaxed font-mono" style={{ color: s.text }}>
+                  {toast.message}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onDismiss(toast.id)}
+                  className="text-[11px] opacity-70 hover:opacity-100 transition-opacity font-pixel"
+                  style={{ color: s.text }}
+                >
+                  ×
+                </button>
+              </div>
             )}
           </div>
         );

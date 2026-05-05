@@ -1,12 +1,13 @@
 "use client";
 
 import { mapNodes } from "../data/scenes";
+import type { SceneId } from "../types";
 
 type Props = {
-  currentSceneId: string;
-  visitedSceneIds: Set<string>;
+  currentSceneId: SceneId;
+  visitedSceneIds: Set<SceneId>;
   compact?: boolean;
-  onJump?: (sceneId: string) => void;
+  onJump?: (sceneId: SceneId) => void;
 };
 
 type LabelLayout = {

@@ -13,14 +13,7 @@ function truncate(s: string, n = 20): string {
   return s.length > n ? s.slice(0, n - 1) + "…" : s;
 }
 
-export default function SpeechBubble({
-  x,
-  y,
-  name,
-  line,
-  borderColor,
-  bgColor,
-}: Props) {
+export default function SpeechBubble({ x, y, name, line, borderColor, bgColor }: Props) {
   return (
     <div
       className="hidden md:block"
@@ -45,25 +38,12 @@ export default function SpeechBubble({
         }}
       >
         <div
-          style={{
-            fontSize: 9,
-            color: borderColor,
-            fontFamily: "'Press Start 2P', monospace",
-            marginBottom: 3,
-            lineHeight: 1,
-            letterSpacing: "0.04em",
-          }}
+          className="font-pixel text-[9px] mb-[3px] leading-none tracking-[0.04em]"
+          style={{ color: borderColor }}
         >
           {name}
         </div>
-        <div
-          style={{
-            fontSize: 11,
-            color: "#d4e47a",
-            fontFamily: "monospace",
-            lineHeight: 1.4,
-          }}
-        >
+        <div className="font-mono text-[11px] text-game-text leading-[1.4]">
           {truncate(line)}
         </div>
       </div>

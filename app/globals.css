@@ -6,6 +6,7 @@
 
   --color-game-bg: #060907;
   --color-game-panel: #0b1208;
+  --color-game-panel-dark: #090d06;
   --color-game-border: #2c3f12;
   --color-game-border-bright: #4a6a1a;
   --color-game-text: #c4d47a;
@@ -14,6 +15,11 @@
   --color-game-accent: #8aa040;
   --color-game-heart: #cc2200;
   --color-game-gold: #c8a020;
+
+  --color-stat-courage: #cc4420;
+  --color-stat-record: #2080cc;
+  --color-stat-trust: #20aa60;
+  --color-stat-safety: #c8a020;
 }
 
 @layer base {

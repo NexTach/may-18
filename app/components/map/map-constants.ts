@@ -1,0 +1,37 @@
+// SVG 좌표계에서의 각 씬 위치 (광주 전도 위)
+export const GAME_NODE_SVG: Record<string, [number, number]> = {
+  start: [341.4, 159.4],
+  observe_street: [344.8, 163.6],
+  station_rumor: [347.2, 166.0],
+  university_gate: [338.6, 141.5],
+  side_alley_detour: [335.0, 145.0],
+  talk_students: [336.3, 138.4],
+  call_family: [309.5, 179.8],
+  family_neighborhood: [304.8, 185.8],
+  radio_room: [301.0, 190.2],
+  leaflet_room: [304.5, 194.0],
+  record_scene: [342.8, 172.2],
+  downtown: [346.0, 177.4],
+  market_people: [352.8, 168.8],
+  street_clinic: [344.4, 186.0],
+  citizen_voice: [360.6, 188.2],
+  citizen_debate: [359.0, 180.4],
+  help_people: [348.4, 190.2],
+  supply_run: [357.6, 174.8],
+  community: [349.8, 172.6],
+  checkpoint_edge: [367.8, 204.0],
+  outside_message: [372.6, 210.8],
+  night_meeting: [363.2, 182.4],
+  last_night: [353.7, 186.2],
+  archive_ending: [350.2, 185.6],
+  memory_ending: [305.6, 108.2],
+};
+
+export const MAP_COLORS = {
+  pinVisited: "#5a8a2a",
+  pinUnvisit: "#243014",
+  pinFrontier: "#879946",
+  stkVisited: "#3a6018",
+  stkUnvisit: "#1a2a0c",
+  stkFrontier: "#c4d47a",
+} as const;
