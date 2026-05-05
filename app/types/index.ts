@@ -1,3 +1,30 @@
+export type SceneId =
+  | "start"
+  | "observe_street"
+  | "station_rumor"
+  | "call_family"
+  | "family_neighborhood"
+  | "radio_room"
+  | "leaflet_room"
+  | "side_alley_detour"
+  | "university_gate"
+  | "talk_students"
+  | "downtown"
+  | "market_people"
+  | "record_scene"
+  | "street_clinic"
+  | "citizen_voice"
+  | "citizen_debate"
+  | "help_people"
+  | "supply_run"
+  | "checkpoint_edge"
+  | "outside_message"
+  | "community"
+  | "night_meeting"
+  | "last_night"
+  | "archive_ending"
+  | "memory_ending";
+
 export type DialogueLine = {
   name: string;
   line: string;
@@ -18,7 +45,7 @@ export type StatKey = "courage" | "record" | "trust" | "safety";
 export type Choice = {
   text: string;
   detail: string;
-  nextSceneId: string;
+  nextSceneId: SceneId;
   stat?: StatKey;
   statDelta?: number;
   requirements?: Partial<Record<StatKey, number>>;
@@ -50,7 +77,7 @@ export type SceneType =
   | "ending";
 
 export type Scene = {
-  id: string;
+  id: SceneId;
   stageNum: number;
   stageTitle: string;
   date: string;
@@ -63,14 +90,16 @@ export type Scene = {
   history: string;
   choices: Choice[];
   isEnding?: boolean;
+  npcSlots?: Array<{ x: number; y: number }>;
+  locationDesc?: string;
 };
 
 export type MapNode = {
-  id: string;
+  id: SceneId;
   label: string;
   x: number;
   y: number;
-  connections: string[];
+  connections: SceneId[];
 };
 
 export type Stats = {
@@ -93,13 +122,13 @@ export type GameSettings = {
 };
 
 export type GameProgress = {
-  currentSceneId: string;
-  visitedSceneIds: string[];
+  currentSceneId: SceneId;
+  visitedSceneIds: SceneId[];
   choiceLog: string[];
   stats: Stats;
   sceneIndex: number;
   updatedAt: string | null;
-  allVisitedSceneIds: string[];
+  allVisitedSceneIds: SceneId[];
   allChoiceLog: string[];
   collectedItems: string[];
 };

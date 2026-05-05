@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { achievementDefs } from "../data/achievements";
 import { collectibleDefs } from "../data/collectibles";
 import { scenes } from "../data/scenes";
@@ -5,6 +6,7 @@ import type {
   GameProgress,
   GameSettings,
   MapDefaultMode,
+  SceneId,
   Stats,
   TextSpeed,
 } from "../types";
@@ -76,73 +78,58 @@ export function sanitizeSettings(value: unknown): GameSettings {
   };
 }
 
+// ── Zod schemas ──────────────────────────────────────────────────────────────
+
+const validSceneIdSet = new Set(scenes.map((s) => s.id as SceneId));
+const SceneIdSchema = z.string().refine(
+  (id): id is SceneId => validSceneIdSet.has(id as SceneId),
+  { message: "Invalid SceneId" },
+) as z.ZodType<SceneId>;
+
+const StatsSchema = z.object({
+  courage: z.number().min(0).default(0),
+  record: z.number().min(0).default(0),
+  trust: z.number().min(0).default(0),
+  safety: z.number().min(0).default(0),
+});
+
+const validCollectibleIds = new Set(collectibleDefs.map((c) => c.id));
+const CollectibleIdSchema = z
+  .string()
+  .refine((id) => validCollectibleIds.has(id));
+
+const GameProgressSchema = z.object({
+  currentSceneId: SceneIdSchema.default("start"),
+  visitedSceneIds: z.array(SceneIdSchema).default(["start"]),
+  choiceLog: z.array(z.string()).default([]),
+  stats: StatsSchema.default({ courage: 0, record: 0, trust: 0, safety: 0 }),
+  sceneIndex: z.number().min(1).default(1),
+  updatedAt: z.string().nullable().default(null),
+  allVisitedSceneIds: z.array(SceneIdSchema).default(["start"]),
+  allChoiceLog: z.array(z.string()).default([]),
+  collectedItems: z.array(CollectibleIdSchema).default([]),
+});
+
 export function sanitizeProgress(value: unknown): GameProgress {
-  if (!value || typeof value !== "object") return createFreshProgress();
+  const result = GameProgressSchema.safeParse(value);
+  if (!result.success) return createFreshProgress();
 
-  const raw = value as Partial<GameProgress>;
-  const validSceneIds = new Set(scenes.map((scene) => scene.id));
-  const currentSceneId =
-    typeof raw.currentSceneId === "string" &&
-    validSceneIds.has(raw.currentSceneId)
-      ? raw.currentSceneId
-      : "start";
-  const visitedSceneIds = Array.isArray(raw.visitedSceneIds)
-    ? raw.visitedSceneIds.filter(
-        (sceneId): sceneId is string =>
-          typeof sceneId === "string" && validSceneIds.has(sceneId),
-      )
-    : ["start"];
+  const data = result.data;
 
-  const uniqueVisited = Array.from(new Set(["start", ...visitedSceneIds]));
-  if (!uniqueVisited.includes(currentSceneId))
-    uniqueVisited.push(currentSceneId);
+  const uniqueVisited = Array.from(new Set<SceneId>(["start", ...data.visitedSceneIds]));
+  if (!uniqueVisited.includes(data.currentSceneId))
+    uniqueVisited.push(data.currentSceneId);
 
   return {
-    currentSceneId,
+    ...data,
     visitedSceneIds: uniqueVisited,
-    choiceLog: Array.isArray(raw.choiceLog)
-      ? raw.choiceLog.filter((item): item is string => typeof item === "string")
-      : [],
-    stats: {
-      courage:
-        typeof raw.stats?.courage === "number"
-          ? Math.max(0, raw.stats.courage)
-          : 0,
-      record:
-        typeof raw.stats?.record === "number"
-          ? Math.max(0, raw.stats.record)
-          : 0,
-      trust:
-        typeof raw.stats?.trust === "number" ? Math.max(0, raw.stats.trust) : 0,
-      safety:
-        typeof raw.stats?.safety === "number"
-          ? Math.max(0, raw.stats.safety)
-          : 0,
-    },
-    sceneIndex:
-      typeof raw.sceneIndex === "number" && raw.sceneIndex >= 1
-        ? raw.sceneIndex
-        : 1,
-    updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
-    allVisitedSceneIds: Array.isArray(raw.allVisitedSceneIds)
-      ? raw.allVisitedSceneIds.filter(
-          (id): id is string => typeof id === "string" && validSceneIds.has(id),
-        )
-      : uniqueVisited,
-    allChoiceLog: Array.isArray(raw.allChoiceLog)
-      ? raw.allChoiceLog.filter((item): item is string => typeof item === "string")
-      : (Array.isArray(raw.choiceLog)
-          ? raw.choiceLog.filter((item): item is string => typeof item === "string")
-          : []),
-    collectedItems: (() => {
-      const validIds = new Set(collectibleDefs.map((c) => c.id));
-      const raw_items = Array.isArray(raw.collectedItems) ? raw.collectedItems : [];
-      return Array.from(new Set(
-        raw_items.filter((id): id is string => typeof id === "string" && validIds.has(id))
-      ));
-    })(),
-  };
+    allVisitedSceneIds:
+      data.allVisitedSceneIds.length > 0 ? data.allVisitedSceneIds : uniqueVisited,
+    collectedItems: Array.from(new Set(data.collectedItems)),
+  } as GameProgress;
 }
+
+// ── Achievement helpers ──────────────────────────────────────────────────────
 
 export function getEndingSceneIds() {
   return scenes.filter((scene) => scene.isEnding).map((scene) => scene.id);
@@ -154,47 +141,9 @@ export function getReachedEndingIds(progress: GameProgress) {
 }
 
 export function getAchievementState(progress: GameProgress) {
-  const visited = new Set(
-    progress.allVisitedSceneIds.length > 0
-      ? progress.allVisitedSceneIds
-      : progress.visitedSceneIds,
-  );
-  const visitedCount = visited.size;
-  const endingIds = new Set(getEndingSceneIds());
-  const reachedEndings = new Set(
-    [...visited].filter((id) => endingIds.has(id)),
-  );
-  const { courage, record, trust, safety } = progress.stats;
-  const unlocked = new Set<string>();
-
-  if (record >= 1) unlocked.add("first_record");
-  if (record >= 6) unlocked.add("deep_record");
-  if (record >= 3 && courage >= 3) unlocked.add("courageous_record");
-  if (courage >= 3) unlocked.add("witness");
-  if (courage >= 5) unlocked.add("brave_soul");
-  if (trust >= 3) unlocked.add("trusted_hands");
-  if (trust >= 6) unlocked.add("strong_trust");
-  if (safety >= 3) unlocked.add("steady_steps");
-  if (safety >= 5) unlocked.add("safe_keeper");
-  if (courage >= 2 && record >= 2 && trust >= 2 && safety >= 2)
-    unlocked.add("balanced_eye");
-
-  if (visitedCount >= 12) unlocked.add("many_paths");
-  if (visitedCount >= 18) unlocked.add("explorer");
-  if (visited.has("university_gate")) unlocked.add("at_the_gate");
-  if (visited.has("radio_room")) unlocked.add("heard_radio");
-  if (visited.has("street_clinic") || visited.has("help_people"))
-    unlocked.add("helper");
-  if (visited.has("outside_message")) unlocked.add("messenger");
-  if (visited.has("last_night")) unlocked.add("last_witness");
-
-  // 엔딩 기반
-  if (reachedEndings.has("archive_ending")) unlocked.add("archivist");
-  if (reachedEndings.has("memory_ending")) unlocked.add("memory_keeper");
-
   return achievementDefs.map((achievement) => ({
     ...achievement,
-    unlocked: unlocked.has(achievement.id),
+    unlocked: achievement.condition(progress),
   }));
 }
 
