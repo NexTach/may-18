@@ -281,7 +281,6 @@ export default function GameApp() {
         achievements={achievementViews}
         syncStatus={syncStatus}
         syncBusy={syncBusy}
-        onSettingsChange={(patch) => dispatch({ type: "PATCH_SETTINGS", patch })}
         onOpenSettings={() => setSettingsOpen(true)}
         onLogin={settingsProps.onLogin}
         onLogout={settingsProps.onLogout}
