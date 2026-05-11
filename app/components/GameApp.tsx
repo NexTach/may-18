@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { usePoorViewport } from "../hooks/usePoorViewport";
-import { collectibleDefs } from "../data/collectibles";
 import { scenes } from "../data/scenes";
 import {
   createFreshProgress,
@@ -145,7 +144,6 @@ export default function GameApp() {
     dispatch,
     toasts,
     dismissToast,
-    achievements,
     syncPush,
     syncPull,
     pushToast,
@@ -240,10 +238,7 @@ export default function GameApp() {
       <ViewportWarningOverlay onDismiss={() => setViewportDismissed(true)} />
     ) : null;
 
-  const achievementViews = getAchievementState(
-    collectibleDefs,
-    progress.collectedItems ?? [],
-  );
+  const achievementViews = getAchievementState(progress);
 
   if (showContinuePrompt) {
     return (
