@@ -21,6 +21,7 @@ import type {
   Stats,
 } from "../types";
 import BottomBar from "./BottomBar";
+import EndingScreen from "./EndingScreen";
 import HistoryModal from "./HistoryModal";
 import HUD from "./HUD";
 import InventoryModal from "./InventoryModal";
@@ -210,6 +211,7 @@ export default function GameScreen() {
   const [mapOpen, setMapOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [revealedNpcCount, setRevealedNpcCount] = useState(0);
   const { slotRef: sceneSlotRef, sceneFrame } = useSceneFrame();
 
   const currentScene = scenes.find((s) => s.id === currentSceneId);
@@ -302,6 +304,11 @@ export default function GameScreen() {
   ]);
 
 
+  // 씬 변경 시 말풍선 카운트 리셋
+  useEffect(() => {
+    setRevealedNpcCount(0);
+  }, [currentSceneId]);
+
   useEffect(() => {
     if (!currentScene) return;
 
@@ -319,13 +326,36 @@ export default function GameScreen() {
 
   if (!currentScene) return null;
 
+  // ── 엔딩 화면 분기 ──
+  if (currentScene.isEnding) {
+    return (
+      <EndingScreen
+        stageTitle={currentScene.stageTitle}
+        text={currentScene.text}
+        dialogue={currentScene.dialogue}
+        history={currentScene.history}
+        onRestart={() => {
+          setCurrentSceneId("start");
+          setVisitedSceneIds(new Set(["start"]));
+          setChoiceLog([]);
+          setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
+          setSceneIndex(1);
+        }}
+        onMainMenu={() => dispatch({ type: "SET_SCREEN", screen: "menu" })}
+      />
+    );
+  }
+
   const slots = NPC_SLOTS[currentScene.sceneType] ?? [];
   const choiceViews = currentScene.choices.map((choice) => {
     const reason = getChoiceDisabledReason(choice, stats);
     return { ...choice, disabled: Boolean(reason), disabledReason: reason ?? undefined };
   });
   const historyMedia = historyMediaBySceneId[currentScene.id];
+  // 전체 NPC 대화 목록
   const npcLines = currentScene.dialogue.filter((d) => d.avatar !== "player");
+  // RightPanel의 순차 공개에 맞춰 보여줄 말풍선만 추출
+  const visibleNpcLines = npcLines.slice(0, revealedNpcCount);
   const locationDesc = LOCATION_DESCS[currentScene.location] ?? "";
 
   return (
@@ -366,14 +396,13 @@ export default function GameScreen() {
               >
                 <PixelScene sceneType={currentScene.sceneType} />
 
-                {npcLines.map((d, i) => {
+                {visibleNpcLines.map((d, i) => {
                   const slot = slots[i];
                   if (!slot) return null;
-                  const color =
-                    AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
+                  const color = AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
                   return (
                     <SpeechBubble
-                      key={`${currentSceneId}-${d.avatar}-${d.name}-${d.line}`}
+                      key={`${currentSceneId}-npc-${i}`}
                       x={slot.x}
                       y={slot.y}
                       name={d.name}
@@ -450,6 +479,7 @@ export default function GameScreen() {
           typingSpeed={TEXT_SPEED_MS[settings.textSpeed]}
           soundOn={settings.soundOn}
           onChoice={handleChoice}
+          onDialogueProgress={setRevealedNpcCount}
         />
       </div>
 
