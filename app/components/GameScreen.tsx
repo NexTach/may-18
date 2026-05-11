@@ -522,8 +522,7 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
 
       {menuOpen && (
         <PauseMenu
-          settings={settings}
-          onSettingsChange={(patch) => dispatch({ type: "PATCH_SETTINGS", patch })}
+          onOpenSettings={() => { setMenuOpen(false); onOpenSettings(); }}
           onResume={() => setMenuOpen(false)}
           onRestart={() => {
             setCurrentSceneId("start");
