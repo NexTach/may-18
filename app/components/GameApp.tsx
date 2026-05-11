@@ -285,7 +285,10 @@ export default function GameApp() {
   return (
     <>
       <MainMenu
-        onStart={() => dispatch({ type: "SET_SCREEN", screen: "game" })}
+        onStart={() => {
+          setContinuePromptDone(true);
+          dispatch({ type: "SET_SCREEN", screen: "game" });
+        }}
         canContinue={canContinue}
         progress={progress}
         settings={settings}

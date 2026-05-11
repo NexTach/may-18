@@ -341,7 +341,23 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
           setStats({ courage: 0, record: 0, trust: 0, safety: 0 });
           setSceneIndex(1);
         }}
-        onMainMenu={() => dispatch({ type: "SET_SCREEN", screen: "menu" })}
+        onMainMenu={() => {
+          dispatch({
+            type: "SET_PROGRESS",
+            progress: {
+              currentSceneId: "start",
+              visitedSceneIds: ["start"],
+              choiceLog: [],
+              stats: { courage: 0, record: 0, trust: 0, safety: 0 },
+              sceneIndex: 1,
+              updatedAt: null,
+              allVisitedSceneIds: Array.from(allVisitedSceneIds),
+              allChoiceLog,
+              collectedItems,
+            },
+          });
+          dispatch({ type: "SET_SCREEN", screen: "menu" });
+        }}
       />
     );
   }
