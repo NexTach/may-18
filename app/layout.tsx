@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR, Press_Start_2P } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import React from "react";
 
 const BASE_URL = "https://may-18-peach.vercel.app";
 
-const pressStart2P = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
+const dungGeunMo = localFont({
+  src: "../public/fonts/DungGeunMo.ttf",
   variable: "--font-pixel",
   display: "swap",
 });
@@ -121,7 +121,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${pressStart2P.variable} ${notoSansKR.variable} h-full`}
+      className={`${dungGeunMo.variable} ${notoSansKR.variable} h-full`}
     >
       <body className="h-full overflow-hidden bg-game-bg">
         <script
