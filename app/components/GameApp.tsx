@@ -18,7 +18,9 @@ import {
 } from "../lib/asset-cache";
 import { SOUNDS } from "../lib/audio-config";
 import { requestFullscreen } from "../lib/fullscreen";
+import { useIsFullscreen } from "../hooks/useIsFullscreen";
 import type { GameProgress } from "../types";
+import FullscreenPrompt from "./FullscreenPrompt";
 import GameScreen from "./GameScreen";
 import MainMenu from "./MainMenu";
 import SettingsModal from "./SettingsModal";
@@ -152,6 +154,7 @@ export default function GameApp() {
   const { progress, settings, screen, syncStatus, syncBusy, booted } = state;
 
   const isPoorViewport = usePoorViewport();
+  const isFullscreen = useIsFullscreen();
   const [viewportDismissed, setViewportDismissed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [continuePromptDone, setContinuePromptDone] = useState(false);
@@ -266,6 +269,12 @@ export default function GameApp() {
     return (
       <>
         <GameScreen onOpenSettings={() => setSettingsOpen(true)} />
+        {!isFullscreen && (
+          <FullscreenPrompt
+            onFullscreen={requestFullscreen}
+            onMainMenu={() => dispatch({ type: "SET_SCREEN", screen: "menu" })}
+          />
+        )}
         <ToastLayer toasts={toasts} onDismiss={dismissToast} />
         {settingsOpen && <SettingsModal {...settingsProps} />}
         {viewportOverlay}
