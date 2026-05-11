@@ -359,7 +359,7 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
   const locationDesc = LOCATION_DESCS[currentScene.location] ?? "";
 
   return (
-    <div className="flex flex-col w-full h-dvh overflow-hidden bg-black p-2 gap-2 md:p-5 md:gap-4 xl:p-6 xl:gap-5 font-mono">
+    <div className="flex flex-col w-full h-dvh overflow-hidden bg-black p-2 gap-2 md:p-3 md:gap-2 xl:p-4 xl:gap-3 font-mono">
       <HUD
         stageNum={currentScene.stageNum}
         stageTitle={currentScene.stageTitle}
@@ -373,11 +373,11 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
         onMenu={() => setMenuOpen(true)}
       />
 
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-2 md:gap-4 xl:gap-5">
-        <div className="shrink-0 md:flex-1 flex flex-col min-w-0 md:min-h-0 gap-2 md:gap-4">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-2 md:gap-2 xl:gap-3">
+        <div className="shrink-0 md:flex-1 flex flex-col min-w-0 md:min-h-0 gap-2 md:gap-2 xl:gap-3">
           <div
             ref={sceneSlotRef}
-            className="relative aspect-video md:aspect-auto md:flex-[1.45] md:min-h-[100px] overflow-hidden border border-game-border bg-game-bg"
+            className="relative aspect-video md:aspect-auto md:flex-[1.7] md:min-h-[100px] overflow-hidden border border-game-border bg-game-bg"
           >
             <div className={`absolute inset-0 flex items-center justify-center ${sceneFrame.isCrop ? "" : "p-3"}`}>
               <div
@@ -421,41 +421,41 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
             </div>
           </div>
 
-          <div className="hidden md:flex flex-[0.66] min-h-[160px] border border-game-border overflow-hidden">
+          <div className="hidden md:flex flex-[0.6] min-h-[140px] border border-game-border overflow-hidden">
             <div
-              className="flex flex-col gap-4 p-4 xl:p-5 border-r border-game-border bg-game-panel overflow-y-auto"
+              className="flex flex-col gap-3 p-3 xl:p-4 border-r border-game-border bg-game-panel overflow-y-auto"
               style={{ minWidth: 0, flex: "0 0 38%" }}
             >
               <div>
-                <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] font-pixel">
+                <div className="text-[10px] text-game-border-bright mb-1.5 pb-1 border-b border-[#1e2e0e] font-pixel">
                   해야 할 일
                 </div>
-                <p className="text-[12px] xl:text-[14px] text-game-accent leading-relaxed mt-1 font-mono">
+                <p className="text-[12px] text-game-accent leading-snug mt-1 font-mono">
                   {currentScene.objective}
                 </p>
               </div>
               <div>
-                <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] font-pixel">
+                <div className="text-[10px] text-game-border-bright mb-1.5 pb-1 border-b border-[#1e2e0e] font-pixel">
                   현재 위치
                 </div>
-                <p className="text-[12px] xl:text-[14px] text-[#6a8a30] font-bold mt-1 mb-1.5 font-mono">
+                <p className="text-[12px] text-[#6a8a30] font-bold mt-1 mb-1 font-mono">
                   {currentScene.location}
                 </p>
-                <p className="text-[11px] xl:text-[13px] text-[#4a6a20] leading-relaxed font-mono">
+                <p className="text-[11px] text-[#4a6a20] leading-snug font-mono line-clamp-2">
                   {locationDesc}
                 </p>
               </div>
               <div>
-                <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] font-pixel">
+                <div className="text-[10px] text-game-border-bright mb-1.5 pb-1 border-b border-[#1e2e0e] font-pixel">
                   눈앞의 상황
                 </div>
-                <p className="text-[11px] xl:text-[13px] text-[#7f9440] leading-relaxed mt-1 font-mono">
+                <p className="text-[11px] text-[#7f9440] leading-snug mt-1 font-mono line-clamp-2">
                   {currentScene.situation}
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col p-4 xl:p-5 bg-[#090d06] flex-1 min-w-0">
+            <div className="flex flex-col p-3 xl:p-4 bg-[#090d06] flex-1 min-w-0">
               <div className="text-[10px] xl:text-[12px] text-game-border-bright mb-2 pb-1.5 border-b border-[#1e2e0e] shrink-0 font-pixel">
                 지역 지도
               </div>

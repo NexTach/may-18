@@ -203,12 +203,12 @@ export default function MiniMap({
     const cx = (Math.min(...fxs) + Math.max(...fxs)) / 2;
     const cy = (Math.min(...fys) + Math.max(...fys)) / 2;
     const hw = Math.min(
-      Math.max((Math.max(...fxs) - Math.min(...fxs)) / 2 + 60, 100),
-      145,
+      Math.max((Math.max(...fxs) - Math.min(...fxs)) / 2 + 35, 55),
+      90,
     );
     const hh = Math.min(
-      Math.max((Math.max(...fys) - Math.min(...fys)) / 2 + 60, 100),
-      145,
+      Math.max((Math.max(...fys) - Math.min(...fys)) / 2 + 35, 55),
+      90,
     );
     vb = `${cx - hw} ${cy - hh} ${hw * 2} ${hh * 2}`;
   } else {

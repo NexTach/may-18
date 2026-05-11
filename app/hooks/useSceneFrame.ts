@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const SCENE_ASPECT_RATIO = 16 / 9;
-const CROP_HEIGHT_THRESHOLD = 400;
+const CROP_HEIGHT_THRESHOLD = 260;
 
 function getContainedFrame(width: number, height: number) {
   if (width <= 0 || height <= 0) return { width: 0, height: 0 };
