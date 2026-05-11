@@ -45,6 +45,9 @@ body {
   background: #061210;
   color: #f0d88a;
   font-family: 'DungGeunMo', monospace;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* pixel art rendering */
