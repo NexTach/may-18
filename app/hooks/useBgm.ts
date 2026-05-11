@@ -40,8 +40,14 @@ export function useBgm(src: string | null, enabled: boolean) {
   useEffect(() => {
     const st = s.current;
 
-    if (st.tid != null) { clearInterval(st.tid); st.tid = null; }
-    if (st.out) { st.out.pause(); st.out = null; }
+    if (st.tid != null) {
+      clearInterval(st.tid);
+      st.tid = null;
+    }
+    if (st.out) {
+      st.out.pause();
+      st.out = null;
+    }
 
     const playNew = (newSrc: string) => {
       const a = new Audio(newSrc);
@@ -50,7 +56,9 @@ export function useBgm(src: string | null, enabled: boolean) {
       st.cur = a;
       st.src = newSrc;
       void a.play().catch(() => {});
-      st.tid = fade(a, TARGET_VOL, () => { st.tid = null; });
+      st.tid = fade(a, TARGET_VOL, () => {
+        st.tid = null;
+      });
     };
 
     if (!enabled || !src) {
@@ -58,7 +66,10 @@ export function useBgm(src: string | null, enabled: boolean) {
         st.out = st.cur;
         st.cur = null;
         st.src = null;
-        st.tid = fade(st.out, 0, () => { st.out = null; st.tid = null; });
+        st.tid = fade(st.out, 0, () => {
+          st.out = null;
+          st.tid = null;
+        });
       }
       return;
     }
@@ -68,7 +79,9 @@ export function useBgm(src: string | null, enabled: boolean) {
     if (st.src === src && st.cur && st.cur.paused) {
       st.cur.volume = 0;
       void st.cur.play().catch(() => {});
-      st.tid = fade(st.cur, TARGET_VOL, () => { st.tid = null; });
+      st.tid = fade(st.cur, TARGET_VOL, () => {
+        st.tid = null;
+      });
       return;
     }
 
@@ -77,7 +90,10 @@ export function useBgm(src: string | null, enabled: boolean) {
       st.out = old;
       st.cur = null;
       st.src = null;
-      st.tid = fade(old, 0, () => { st.out = null; playNew(src); });
+      st.tid = fade(old, 0, () => {
+        st.out = null;
+        playNew(src);
+      });
     } else {
       playNew(src);
     }

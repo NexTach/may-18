@@ -19,12 +19,17 @@ type Props = {
 
 const STAT_COLOR_VAR: Record<StatKey, string> = {
   courage: "var(--color-stat-courage)",
-  record:  "var(--color-stat-record)",
-  trust:   "var(--color-stat-trust)",
-  safety:  "var(--color-stat-safety)",
+  record: "var(--color-stat-record)",
+  trust: "var(--color-stat-trust)",
+  safety: "var(--color-stat-safety)",
 };
 
-export default function ChoiceBottomSheet({ choices, soundOn, onChoice, onClose }: Props) {
+export default function ChoiceBottomSheet({
+  choices,
+  soundOn,
+  onChoice,
+  onClose,
+}: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -61,7 +66,9 @@ export default function ChoiceBottomSheet({ choices, soundOn, onChoice, onClose 
         }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-game-border">
-          <span className="text-[11px] text-game-text-muted font-pixel">◆ 이제 어떻게 해야 할까</span>
+          <span className="text-[11px] text-game-text-muted font-pixel">
+            ◆ 이제 어떻게 해야 할까
+          </span>
           <button
             type="button"
             onClick={handleClose}

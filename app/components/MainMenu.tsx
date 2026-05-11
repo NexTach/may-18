@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { requestFullscreen } from "../lib/fullscreen";
 import { playSfx } from "../lib/sfx";
-import type { GameProgress, GameSettings, SyncStatus } from "../types";
+import type { GameProgress, GameSettings } from "../types";
 import AchievementModal from "./AchievementModal";
 import ArchiveModal from "./ArchiveModal";
 
@@ -23,15 +23,7 @@ type Props = {
   progress: GameProgress;
   settings: GameSettings;
   achievements: AchievementView[];
-  syncStatus: SyncStatus;
-  syncBusy: boolean;
   onOpenSettings: () => void;
-  onLogin: () => void;
-  onLogout: () => void;
-  onPull: () => void;
-  onPush: () => void;
-  onResetProgress: () => void;
-  onResetServerData: () => Promise<void>;
 };
 
 type MenuItem = { label: string; action: () => void };
@@ -42,15 +34,7 @@ export default function MainMenu({
   progress,
   settings,
   achievements,
-  syncStatus,
-  syncBusy,
   onOpenSettings,
-  onLogin,
-  onLogout,
-  onPull,
-  onPush,
-  onResetProgress,
-  onResetServerData,
 }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
@@ -58,10 +42,22 @@ export default function MainMenu({
   const [exitHint, setExitHint] = useState(false);
 
   const menuItems: MenuItem[] = [
-    { label: canContinue ? "이어하기" : "게임 시작", action: () => { requestFullscreen(); onStart(); } },
+    {
+      label: canContinue ? "이어하기" : "게임 시작",
+      action: () => {
+        requestFullscreen();
+        onStart();
+      },
+    },
     { label: "기록 보기", action: () => setArchiveOpen(true) },
     { label: "설정", action: onOpenSettings },
-    { label: "게임 종료", action: () => { window.close(); setExitHint(true); } },
+    {
+      label: "게임 종료",
+      action: () => {
+        window.close();
+        setExitHint(true);
+      },
+    },
   ];
 
   return (
@@ -80,18 +76,27 @@ export default function MainMenu({
         {/* scanlines */}
         <div
           className="absolute inset-0 pointer-events-none z-[1]"
-          style={{ background: "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)" }}
+          style={{
+            background:
+              "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)",
+          }}
         />
         {/* vignette */}
         <div
           className="absolute inset-0 pointer-events-none z-[1]"
-          style={{ background: "radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,0.9) 100%)" }}
+          style={{
+            background:
+              "radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,0.9) 100%)",
+          }}
         />
 
         <div className="relative z-[2] flex h-full flex-col items-center justify-center">
           <p
             className="text-[12px] tracking-[4px] mb-5 px-4 text-center"
-            style={{ color: "var(--color-game-text-dim)", fontFamily: "'DungGeunMo', monospace" }}
+            style={{
+              color: "var(--color-game-text-dim)",
+              fontFamily: "'DungGeunMo', monospace",
+            }}
           >
             5·18 민주화운동 인터랙티브 체험 게임
           </p>
@@ -101,7 +106,8 @@ export default function MainMenu({
             style={{
               color: "var(--color-game-accent)",
               fontFamily: "'DungGeunMo', monospace",
-              textShadow: "0 0 32px rgba(245,208,108,0.65), 0 0 64px rgba(245,208,108,0.2)",
+              textShadow:
+                "0 0 32px rgba(245,208,108,0.65), 0 0 64px rgba(245,208,108,0.2)",
               animation: "tPulse 3s ease-in-out infinite",
             }}
           >
@@ -110,7 +116,10 @@ export default function MainMenu({
 
           <p
             className="text-[13px] mb-12 tracking-[2px] px-4 text-center"
-            style={{ color: "var(--color-game-text-dim)", fontFamily: "'DungGeunMo', monospace" }}
+            style={{
+              color: "var(--color-game-text-dim)",
+              fontFamily: "'DungGeunMo', monospace",
+            }}
           >
             1980년 5월, 광주의 시민이 되어 선택을 경험하세요.
           </p>
@@ -120,14 +129,23 @@ export default function MainMenu({
               <button
                 key={label}
                 type="button"
-                onClick={() => { if (settings.soundOn) playSfx("click"); action(); }}
+                onClick={() => {
+                  if (settings.soundOn) playSfx("click");
+                  action();
+                }}
                 onMouseEnter={() => setHovered(label)}
                 onMouseLeave={() => setHovered(null)}
                 className="flex items-center gap-2.5 px-[18px] py-[11px] text-[17px] tracking-[2px] text-left cursor-pointer transition-colors"
                 style={{
-                  background: hovered === label ? "rgba(245,208,108,0.05)" : "transparent",
+                  background:
+                    hovered === label
+                      ? "rgba(245,208,108,0.05)"
+                      : "transparent",
                   border: "none",
-                  color: hovered === label ? "var(--color-game-accent)" : "var(--color-game-text-dim)",
+                  color:
+                    hovered === label
+                      ? "var(--color-game-accent)"
+                      : "var(--color-game-text-dim)",
                   fontFamily: "'DungGeunMo', monospace",
                 }}
               >
@@ -148,17 +166,27 @@ export default function MainMenu({
 
         <div
           className="absolute bottom-[22px] left-0 right-0 text-center text-[11px] tracking-[2px] z-[2]"
-          style={{ color: "var(--color-game-border-bright)", fontFamily: "'DungGeunMo', monospace" }}
+          style={{
+            color: "var(--color-game-border-bright)",
+            fontFamily: "'DungGeunMo', monospace",
+          }}
         >
           © Remember 5.18 &nbsp;·&nbsp; 우리는 기억해야 합니다
         </div>
       </div>
 
       {archiveOpen && (
-        <ArchiveModal progress={progress} achievements={achievements} onClose={() => setArchiveOpen(false)} />
+        <ArchiveModal
+          progress={progress}
+          achievements={achievements}
+          onClose={() => setArchiveOpen(false)}
+        />
       )}
       {achievementOpen && (
-        <AchievementModal achievements={achievements} onClose={() => setAchievementOpen(false)} />
+        <AchievementModal
+          achievements={achievements}
+          onClose={() => setAchievementOpen(false)}
+        />
       )}
       {exitHint && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/[0.88]">

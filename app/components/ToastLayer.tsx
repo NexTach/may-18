@@ -9,7 +9,14 @@ export type ToastItem = {
 
 const TOAST_STYLES: Record<
   ToastItem["tone"],
-  { border: string; glow: string; text: string; bg: string; label?: string; labelColor?: string }
+  {
+    border: string;
+    glow: string;
+    text: string;
+    bg: string;
+    label?: string;
+    labelColor?: string;
+  }
 > = {
   info: {
     border: "var(--color-game-border-bright)",
@@ -55,12 +62,19 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
           <div
             key={toast.id}
             className="pointer-events-auto border px-4 py-3 backdrop-blur-sm"
-            style={{ borderColor: s.border, background: s.bg, boxShadow: `0 0 18px ${s.glow}` }}
+            style={{
+              borderColor: s.border,
+              background: s.bg,
+              boxShadow: `0 0 18px ${s.glow}`,
+            }}
           >
             {toast.tone === "achievement" ? (
               <div className="flex items-center gap-3">
                 {toast.achievementIcon && (
-                  <span className="shrink-0 text-[22px] leading-none" style={{ color: s.text }}>
+                  <span
+                    className="shrink-0 text-[22px] leading-none"
+                    style={{ color: s.text }}
+                  >
                     {toast.achievementIcon}
                   </span>
                 )}
@@ -73,7 +87,10 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
                       {s.label}
                     </p>
                   )}
-                  <p className="text-[13px] font-bold leading-snug font-mono" style={{ color: s.text }}>
+                  <p
+                    className="text-[13px] font-bold leading-snug font-mono"
+                    style={{ color: s.text }}
+                  >
                     {toast.message}
                   </p>
                 </div>
@@ -88,7 +105,10 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
               </div>
             ) : (
               <div className="flex items-start gap-3">
-                <p className="flex-1 text-[12px] leading-relaxed font-mono" style={{ color: s.text }}>
+                <p
+                  className="flex-1 text-[12px] leading-relaxed font-mono"
+                  style={{ color: s.text }}
+                >
                   {toast.message}
                 </p>
                 <button

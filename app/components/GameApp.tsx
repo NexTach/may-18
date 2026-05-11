@@ -3,13 +3,9 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useGame } from "../context/GameContext";
-import { usePoorViewport } from "../hooks/usePoorViewport";
 import { scenes } from "../data/scenes";
-import {
-  createFreshProgress,
-  getAchievementState,
-  hasContinuableProgress,
-} from "../lib/game-state";
+import { useIsFullscreen } from "../hooks/useIsFullscreen";
+import { usePoorViewport } from "../hooks/usePoorViewport";
 import {
   preloadAudio,
   preloadImage,
@@ -18,7 +14,11 @@ import {
 } from "../lib/asset-cache";
 import { SOUNDS } from "../lib/audio-config";
 import { requestFullscreen } from "../lib/fullscreen";
-import { useIsFullscreen } from "../hooks/useIsFullscreen";
+import {
+  createFreshProgress,
+  getAchievementState,
+  hasContinuableProgress,
+} from "../lib/game-state";
 import type { GameProgress } from "../types";
 import FullscreenPrompt from "./FullscreenPrompt";
 import GameScreen from "./GameScreen";
@@ -28,20 +28,26 @@ import ToastLayer from "./ToastLayer";
 
 function ViewportWarningOverlay({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm">
       <div
         className="border-2 border-[#4a6a1a] bg-[#0b1208] p-8 max-w-xs w-full text-center"
-        style={{ boxShadow: "0 0 0 1px #3e4a36, 0 0 40px rgba(245,208,108,0.13)" }}
+        style={{
+          boxShadow: "0 0 0 1px #3e4a36, 0 0 40px rgba(245,208,108,0.13)",
+        }}
       >
         <p className="text-[28px] mb-4 text-[#8aaa40]">⚠</p>
         <p className="text-[13px] text-game-text font-pixel mb-4 leading-relaxed tracking-wide">
           화면 비율 조정 필요
         </p>
         <p className="text-[12px] text-game-accent font-mono leading-relaxed">
-          현재 화면 높이가 낮아<br />게임이 제대로 표시되지 않습니다.
+          현재 화면 높이가 낮아
+          <br />
+          게임이 제대로 표시되지 않습니다.
         </p>
         <p className="text-[11px] text-[#5a7a30] font-mono mt-2.5 leading-relaxed">
-          브라우저 창을 최대화하거나<br />화면 배율을 낮춰 주세요.
+          브라우저 창을 최대화하거나
+          <br />
+          화면 배율을 낮춰 주세요.
         </p>
         <button
           type="button"
@@ -76,7 +82,7 @@ function ContinuePrompt({
   };
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-game-bg">
+    <div className="fixed inset-0 z-90 flex items-center justify-center bg-game-bg">
       <Image
         src="/menu-bg.png"
         alt=""
@@ -89,24 +95,38 @@ function ContinuePrompt({
         className="relative z-10 bg-game-panel p-8 w-[320px]"
         style={{
           border: "2px solid var(--color-game-border-bright)",
-          boxShadow: "0 0 0 2px var(--color-game-border), 0 0 40px rgba(245,208,108,0.1)",
+          boxShadow:
+            "0 0 0 2px var(--color-game-border), 0 0 40px rgba(245,208,108,0.1)",
         }}
       >
         <p
           className="text-center mb-1.5"
-          style={{ fontSize: 10, color: "var(--color-game-text-muted)", fontFamily: "'DungGeunMo', monospace", letterSpacing: "2px" }}
+          style={{
+            fontSize: 10,
+            color: "var(--color-game-text-muted)",
+            fontFamily: "'DungGeunMo', monospace",
+            letterSpacing: "2px",
+          }}
         >
           저장된 기록 발견
         </p>
         <p
           className="text-center mb-2"
-          style={{ fontSize: 14, color: "var(--color-game-text)", fontFamily: "'DungGeunMo', monospace" }}
+          style={{
+            fontSize: 14,
+            color: "var(--color-game-text)",
+            fontFamily: "'DungGeunMo', monospace",
+          }}
         >
           이어서 하시겠습니까?
         </p>
         <p
           className="text-center mb-7"
-          style={{ fontSize: 11, color: "var(--color-game-text-muted)", fontFamily: "monospace" }}
+          style={{
+            fontSize: 11,
+            color: "var(--color-game-text-muted)",
+            fontFamily: "monospace",
+          }}
         >
           {progress.sceneIndex - 1}번의 선택 기록이 있습니다
         </p>
@@ -163,10 +183,7 @@ export default function GameApp() {
     if (!isPoorViewport) setViewportDismissed(false);
   }, [isPoorViewport]);
 
-  const sceneById = useMemo(
-    () => new Map(scenes.map((s) => [s.id, s])),
-    [],
-  );
+  const sceneById = useMemo(() => new Map(scenes.map((s) => [s.id, s])), []);
 
   useEffect(() => {
     if (!booted) return;
@@ -177,7 +194,8 @@ export default function GameApp() {
 
   useEffect(() => {
     if (!booted) return;
-    const activeScene = sceneById.get(progress.currentSceneId) ?? sceneById.get("start");
+    const activeScene =
+      sceneById.get(progress.currentSceneId) ?? sceneById.get("start");
     if (!activeScene) return;
     const nextTypes = activeScene.choices.flatMap((c) => {
       const next = sceneById.get(c.nextSceneId);
@@ -198,7 +216,9 @@ export default function GameApp() {
     onClose: () => setSettingsOpen(false),
     onSettingsChange: (patch: Partial<typeof settings>) =>
       dispatch({ type: "PATCH_SETTINGS", patch }),
-    onLogin: () => { window.location.href = "/api/auth/datagsm/login"; },
+    onLogin: () => {
+      window.location.href = "/api/auth/datagsm/login";
+    },
     onLogout: () => {
       void fetch("/api/auth/datagsm/logout", { method: "POST" })
         .then(() => {
@@ -210,8 +230,12 @@ export default function GameApp() {
         })
         .catch(() => pushToast("로그아웃 중 문제가 생겼습니다.", "error"));
     },
-    onPull: () => { void syncPull(); },
-    onPush: () => { void syncPush(); },
+    onPull: () => {
+      void syncPull();
+    },
+    onPush: () => {
+      void syncPush();
+    },
     onResetProgress: () => {
       dispatch({ type: "SET_PROGRESS", progress: createFreshProgress() });
       pushToast("이 기기의 진행 기록을 초기화했습니다.", "success");
@@ -293,15 +317,7 @@ export default function GameApp() {
         progress={progress}
         settings={settings}
         achievements={achievementViews}
-        syncStatus={syncStatus}
-        syncBusy={syncBusy}
         onOpenSettings={() => setSettingsOpen(true)}
-        onLogin={settingsProps.onLogin}
-        onLogout={settingsProps.onLogout}
-        onPull={settingsProps.onPull}
-        onPush={settingsProps.onPush}
-        onResetProgress={settingsProps.onResetProgress}
-        onResetServerData={settingsProps.onResetServerData}
       />
       <ToastLayer toasts={toasts} onDismiss={dismissToast} />
       {settingsOpen && <SettingsModal {...settingsProps} />}

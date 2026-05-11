@@ -148,26 +148,62 @@ function GwangjuMapBackground() {
 
   return (
     <g>
-      <path d="M 1,1 L 352,1 L 352,122 L 1,122 Z"
-        fill={FILL} fillOpacity="0.16" stroke="none" />
-      <path d="M 1,122 L 120,122 L 120,224 L 1,224 Z"
-        fill={FILL} fillOpacity="0.14" stroke="none" />
-      <path d="M 120,122 L 352,122 L 352,172 L 120,172 Z"
-        fill={FILL} fillOpacity="0.18" stroke="none" />
-      <path d="M 120,172 L 352,172 L 352,224 L 120,224 Z"
-        fill={FILL} fillOpacity="0.14" stroke="none" />
+      <path
+        d="M 1,1 L 352,1 L 352,122 L 1,122 Z"
+        fill={FILL}
+        fillOpacity="0.16"
+        stroke="none"
+      />
+      <path
+        d="M 1,122 L 120,122 L 120,224 L 1,224 Z"
+        fill={FILL}
+        fillOpacity="0.14"
+        stroke="none"
+      />
+      <path
+        d="M 120,122 L 352,122 L 352,172 L 120,172 Z"
+        fill={FILL}
+        fillOpacity="0.18"
+        stroke="none"
+      />
+      <path
+        d="M 120,172 L 352,172 L 352,224 L 120,224 Z"
+        fill={FILL}
+        fillOpacity="0.14"
+        stroke="none"
+      />
 
-      <g stroke={BORDER} strokeWidth="0.7" strokeDasharray="3,2" fill="none" opacity="0.38">
+      <g
+        stroke={BORDER}
+        strokeWidth="0.7"
+        strokeDasharray="3,2"
+        fill="none"
+        opacity="0.38"
+      >
         <line x1="1" y1="122" x2="352" y2="122" />
         <line x1="120" y1="122" x2="120" y2="224" />
         <line x1="120" y1="172" x2="352" y2="172" />
       </g>
 
-      <g fontFamily="monospace" textAnchor="middle" fontSize="6" fill={LABEL} opacity="0.5">
-        <text x="180" y="42">북구</text>
-        <text x="60" y="160">서구</text>
-        <text x="315" y="145">동구</text>
-        <text x="315" y="190">남구</text>
+      <g
+        fontFamily="monospace"
+        textAnchor="middle"
+        fontSize="6"
+        fill={LABEL}
+        opacity="0.5"
+      >
+        <text x="180" y="42">
+          북구
+        </text>
+        <text x="60" y="160">
+          서구
+        </text>
+        <text x="315" y="145">
+          동구
+        </text>
+        <text x="315" y="190">
+          남구
+        </text>
       </g>
     </g>
   );

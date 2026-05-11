@@ -40,7 +40,8 @@ export default function EndingScreen({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.92) 100%)",
+          background:
+            "radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.92) 100%)",
           zIndex: 1,
         }}
       />
@@ -51,7 +52,10 @@ export default function EndingScreen({
       >
         <div
           className="text-[11px] tracking-[4px]"
-          style={{ color: "var(--color-game-text-dim)", fontFamily: "'DungGeunMo', monospace" }}
+          style={{
+            color: "var(--color-game-text-dim)",
+            fontFamily: "'DungGeunMo', monospace",
+          }}
         >
           {stageTitle}
         </div>

@@ -10,7 +10,9 @@ export type AchievementDef = {
 };
 
 const visited = (p: GameProgress) =>
-  new Set(p.allVisitedSceneIds.length > 0 ? p.allVisitedSceneIds : p.visitedSceneIds);
+  new Set(
+    p.allVisitedSceneIds.length > 0 ? p.allVisitedSceneIds : p.visitedSceneIds,
+  );
 
 export const achievementDefs: AchievementDef[] = [
   // ── 스탯 기반 ─────────────────────────────────────────────────────
@@ -93,7 +95,10 @@ export const achievementDefs: AchievementDef[] = [
     description: "용기, 기록, 신뢰, 안전 성향을 모두 2 이상 쌓았다.",
     hint: "한 가지 방향에만 치우치지 말고 다양한 선택을 해 보자.",
     condition: (p) =>
-      p.stats.courage >= 2 && p.stats.record >= 2 && p.stats.trust >= 2 && p.stats.safety >= 2,
+      p.stats.courage >= 2 &&
+      p.stats.record >= 2 &&
+      p.stats.trust >= 2 &&
+      p.stats.safety >= 2,
   },
 
   // ── 방문 기반 ─────────────────────────────────────────────────────
@@ -135,7 +140,8 @@ export const achievementDefs: AchievementDef[] = [
     title: "곁에 선 사람",
     description: "다친 이들 곁에 머물렀다.",
     hint: "도움이 필요한 사람 쪽으로 발걸음을 옮겨 보자.",
-    condition: (p) => visited(p).has("street_clinic") || visited(p).has("help_people"),
+    condition: (p) =>
+      visited(p).has("street_clinic") || visited(p).has("help_people"),
   },
   {
     id: "messenger",

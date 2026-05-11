@@ -27,7 +27,13 @@ export default function BottomBar() {
           >
             {key}
           </span>
-          <span className="text-[11px]" style={{ color: "var(--color-game-text-dim)", letterSpacing: "1px" }}>
+          <span
+            className="text-[11px]"
+            style={{
+              color: "var(--color-game-text-dim)",
+              letterSpacing: "1px",
+            }}
+          >
             : {label}
           </span>
         </div>

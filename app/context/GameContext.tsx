@@ -2,15 +2,16 @@
 
 import {
   createContext,
+  type Dispatch,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type Dispatch,
-  type ReactNode,
 } from "react";
+import type { ToastItem } from "../components/ToastLayer";
 import { collectibleDefs } from "../data/collectibles";
 import { useBgm } from "../hooks/useBgm";
 import { SCENE_BGM, SOUNDS } from "../lib/audio-config";
@@ -20,9 +21,9 @@ import {
   DEFAULT_SETTINGS,
   getAchievementState,
   PROGRESS_STORAGE_KEY,
+  SETTINGS_STORAGE_KEY,
   sanitizeProgress,
   sanitizeSettings,
-  SETTINGS_STORAGE_KEY,
 } from "../lib/game-state";
 import type {
   GameProgress,
@@ -30,7 +31,6 @@ import type {
   SyncBundle,
   SyncStatus,
 } from "../types";
-import type { ToastItem } from "../components/ToastLayer";
 
 export type Screen = "menu" | "game";
 
@@ -44,7 +44,12 @@ type GameState = {
 };
 
 export type GameAction =
-  | { type: "BOOT"; progress: GameProgress; settings: GameSettings; screen: Screen }
+  | {
+      type: "BOOT";
+      progress: GameProgress;
+      settings: GameSettings;
+      screen: Screen;
+    }
   | { type: "SET_PROGRESS"; progress: GameProgress }
   | { type: "PATCH_SETTINGS"; patch: Partial<GameSettings> }
   | { type: "SET_SCREEN"; screen: Screen }
@@ -66,7 +71,13 @@ const initialState: GameState = {
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "BOOT":
-      return { ...state, progress: action.progress, settings: action.settings, screen: action.screen, booted: true };
+      return {
+        ...state,
+        progress: action.progress,
+        settings: action.settings,
+        screen: action.screen,
+        booted: true,
+      };
     case "SET_PROGRESS":
       return { ...state, progress: action.progress };
     case "PATCH_SETTINGS":
@@ -125,13 +136,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const pushToast = useCallback((message: string, tone: ToastItem["tone"] = "info") => {
-    const id = Date.now() + Math.floor(Math.random() * 1000);
-    setToasts((prev) => [...prev, { id, message, tone }]);
-    window.setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3600);
-  }, []);
+  const pushToast = useCallback(
+    (message: string, tone: ToastItem["tone"] = "info") => {
+      const id = Date.now() + Math.floor(Math.random() * 1000);
+      setToasts((prev) => [...prev, { id, message, tone }]);
+      window.setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 3600);
+    },
+    [],
+  );
 
   const dismissToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -146,20 +160,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
       readStoredJson(SETTINGS_STORAGE_KEY, DEFAULT_SETTINGS),
     );
     const savedScreen: Screen =
-      window.localStorage.getItem(SCREEN_STORAGE_KEY) === "game" ? "game" : "menu";
-    dispatchAction({ type: "BOOT", progress: savedProgress, settings: savedSettings, screen: savedScreen });
+      window.localStorage.getItem(SCREEN_STORAGE_KEY) === "game"
+        ? "game"
+        : "menu";
+    dispatchAction({
+      type: "BOOT",
+      progress: savedProgress,
+      settings: savedSettings,
+      screen: savedScreen,
+    });
   }, [dispatchAction]);
 
   // Persist progress
   useEffect(() => {
     if (!state.booted) return;
-    window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(state.progress));
+    window.localStorage.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify(state.progress),
+    );
   }, [state.booted, state.progress]);
 
   // Persist settings
   useEffect(() => {
     if (!state.booted) return;
-    window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(state.settings));
+    window.localStorage.setItem(
+      SETTINGS_STORAGE_KEY,
+      JSON.stringify(state.settings),
+    );
   }, [state.booted, state.settings]);
 
   // Persist screen
@@ -183,7 +210,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       dispatchAction({ type: "SET_SYNC_STATUS", status: data });
       return data;
     } catch {
-      const fallback: SyncStatus = { authenticated: false, user: null, lastSyncedAt: null };
+      const fallback: SyncStatus = {
+        authenticated: false,
+        user: null,
+        lastSyncedAt: null,
+      };
       dispatchAction({ type: "SET_SYNC_STATUS", status: fallback });
       return fallback;
     }
@@ -194,6 +225,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [refreshAuth]);
 
   // Auth redirect callback
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 부트 시 1회 실행이 목적
   useEffect(() => {
     if (typeof window === "undefined" || !state.booted) return;
     const params = new URLSearchParams(window.location.search);
@@ -203,7 +235,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     const messages: Record<string, string> = {
       success: "DataGSM 로그인이 완료되었습니다.",
-      "invalid-state": "로그인 확인 과정이 올바르지 않았습니다. 다시 시도해 주세요.",
+      "invalid-state":
+        "로그인 확인 과정이 올바르지 않았습니다. 다시 시도해 주세요.",
       "token-failed": "로그인을 마무리하지 못했습니다.",
       "token-missing": "로그인 토큰을 받지 못했습니다.",
       "userinfo-failed": "계정 정보를 불러오지 못했습니다.",
@@ -212,7 +245,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     };
     const message = messages[authCode] ?? `로그인 처리 상태: ${authCode}`;
     const detailedMessage =
-      authCode === "token-failed" && authReason ? `${message} (${authReason})` : message;
+      authCode === "token-failed" && authReason
+        ? `${message} (${authReason})`
+        : message;
     window.history.replaceState({}, "", "/");
 
     if (authCode === "success") {
@@ -223,17 +258,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
           status = await refreshAuth();
         }
         if (!status.authenticated) {
-          pushToast("로그인은 완료됐지만 계정 상태를 확인하지 못했습니다.", "error");
+          pushToast(
+            "로그인은 완료됐지만 계정 상태를 확인하지 못했습니다.",
+            "error",
+          );
           return;
         }
-        pushToast(`${formatUserSummary(status.user)} 계정으로 로그인했습니다.`, "success");
+        pushToast(
+          `${formatUserSummary(status.user)} 계정으로 로그인했습니다.`,
+          "success",
+        );
         await reconcileAfterLogin(status);
       })();
       return;
     }
     pushToast(detailedMessage, "error");
     void refreshAuth();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.booted]);
 
   // Sync operations
@@ -260,11 +300,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
       });
       pushToast("현재 기록을 서버에 저장했습니다.", "success");
     } catch (e) {
-      pushToast(e instanceof Error ? e.message : "서버 저장에 실패했습니다.", "error");
+      pushToast(
+        e instanceof Error ? e.message : "서버 저장에 실패했습니다.",
+        "error",
+      );
     } finally {
       dispatchAction({ type: "SET_SYNC_BUSY", busy: false });
     }
-  }, [state.progress, state.settings, state.syncStatus, dispatchAction, pushToast]);
+  }, [
+    state.progress,
+    state.settings,
+    state.syncStatus,
+    dispatchAction,
+    pushToast,
+  ]);
 
   const syncPull = useCallback(async () => {
     dispatchAction({ type: "SET_SYNC_BUSY", busy: true });
@@ -279,7 +328,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         pushToast("서버에 저장된 기록이 아직 없습니다.");
         return;
       }
-      dispatchAction({ type: "SET_PROGRESS", progress: sanitizeProgress(data.bundle.progress) });
+      dispatchAction({
+        type: "SET_PROGRESS",
+        progress: sanitizeProgress(data.bundle.progress),
+      });
       dispatchAction({
         type: "PATCH_SETTINGS",
         patch: sanitizeSettings(data.bundle.settings),
@@ -290,7 +342,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       });
       pushToast("서버 기록과 설정을 불러왔습니다.", "success");
     } catch (e) {
-      pushToast(e instanceof Error ? e.message : "서버 기록을 불러오지 못했습니다.", "error");
+      pushToast(
+        e instanceof Error ? e.message : "서버 기록을 불러오지 못했습니다.",
+        "error",
+      );
     } finally {
       dispatchAction({ type: "SET_SYNC_BUSY", busy: false });
     }
@@ -305,13 +360,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (res.ok) {
           const data = (await res.json()) as { bundle: SyncBundle | null };
           if (data.bundle) {
-            dispatchAction({ type: "SET_PROGRESS", progress: sanitizeProgress(data.bundle.progress) });
-            dispatchAction({ type: "PATCH_SETTINGS", patch: sanitizeSettings(data.bundle.settings) });
+            dispatchAction({
+              type: "SET_PROGRESS",
+              progress: sanitizeProgress(data.bundle.progress),
+            });
+            dispatchAction({
+              type: "PATCH_SETTINGS",
+              patch: sanitizeSettings(data.bundle.settings),
+            });
             dispatchAction({
               type: "SET_SYNC_STATUS",
               status: { ...status, lastSyncedAt: data.bundle.savedAt },
             });
-            pushToast("서버 기록을 불러와 이어서 시작할 수 있습니다.", "success");
+            pushToast(
+              "서버 기록을 불러와 이어서 시작할 수 있습니다.",
+              "success",
+            );
             return;
           }
         }
@@ -331,10 +395,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
             status: { ...status, lastSyncedAt: pushData.bundle.savedAt },
           });
         }
-        pushToast("처음 로그인한 계정입니다. 지금 기록을 서버에 저장했습니다.", "success");
+        pushToast(
+          "처음 로그인한 계정입니다. 지금 기록을 서버에 저장했습니다.",
+          "success",
+        );
       } catch (e) {
         pushToast(
-          e instanceof Error ? e.message : "로그인 후 기록을 확인하는 중 문제가 생겼습니다.",
+          e instanceof Error
+            ? e.message
+            : "로그인 후 기록을 확인하는 중 문제가 생겼습니다.",
           "error",
         );
       } finally {
@@ -346,7 +415,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Auto-sync
   useEffect(() => {
-    if (!state.booted || !state.syncStatus.authenticated || !state.settings.autoSync) return;
+    if (
+      !state.booted ||
+      !state.syncStatus.authenticated ||
+      !state.settings.autoSync
+    )
+      return;
     const timer = window.setTimeout(() => {
       void fetch("/api/sync", {
         method: "POST",
@@ -385,7 +459,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
           const toastId = Date.now() + Math.floor(Math.random() * 1000);
           setToasts((prev) => [
             ...prev,
-            { id: toastId, message: `${item.name} 획득`, tone: "success" as const },
+            {
+              id: toastId,
+              message: `${item.name} 획득`,
+              tone: "success" as const,
+            },
           ]);
           window.setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== toastId));
@@ -405,7 +483,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const prevUnlockedRef = useRef<Set<string> | null>(null);
   useEffect(() => {
     if (!state.booted) return;
-    const current = new Set(achievements.filter((a) => a.unlocked).map((a) => a.id));
+    const current = new Set(
+      achievements.filter((a) => a.unlocked).map((a) => a.id),
+    );
     if (prevUnlockedRef.current === null) {
       prevUnlockedRef.current = current;
       return;
@@ -417,7 +497,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
           const toastId = Date.now() + Math.floor(Math.random() * 1000);
           setToasts((prev) => [
             ...prev,
-            { id: toastId, message: ach.title, tone: "achievement", achievementIcon: ach.icon },
+            {
+              id: toastId,
+              message: ach.title,
+              tone: "achievement",
+              achievementIcon: ach.icon,
+            },
           ]);
           window.setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== toastId));
@@ -439,7 +524,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       syncPush,
       syncPull,
     }),
-    [state, dispatchAction, toasts, pushToast, dismissToast, achievements, syncPush, syncPull],
+    [
+      state,
+      dispatchAction,
+      toasts,
+      pushToast,
+      dismissToast,
+      achievements,
+      syncPush,
+      syncPull,
+    ],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

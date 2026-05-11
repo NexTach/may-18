@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { historyMediaBySceneId } from "../data/history-media";
 import { scenes, TOTAL_STAGES } from "../data/scenes";
+import { useKeyboardControls } from "../hooks/useKeyboardControls";
+import { useSceneFrame } from "../hooks/useSceneFrame";
 import {
   preloadSceneType,
   preloadSceneTypes,
@@ -11,15 +13,7 @@ import {
 } from "../lib/asset-cache";
 import { AVATAR_COLORS, STAT_LABELS } from "../lib/constants";
 import { TEXT_SPEED_MS } from "../lib/game-state";
-import { useKeyboardControls } from "../hooks/useKeyboardControls";
-import { useSceneFrame } from "../hooks/useSceneFrame";
-import type {
-  Choice,
-  SceneId,
-  SceneType,
-  StatKey,
-  Stats,
-} from "../types";
+import type { Choice, SceneId, SceneType, StatKey, Stats } from "../types";
 import BottomBar from "./BottomBar";
 import EndingScreen from "./EndingScreen";
 import HistoryModal from "./HistoryModal";
@@ -73,7 +67,7 @@ const LOCATION_DESCS: Record<string, string> = {
     "남겨진 기록이 훗날 역사를 증언하는 장소다. 기억을 지키는 힘이 모여 있다.",
   국립5·18민주묘지:
     "오늘의 우리가 5·18을 기억하고 되새기는 자리다. 시간이 지나도 질문은 남아 있다.",
-}
+};
 
 const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   street: [
@@ -87,7 +81,7 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   ],
   university: [],
   downtown: [
-    { x: 11.8, y: 56  },
+    { x: 11.8, y: 56 },
     { x: 50.2, y: 48 },
     { x: 42, y: 60 },
   ],
@@ -160,8 +154,6 @@ const NPC_SLOTS: Record<SceneType, { x: number; y: number }[]> = {
   ],
 };
 
-
-
 function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   if (!choice.requirements) return null;
 
@@ -175,7 +167,11 @@ function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   return null;
 }
 
-export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
+export default function GameScreen({
+  onOpenSettings,
+}: {
+  onOpenSettings: () => void;
+}) {
   const { state, dispatch } = useGame();
   const { settings } = state;
   const initialProgress = state.progress;
@@ -303,8 +299,7 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
     collectedItems,
   ]);
 
-
-  // 씬 변경 시 말풍선 카운트 리셋
+  // biome-ignore lint/correctness/useExhaustiveDependencies: currentSceneId 변경 시 카운트 리셋이 목적
   useEffect(() => {
     setRevealedNpcCount(0);
   }, [currentSceneId]);
@@ -365,7 +360,11 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
   const slots = NPC_SLOTS[currentScene.sceneType] ?? [];
   const choiceViews = currentScene.choices.map((choice) => {
     const reason = getChoiceDisabledReason(choice, stats);
-    return { ...choice, disabled: Boolean(reason), disabledReason: reason ?? undefined };
+    return {
+      ...choice,
+      disabled: Boolean(reason),
+      disabledReason: reason ?? undefined,
+    };
   });
   const historyMedia = historyMediaBySceneId[currentScene.id];
   // 전체 NPC 대화 목록
@@ -395,7 +394,9 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
             ref={sceneSlotRef}
             className="relative aspect-video md:aspect-auto md:flex-[1.7] md:min-h-25 overflow-hidden border border-game-border bg-game-bg"
           >
-            <div className={`absolute inset-0 flex items-center justify-center ${sceneFrame.isCrop ? "" : "p-3"}`}>
+            <div
+              className={`absolute inset-0 flex items-center justify-center ${sceneFrame.isCrop ? "" : "p-3"}`}
+            >
               <div
                 className="relative overflow-hidden bg-game-bg"
                 style={
@@ -415,16 +416,16 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
                 {visibleNpcLines.map((d, i) => {
                   const slot = slots[i];
                   if (!slot) return null;
-                  const color = AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
+                  const color =
+                    AVATAR_COLORS[d.avatar] ?? AVATAR_COLORS.citizen;
                   return (
                     <SpeechBubble
-                      key={`${currentSceneId}-npc-${i}`}
+                      key={`${currentSceneId}-npc-${d.avatar}`}
                       x={slot.x}
                       y={slot.y}
                       name={d.name}
                       line={d.line}
                       borderColor={color.border}
-                      bgColor={color.bg}
                     />
                   );
                 })}
@@ -538,7 +539,10 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
 
       {menuOpen && (
         <PauseMenu
-          onOpenSettings={() => { setMenuOpen(false); onOpenSettings(); }}
+          onOpenSettings={() => {
+            setMenuOpen(false);
+            onOpenSettings();
+          }}
           onResume={() => setMenuOpen(false)}
           onRestart={() => {
             setCurrentSceneId("start");

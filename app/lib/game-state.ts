@@ -81,10 +81,11 @@ export function sanitizeSettings(value: unknown): GameSettings {
 // ── Zod schemas ──────────────────────────────────────────────────────────────
 
 const validSceneIdSet = new Set(scenes.map((s) => s.id as SceneId));
-const SceneIdSchema = z.string().refine(
-  (id): id is SceneId => validSceneIdSet.has(id as SceneId),
-  { message: "Invalid SceneId" },
-) as z.ZodType<SceneId>;
+const SceneIdSchema = z
+  .string()
+  .refine((id): id is SceneId => validSceneIdSet.has(id as SceneId), {
+    message: "Invalid SceneId",
+  }) as z.ZodType<SceneId>;
 
 const StatsSchema = z.object({
   courage: z.number().min(0).default(0),
@@ -116,7 +117,9 @@ export function sanitizeProgress(value: unknown): GameProgress {
 
   const data = result.data;
 
-  const uniqueVisited = Array.from(new Set<SceneId>(["start", ...data.visitedSceneIds]));
+  const uniqueVisited = Array.from(
+    new Set<SceneId>(["start", ...data.visitedSceneIds]),
+  );
   if (!uniqueVisited.includes(data.currentSceneId))
     uniqueVisited.push(data.currentSceneId);
 
@@ -124,7 +127,9 @@ export function sanitizeProgress(value: unknown): GameProgress {
     ...data,
     visitedSceneIds: uniqueVisited,
     allVisitedSceneIds:
-      data.allVisitedSceneIds.length > 0 ? data.allVisitedSceneIds : uniqueVisited,
+      data.allVisitedSceneIds.length > 0
+        ? data.allVisitedSceneIds
+        : uniqueVisited,
     collectedItems: Array.from(new Set(data.collectedItems)),
   } as GameProgress;
 }

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import React from "react";
+import type React from "react";
 
 const BASE_URL = "https://may-18-peach.vercel.app";
 

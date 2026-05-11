@@ -11,7 +11,11 @@ function getContainedFrame(width: number, height: number) {
 
 export function useSceneFrame() {
   const slotRef = useRef<HTMLDivElement | null>(null);
-  const [sceneFrame, setSceneFrame] = useState({ width: 0, height: 0, isCrop: false });
+  const [sceneFrame, setSceneFrame] = useState({
+    width: 0,
+    height: 0,
+    isCrop: false,
+  });
 
   useEffect(() => {
     const node = slotRef.current;

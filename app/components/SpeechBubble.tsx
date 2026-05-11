@@ -8,14 +8,13 @@ type Props = {
   name: string;
   line: string;
   borderColor: string;
-  bgColor: string;
 };
 
 function truncate(s: string, n = 20): string {
-  return s.length > n ? s.slice(0, n - 1) + "…" : s;
+  return s.length > n ? `${s.slice(0, n - 1)}…` : s;
 }
 
-export default function SpeechBubble({ x, y, name, line, borderColor, bgColor }: Props) {
+export default function SpeechBubble({ x, y, name, line, borderColor }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

@@ -15,7 +15,7 @@ export default function FullscreenPrompt({ onFullscreen, onMainMenu }: Props) {
 
   const buttons = [
     { key: "fullscreen", label: "전체화면으로 플레이", action: onFullscreen },
-    { key: "menu",       label: "메인화면으로 가기",   action: onMainMenu },
+    { key: "menu", label: "메인화면으로 가기", action: onMainMenu },
   ] as const;
 
   return (
@@ -34,7 +34,8 @@ export default function FullscreenPrompt({ onFullscreen, onMainMenu }: Props) {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.92) 100%)",
+          background:
+            "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.92) 100%)",
           zIndex: 1,
         }}
       />

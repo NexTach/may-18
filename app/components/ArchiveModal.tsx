@@ -18,26 +18,50 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ArchiveModal({ progress, achievements, onClose }: Props) {
+export default function ArchiveModal({
+  progress,
+  achievements,
+  onClose,
+}: Props) {
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "z" || e.key === "Z") onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "z" || e.key === "Z") onClose();
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const currentScene = scenes.find((scene) => scene.id === progress.currentSceneId);
-  const cumulativeChoices = progress.allChoiceLog.length > 0 ? progress.allChoiceLog : progress.choiceLog;
-  const cumulativeVisited = progress.allVisitedSceneIds.length > 0 ? progress.allVisitedSceneIds : progress.visitedSceneIds;
+  const currentScene = scenes.find(
+    (scene) => scene.id === progress.currentSceneId,
+  );
+  const cumulativeChoices =
+    progress.allChoiceLog.length > 0
+      ? progress.allChoiceLog
+      : progress.choiceLog;
+  const cumulativeVisited =
+    progress.allVisitedSceneIds.length > 0
+      ? progress.allVisitedSceneIds
+      : progress.visitedSceneIds;
   const recentChoiceStart = Math.max(0, cumulativeChoices.length - 12);
-  const endingScenes = scenes.filter((scene) => scene.isEnding && cumulativeVisited.includes(scene.id));
+  const endingScenes = scenes.filter(
+    (scene) => scene.isEnding && cumulativeVisited.includes(scene.id),
+  );
   const unlockedAchievements = achievements.filter((a) => a.unlocked);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/[0.82]">
-      <button type="button" aria-label="기록 보기 닫기" className="absolute inset-0" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="기록 보기 닫기"
+        className="absolute inset-0"
+        onClick={onClose}
+      />
       <div
         className="relative mx-4 w-full max-w-3xl border-2 border-game-border-bright bg-game-panel p-3 md:p-6"
-        style={{ boxShadow: "0 0 0 2px var(--color-game-border), 0 0 0 4px var(--color-game-panel)" }}
+        style={{
+          boxShadow:
+            "0 0 0 2px var(--color-game-border), 0 0 0 4px var(--color-game-panel)",
+        }}
         onMouseDown={(e) => e.stopPropagation()}
         aria-label="기록 보기"
         aria-modal="true"
@@ -45,8 +69,12 @@ export default function ArchiveModal({ progress, achievements, onClose }: Props)
       >
         <div className="mb-4 flex items-center justify-between border-b border-game-border pb-3">
           <div>
-            <div className="text-[12px] text-game-text font-pixel">▣ 기록 보기</div>
-            <p className="mt-2 text-[12px] text-game-text-dim font-mono">남겨 둔 선택과 도달한 장면을 다시 살펴봅니다.</p>
+            <div className="text-[12px] text-game-text font-pixel">
+              ▣ 기록 보기
+            </div>
+            <p className="mt-2 text-[12px] text-game-text-dim font-mono">
+              남겨 둔 선택과 도달한 장면을 다시 살펴봅니다.
+            </p>
           </div>
           <button
             type="button"
@@ -60,50 +88,79 @@ export default function ArchiveModal({ progress, achievements, onClose }: Props)
         <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
             { label: "현재 장면", value: currentScene?.stageTitle ?? "시작" },
-            { label: "방문 장소", value: `${cumulativeVisited.length} / ${scenes.length}` },
+            {
+              label: "방문 장소",
+              value: `${cumulativeVisited.length} / ${scenes.length}`,
+            },
             { label: "도달한 엔딩", value: `${endingScenes.length}` },
-            { label: "해금 업적", value: `${unlockedAchievements.length} / ${achievements.length}` },
+            {
+              label: "해금 업적",
+              value: `${unlockedAchievements.length} / ${achievements.length}`,
+            },
           ].map((item) => (
-            <div key={item.label} className="border border-[#243410] bg-game-panel p-3">
-              <div className="text-[10px] text-game-border-bright font-pixel">{item.label}</div>
-              <p className="mt-2 text-[13px] text-game-text font-mono">{item.value}</p>
+            <div
+              key={item.label}
+              className="border border-[#243410] bg-game-panel p-3"
+            >
+              <div className="text-[10px] text-game-border-bright font-pixel">
+                {item.label}
+              </div>
+              <p className="mt-2 text-[13px] text-game-text font-mono">
+                {item.value}
+              </p>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.1fr_0.9fr]">
           <div className="border border-game-border bg-game-panel-dark p-3 md:p-4">
-            <div className="mb-3 text-[11px] text-game-border-bright font-pixel">최근 선택</div>
+            <div className="mb-3 text-[11px] text-game-border-bright font-pixel">
+              최근 선택
+            </div>
             {cumulativeChoices.length === 0 ? (
-              <p className="text-[12px] text-[#40511c] font-mono">아직 남겨진 선택이 없습니다.</p>
+              <p className="text-[12px] text-[#40511c] font-mono">
+                아직 남겨진 선택이 없습니다.
+              </p>
             ) : (
               <div className="flex max-h-70 flex-col gap-1.5 overflow-y-auto pr-1">
-                {cumulativeChoices.slice(recentChoiceStart).map((choice, index) => (
-                  <div key={`${index}-${choice}`} className="flex gap-3">
-                    <span className="text-[12px] text-game-text-muted font-mono">
-                      {String(recentChoiceStart + index + 1).padStart(2, "0")}
-                    </span>
-                    <p className="flex-1 text-[12px] leading-relaxed text-game-accent font-mono">{choice}</p>
-                  </div>
-                ))}
+                {cumulativeChoices
+                  .slice(recentChoiceStart)
+                  .map((choice, index) => (
+                    <div key={`${index}-${choice}`} className="flex gap-3">
+                      <span className="text-[12px] text-game-text-muted font-mono">
+                        {String(recentChoiceStart + index + 1).padStart(2, "0")}
+                      </span>
+                      <p className="flex-1 text-[12px] leading-relaxed text-game-accent font-mono">
+                        {choice}
+                      </p>
+                    </div>
+                  ))}
               </div>
             )}
           </div>
 
           <div className="flex flex-col gap-4">
             <div className="border border-game-border bg-game-panel-dark p-3 md:p-4">
-              <div className="mb-3 text-[11px] text-game-border-bright font-pixel">선택 성향</div>
+              <div className="mb-3 text-[11px] text-game-border-bright font-pixel">
+                선택 성향
+              </div>
               <div className="flex flex-col gap-2.5">
                 {(Object.keys(progress.stats) as (keyof Stats)[]).map((key) => (
                   <div key={key}>
                     <div className="mb-1 flex items-center justify-between">
-                      <span className="text-[12px] text-game-accent font-mono">{STAT_LABELS[key]}</span>
-                      <span className="text-[12px] text-game-text font-mono">{progress.stats[key]}</span>
+                      <span className="text-[12px] text-game-accent font-mono">
+                        {STAT_LABELS[key]}
+                      </span>
+                      <span className="text-[12px] text-game-text font-mono">
+                        {progress.stats[key]}
+                      </span>
                     </div>
                     <div className="h-2 border border-[#1e2e0e] bg-game-panel">
                       <div
                         className="h-full bg-[#5a8a2a]"
-                        style={{ width: `${Math.min(100, progress.stats[key] * 16)}%` }}
+                        style={{
+                          width: `${Math.min(100, progress.stats[key] * 16)}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -112,15 +169,26 @@ export default function ArchiveModal({ progress, achievements, onClose }: Props)
             </div>
 
             <div className="border border-game-border bg-game-panel-dark p-3 md:p-4">
-              <div className="mb-3 text-[11px] text-game-border-bright font-pixel">도달한 엔딩</div>
+              <div className="mb-3 text-[11px] text-game-border-bright font-pixel">
+                도달한 엔딩
+              </div>
               {endingScenes.length === 0 ? (
-                <p className="text-[12px] text-[#40511c] font-mono">아직 엔딩에 도달하지 않았습니다.</p>
+                <p className="text-[12px] text-[#40511c] font-mono">
+                  아직 엔딩에 도달하지 않았습니다.
+                </p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {endingScenes.map((scene) => (
-                    <div key={scene.id} className="border border-[#243410] bg-game-panel px-3 py-2">
-                      <p className="text-[12px] text-game-text font-mono">{scene.stageTitle}</p>
-                      <p className="mt-1 text-[11px] text-[#6f8441] font-mono">{scene.location}</p>
+                    <div
+                      key={scene.id}
+                      className="border border-[#243410] bg-game-panel px-3 py-2"
+                    >
+                      <p className="text-[12px] text-game-text font-mono">
+                        {scene.stageTitle}
+                      </p>
+                      <p className="mt-1 text-[11px] text-[#6f8441] font-mono">
+                        {scene.location}
+                      </p>
                     </div>
                   ))}
                 </div>

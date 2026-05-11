@@ -35,7 +35,9 @@ function HUDButton({
       style={{
         background: "var(--color-game-panel)",
         border: "2px solid",
-        borderColor: hov ? "var(--color-game-accent)" : "var(--color-game-border-bright)",
+        borderColor: hov
+          ? "var(--color-game-accent)"
+          : "var(--color-game-border-bright)",
         color: hov ? "var(--color-game-accent)" : "var(--color-game-text)",
         fontFamily: "'DungGeunMo', monospace",
       }}
@@ -81,7 +83,9 @@ export default function HUD({
       </div>
 
       <div className="hidden md:flex items-center gap-4 shrink-0">
-        <span className="text-[12px] xl:text-[13px] text-game-text-muted font-mono">기록한 선택</span>
+        <span className="text-[12px] xl:text-[13px] text-game-text-muted font-mono">
+          기록한 선택
+        </span>
         <span className="text-[12px] xl:text-[13px] text-game-text-dim font-mono">
           {String(sceneIndex).padStart(2, "0")}/
           {String(totalScenes).padStart(2, "0")}

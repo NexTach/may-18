@@ -7,10 +7,15 @@ type Props = {
   onOpenSettings: () => void;
 };
 
-export default function PauseMenu({ onResume, onRestart, onMainMenu, onOpenSettings }: Props) {
+export default function PauseMenu({
+  onResume,
+  onRestart,
+  onMainMenu,
+  onOpenSettings,
+}: Props) {
   const items = [
     { label: "계속하기", action: onResume },
-    { label: "설정",     action: onOpenSettings },
+    { label: "설정", action: onOpenSettings },
     { label: "처음부터", action: onRestart },
     { label: "메인 메뉴", action: onMainMenu },
   ];

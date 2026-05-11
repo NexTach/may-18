@@ -16,7 +16,8 @@ export const collectibleDefs: CollectibleDef[] = [
     id: "radio_note",
     icon: "◻",
     name: "라디오 메모지",
-    description: "방송과 현실이 다르다는 사실을 손으로 옮겨 적은 낡은 종이 조각.",
+    description:
+      "방송과 현실이 다르다는 사실을 손으로 옮겨 적은 낡은 종이 조각.",
   },
   {
     id: "leaflet",

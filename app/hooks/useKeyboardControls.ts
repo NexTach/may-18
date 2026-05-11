@@ -38,15 +38,34 @@ export function useKeyboardControls({
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "z" || e.key === "Z") {
-        if (historyOpen) { onCloseHistory(); return; }
-        if (mapOpen) { onCloseMap(); return; }
-        if (inventoryOpen) { onCloseInventory(); return; }
+        if (historyOpen) {
+          onCloseHistory();
+          return;
+        }
+        if (mapOpen) {
+          onCloseMap();
+          return;
+        }
+        if (inventoryOpen) {
+          onCloseInventory();
+          return;
+        }
         onToggleMenu();
         return;
       }
-      if (e.key === "x" || e.key === "X") { onToggleHistory(); return; }
-      if (e.key === "m" || e.key === "M") { onToggleMap(); return; }
-      if (e.key === "Tab") { e.preventDefault(); onToggleInventory(); return; }
+      if (e.key === "x" || e.key === "X") {
+        onToggleHistory();
+        return;
+      }
+      if (e.key === "m" || e.key === "M") {
+        onToggleMap();
+        return;
+      }
+      if (e.key === "Tab") {
+        e.preventDefault();
+        onToggleInventory();
+        return;
+      }
 
       if (!historyOpen && !mapOpen && !inventoryOpen && !menuOpen && choices) {
         const tryChoice = (c?: Choice) => {
@@ -60,9 +79,19 @@ export function useKeyboardControls({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [
-    historyOpen, mapOpen, inventoryOpen, menuOpen, choices,
-    isChoiceDisabled, onChoice,
-    onToggleHistory, onToggleMap, onToggleInventory, onToggleMenu,
-    onCloseHistory, onCloseMap, onCloseInventory,
+    historyOpen,
+    mapOpen,
+    inventoryOpen,
+    menuOpen,
+    choices,
+    isChoiceDisabled,
+    onChoice,
+    onToggleHistory,
+    onToggleMap,
+    onToggleInventory,
+    onToggleMenu,
+    onCloseHistory,
+    onCloseMap,
+    onCloseInventory,
   ]);
 }
