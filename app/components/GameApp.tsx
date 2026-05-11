@@ -17,6 +17,7 @@ import {
   scheduleIdlePreload,
 } from "../lib/asset-cache";
 import { SOUNDS } from "../lib/audio-config";
+import { requestFullscreen } from "../lib/fullscreen";
 import type { GameProgress } from "../types";
 import GameScreen from "./GameScreen";
 import MainMenu from "./MainMenu";
@@ -246,6 +247,7 @@ export default function GameApp() {
         <ContinuePrompt
           progress={progress}
           onContinue={() => {
+            requestFullscreen();
             setContinuePromptDone(true);
             dispatch({ type: "SET_SCREEN", screen: "game" });
           }}

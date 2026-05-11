@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { requestFullscreen } from "../lib/fullscreen";
 import { playSfx } from "../lib/sfx";
 import type { GameProgress, GameSettings, SyncStatus } from "../types";
 import AchievementModal from "./AchievementModal";
@@ -57,7 +58,7 @@ export default function MainMenu({
   const [exitHint, setExitHint] = useState(false);
 
   const menuItems: MenuItem[] = [
-    { label: canContinue ? "이어하기" : "게임 시작", action: onStart },
+    { label: canContinue ? "이어하기" : "게임 시작", action: () => { requestFullscreen(); onStart(); } },
     { label: "기록 보기", action: () => setArchiveOpen(true) },
     { label: "설정", action: onOpenSettings },
     { label: "게임 종료", action: () => { window.close(); setExitHint(true); } },
