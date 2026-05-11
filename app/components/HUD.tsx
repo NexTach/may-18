@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 type Props = {
   stageNum: number;
   stageTitle: string;
@@ -22,14 +24,32 @@ function HUDButton({
   shortcut: string;
   onClick: () => void;
 }) {
+  const [hov, setHov] = useState(false);
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1.5 md:px-3 xl:px-4 xl:py-2 border border-game-border bg-game-panel hover:bg-[#1a2a0c] transition-colors cursor-pointer font-mono"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="flex items-center gap-1.5 px-2 py-1.5 md:px-3 xl:px-4 xl:py-2 cursor-pointer transition-colors"
+      style={{
+        background: "var(--color-game-panel)",
+        border: "2px solid",
+        borderColor: hov ? "var(--color-game-accent)" : "var(--color-game-border-bright)",
+        color: hov ? "var(--color-game-accent)" : "var(--color-game-text)",
+        fontFamily: "'DungGeunMo', monospace",
+      }}
     >
-      <span className="hidden md:inline text-[11px] xl:text-[12px] text-game-border-bright">[{shortcut}]</span>
-      <span className="text-[12px] md:text-[13px] xl:text-[14px] text-game-accent">{label}</span>
+      <span
+        className="hidden md:inline text-[11px] xl:text-[12px] px-1 py-px"
+        style={{
+          border: "1px solid var(--color-game-border-bright)",
+          color: "var(--color-game-text-dim)",
+        }}
+      >
+        {shortcut}
+      </span>
+      <span className="text-[12px] md:text-[13px] xl:text-[14px]">{label}</span>
     </button>
   );
 }

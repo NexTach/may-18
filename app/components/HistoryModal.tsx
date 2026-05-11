@@ -32,7 +32,7 @@ export default function HistoryModal({ sceneId, stageTitle, imageCaption, histor
       />
       <div
         className="border-2 border-game-border-bright bg-game-panel p-4 md:p-7 xl:p-8 max-w-4xl xl:max-w-5xl w-full mx-4 relative z-10 max-h-[85dvh] overflow-y-auto"
-        style={{ boxShadow: "0 0 0 2px var(--color-game-border), 0 0 0 4px var(--color-game-panel), 0 0 0 6px #1a2a0c" }}
+        style={{ boxShadow: "0 0 0 2px var(--color-game-border), 0 0 0 4px var(--color-game-panel), 0 0 0 6px #10251f" }}
       >
         <div className="border-b border-game-border pb-4 mb-5">
           <div className="text-[12px] xl:text-[13px] text-game-border-bright mb-2 font-pixel">▣ 실제 역사적 사실</div>
@@ -90,7 +90,7 @@ export default function HistoryModal({ sceneId, stageTitle, imageCaption, histor
         <button
           type="button"
           onClick={onClose}
-          className="w-full border border-game-border-bright bg-game-panel hover:bg-[#162010] py-3 transition-colors cursor-pointer font-pixel"
+          className="w-full border border-game-border-bright bg-game-panel hover:bg-[#0f2420] py-3 transition-colors cursor-pointer font-pixel"
         >
           <span className="text-[12px] text-game-text">[ 닫기 ]</span>
         </button>

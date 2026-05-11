@@ -121,7 +121,7 @@ export default function InventoryModal({ stats, collectedItems, onClose }: Props
         <button
           type="button"
           onClick={onClose}
-          className="w-full border border-game-border-bright bg-game-panel hover:bg-[#162010] py-3 transition-colors cursor-pointer font-pixel"
+          className="w-full border border-game-border-bright bg-game-panel hover:bg-[#0f2420] py-3 transition-colors cursor-pointer font-pixel"
         >
           <span className="text-[12px] text-game-text">[ 닫기 ]</span>
         </button>
