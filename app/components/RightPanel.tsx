@@ -232,9 +232,6 @@ export default function RightPanel({
           {!done && (
             <p className="text-[11px] xl:text-[12px] text-game-text-muted mt-2 font-mono">클릭하면 건너뜁니다</p>
           )}
-          {done && !allRevealed && (
-            <p className="text-[11px] xl:text-[12px] text-game-text-muted mt-2 font-mono animate-blink">클릭하면 다음으로</p>
-          )}
         </div>
       </button>
 
@@ -294,6 +291,9 @@ export default function RightPanel({
           {visibleDialogue.map((l, i) => (
             <DialLine key={`${l.avatar}-${l.name}-${i}`} line={l} />
           ))}
+          {!allRevealed && (
+            <p className="text-[11px] xl:text-[12px] text-game-text-muted font-mono shrink-0">클릭하면 다음으로</p>
+          )}
         </div>
       )}
 

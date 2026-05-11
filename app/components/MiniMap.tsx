@@ -203,12 +203,12 @@ export default function MiniMap({
     const cx = (Math.min(...fxs) + Math.max(...fxs)) / 2;
     const cy = (Math.min(...fys) + Math.max(...fys)) / 2;
     const hw = Math.min(
-      Math.max((Math.max(...fxs) - Math.min(...fxs)) / 2 + 35, 55),
-      90,
+      Math.max((Math.max(...fxs) - Math.min(...fxs)) / 2 + 60, 100),
+      145,
     );
     const hh = Math.min(
-      Math.max((Math.max(...fys) - Math.min(...fys)) / 2 + 35, 55),
-      90,
+      Math.max((Math.max(...fys) - Math.min(...fys)) / 2 + 60, 100),
+      145,
     );
     vb = `${cx - hw} ${cy - hh} ${hw * 2} ${hh * 2}`;
   } else {
@@ -308,7 +308,7 @@ export default function MiniMap({
   return (
     <svg viewBox={vb} className="w-full h-full">
       <title>게임 활동 지도</title>
-      {!compact && !focusMode && <GwangjuMapBackground />}
+      {!compact && <GwangjuMapBackground />}
 
       {mapNodes.flatMap((node) =>
         node.connections.map((toId) => {
