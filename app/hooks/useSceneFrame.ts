@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
 const SCENE_ASPECT_RATIO = 16 / 9;
-// 슬롯 높이가 이 값 미만이면 16:9 비율 포기하고 크롭으로 채움
 const CROP_HEIGHT_THRESHOLD = 400;
 
 function getContainedFrame(width: number, height: number) {

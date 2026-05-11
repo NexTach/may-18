@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGame } from "../context/GameContext";
+import { usePoorViewport } from "../hooks/usePoorViewport";
 import { collectibleDefs } from "../data/collectibles";
 import { scenes } from "../data/scenes";
 import {
@@ -20,6 +21,35 @@ import GameScreen from "./GameScreen";
 import MainMenu from "./MainMenu";
 import ToastLayer from "./ToastLayer";
 
+function ViewportWarningOverlay({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm">
+      <div
+        className="border-2 border-[#4a6a1a] bg-[#0b1208] p-8 max-w-xs w-full text-center"
+        style={{ boxShadow: "0 0 0 1px #2c3f12, 0 0 40px rgba(74,106,26,0.15)" }}
+      >
+        <p className="text-[28px] mb-4 text-[#8aaa40]">⚠</p>
+        <p className="text-[13px] text-game-text font-pixel mb-4 leading-relaxed tracking-wide">
+          화면 비율 조정 필요
+        </p>
+        <p className="text-[12px] text-game-accent font-mono leading-relaxed">
+          현재 화면 높이가 낮아<br />게임이 제대로 표시되지 않습니다.
+        </p>
+        <p className="text-[11px] text-[#5a7a30] font-mono mt-2.5 leading-relaxed">
+          브라우저 창을 최대화하거나<br />화면 배율을 낮춰 주세요.
+        </p>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="mt-6 w-full px-4 py-2.5 border border-[#2c3f12] hover:border-[#4a6a1a] bg-[#0f1a08] hover:bg-[#162010] text-[12px] text-[#5a7a30] hover:text-game-accent font-mono transition-colors cursor-pointer"
+        >
+          그냥 계속하기
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function GameApp() {
   const {
     state,
@@ -32,6 +62,14 @@ export default function GameApp() {
     pushToast,
   } = useGame();
   const { progress, settings, screen, syncStatus, syncBusy, booted } = state;
+
+  const isPoorViewport = usePoorViewport();
+  const [viewportDismissed, setViewportDismissed] = useState(false);
+
+  // 화면이 정상 크기로 돌아오면 dismissed 리셋 (다시 작아지면 재표시)
+  useEffect(() => {
+    if (!isPoorViewport) setViewportDismissed(false);
+  }, [isPoorViewport]);
 
   const sceneById = useMemo(
     () => new Map(scenes.map((s) => [s.id, s])),
@@ -60,11 +98,17 @@ export default function GameApp() {
     });
   }, [booted, progress.currentSceneId, sceneById]);
 
+  const viewportOverlay =
+    isPoorViewport && !viewportDismissed ? (
+      <ViewportWarningOverlay onDismiss={() => setViewportDismissed(true)} />
+    ) : null;
+
   if (screen === "game") {
     return (
       <>
         <GameScreen />
         <ToastLayer toasts={toasts} onDismiss={dismissToast} />
+        {viewportOverlay}
       </>
     );
   }
@@ -119,6 +163,7 @@ export default function GameApp() {
         }}
       />
       <ToastLayer toasts={toasts} onDismiss={dismissToast} />
+      {viewportOverlay}
     </>
   );
 }
