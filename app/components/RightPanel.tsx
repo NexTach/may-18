@@ -161,7 +161,6 @@ function ChoiceBtn({
   );
 }
 
-// ── 메인 컴포넌트 ──────────────────────────────────────────
 export default function RightPanel({
   text, situation, dialogue, choices,
   typingSpeed, soundOn, onChoice, onDialogueProgress,
@@ -170,27 +169,23 @@ export default function RightPanel({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [situationOpen, setSituationOpen] = useState(false);
 
-  // 대화 순차 공개 인덱스 (-1 = 아직 아무것도 안 보임)
   const [revealIndex, setRevealIndex] = useState(-1);
 
-  // 씬 바뀌면 초기화
   useEffect(() => { setRevealIndex(-1); }, [text]);
 
-  // 타이핑 완료 → 첫 줄 공개 시작
+  const isInstant = typingSpeed <= 0;
   useEffect(() => {
     if (!done || dialogue.length === 0) return;
+    if (isInstant) { setRevealIndex(dialogue.length - 1); return; }
     const id = setTimeout(() => setRevealIndex(0), 350);
     return () => clearTimeout(id);
-  }, [done, dialogue.length]);
-
-  // 자동 다음 줄 공개 (1.4초 간격)
+  }, [done, dialogue.length, isInstant]);
   useEffect(() => {
-    if (revealIndex < 0 || revealIndex >= dialogue.length - 1) return;
+    if (isInstant || revealIndex < 0 || revealIndex >= dialogue.length - 1) return;
     const id = setTimeout(() => setRevealIndex((v) => v + 1), 1400);
     return () => clearTimeout(id);
-  }, [revealIndex, dialogue.length]);
+  }, [isInstant, revealIndex, dialogue.length]);
 
-  // NPC 공개 수를 GameScreen에 전달
   const npcRevealCount =
     revealIndex < 0
       ? 0
@@ -203,7 +198,6 @@ export default function RightPanel({
   const allRevealed = dialogue.length === 0 || revealIndex >= dialogue.length - 1;
   const showChoices = done && allRevealed;
 
-  // 클릭: 타이핑 건너뛰기 → 대화 한 줄씩 넘기기
   const handleAreaClick = () => {
     if (!done) { if (soundOn) playSfx("click"); skip(); return; }
     if (!allRevealed) {
