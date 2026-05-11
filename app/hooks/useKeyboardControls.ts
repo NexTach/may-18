@@ -37,7 +37,7 @@ export function useKeyboardControls({
 }: Opts) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "z" || e.key === "Z") {
         if (historyOpen) { onCloseHistory(); return; }
         if (mapOpen) { onCloseMap(); return; }
         if (inventoryOpen) { onCloseInventory(); return; }

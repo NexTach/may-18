@@ -29,7 +29,7 @@ export default function InventoryModal({ stats, collectedItems, onClose }: Props
   const collectedSet = new Set(collectedItems);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/[0.78]" onClick={onClose}>
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/78" onClick={onClose}>
       <div
         className="border-2 border-game-border-bright bg-game-panel p-4 md:p-5 xl:p-6 max-w-lg xl:max-w-xl 2xl:max-w-2xl w-full mx-4 max-h-[85dvh] overflow-y-auto"
         style={{ boxShadow: "0 0 0 2px var(--color-game-border), 0 0 0 4px var(--color-game-panel)" }}
@@ -60,7 +60,7 @@ export default function InventoryModal({ stats, collectedItems, onClose }: Props
                     </span>
                     <span className="text-[13px] xl:text-[14px] text-game-text-muted font-mono">{val}</span>
                   </div>
-                  <div className="w-full bg-[#0a1006] border border-[#1e2e0e] h-[10px]">
+                  <div className="w-full bg-[#0a1006] border border-[#1e2e0e] h-2.5">
                     <div
                       className="h-full transition-all opacity-70"
                       style={{ width: `${pct}%`, background: STAT_COLOR_VAR[key] }}

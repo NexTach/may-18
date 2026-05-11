@@ -76,7 +76,7 @@ export default function MapModal({
             onClick={onClose}
             className="text-[13px] text-game-border-bright hover:text-game-text transition-colors cursor-pointer font-mono"
           >
-            <span className="hidden md:inline">[ESC] </span>닫기
+            <span className="hidden md:inline">[Z] </span>닫기
           </button>
         </div>
 

@@ -5,7 +5,7 @@ const hints = [
   { key: "X", label: "기록 하기" },
   { key: "M", label: "지도 열기" },
   { key: "Tab", label: "가방 열기" },
-  { key: "ESC", label: "메뉴/일시정지" },
+  { key: "Z", label: "메뉴/일시정지" },
 ];
 
 const font = "'DungGeunMo', monospace";

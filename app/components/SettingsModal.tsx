@@ -305,7 +305,7 @@ export default function SettingsModal({
   const [activeTab, setActiveTab] = useState<SettingsTab>("display");
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handler = (e: KeyboardEvent) => { if (e.key === "z" || e.key === "Z") onClose(); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
@@ -319,7 +319,7 @@ export default function SettingsModal({
           onClick={onClose}
           className="text-[13px] text-game-border-bright transition-colors hover:text-game-text font-mono"
         >
-          <span className="hidden md:inline">[ESC] </span>닫기
+          <span className="hidden md:inline">[Z] </span>닫기
         </button>
       </div>
 

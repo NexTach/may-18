@@ -377,7 +377,7 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
         <div className="shrink-0 md:flex-1 flex flex-col min-w-0 md:min-h-0 gap-2 md:gap-2 xl:gap-3">
           <div
             ref={sceneSlotRef}
-            className="relative aspect-video md:aspect-auto md:flex-[1.7] md:min-h-[100px] overflow-hidden border border-game-border bg-game-bg"
+            className="relative aspect-video md:aspect-auto md:flex-[1.7] md:min-h-25 overflow-hidden border border-game-border bg-game-bg"
           >
             <div className={`absolute inset-0 flex items-center justify-center ${sceneFrame.isCrop ? "" : "p-3"}`}>
               <div
@@ -421,7 +421,7 @@ export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => v
             </div>
           </div>
 
-          <div className="hidden md:flex flex-[0.6] min-h-[140px] border border-game-border overflow-hidden">
+          <div className="hidden md:flex flex-[0.6] min-h-35 border border-game-border overflow-hidden">
             <div
               className="flex flex-col gap-3 p-3 xl:p-4 border-r border-game-border bg-game-panel overflow-y-auto"
               style={{ minWidth: 0, flex: "0 0 38%" }}

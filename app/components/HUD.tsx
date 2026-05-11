@@ -67,9 +67,9 @@ export default function HUD({
   onMenu,
 }: Props) {
   return (
-    <div className="flex items-center justify-between px-3 py-2 md:px-4 xl:px-6 border-2 border-game-border bg-game-panel shrink-0 min-h-[48px] xl:min-h-[60px]">
+    <div className="flex items-center justify-between px-3 py-2 md:px-4 xl:px-6 border-2 border-game-border bg-game-panel shrink-0 min-h-12 xl:min-h-15">
       <div className="flex items-center gap-2 md:gap-4 xl:gap-6 min-w-0 flex-1 mr-2">
-        <span className="text-[11px] md:text-[13px] xl:text-[15px] font-bold text-game-text truncate font-pixel tracking-[0.05em]">
+        <span className="text-[11px] md:text-[13px] xl:text-[15px] font-bold text-game-text truncate font-pixel tracking-wider">
           {String(stageNum).padStart(2, "0")}. {stageTitle}
         </span>
         <span className="hidden md:inline text-[13px] xl:text-[14px] text-game-text-dim shrink-0 font-mono">
@@ -92,7 +92,7 @@ export default function HUD({
         <HUDButton label="역사" shortcut="X" onClick={onHistory} />
         <HUDButton label="지도" shortcut="M" onClick={onMap} />
         <HUDButton label="가방" shortcut="Tab" onClick={onInventory} />
-        <HUDButton label="메뉴" shortcut="ESC" onClick={onMenu} />
+        <HUDButton label="메뉴" shortcut="Z" onClick={onMenu} />
       </div>
     </div>
   );
