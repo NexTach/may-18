@@ -7,6 +7,7 @@ type Props = {
   currentSceneId: SceneId;
   visitedSceneIds: Set<SceneId>;
   compact?: boolean;
+  focusMode?: boolean;
   onJump?: (sceneId: SceneId) => void;
 };
 
@@ -176,6 +177,7 @@ export default function MiniMap({
   currentSceneId,
   visitedSceneIds,
   compact = false,
+  focusMode = false,
   onJump,
 }: Props) {
   const pad = 14;
@@ -186,12 +188,35 @@ export default function MiniMap({
   const maxX = Math.max(...allX) + pad;
   const minY = Math.min(...allY) - pad;
   const maxY = Math.max(...allY) + pad + labelH;
-  const vb = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
 
   const nodeById = Object.fromEntries(mapNodes.map((n) => [n.id, n]));
+  const currentNode = nodeById[currentSceneId];
+
+  let vb: string;
+  if (focusMode && currentNode) {
+    const neighbors = mapNodes.filter((n) =>
+      currentNode.connections.includes(n.id),
+    );
+    const focusNodes = [currentNode, ...neighbors];
+    const fxs = focusNodes.map((n) => n.x);
+    const fys = focusNodes.map((n) => n.y);
+    const cx = (Math.min(...fxs) + Math.max(...fxs)) / 2;
+    const cy = (Math.min(...fys) + Math.max(...fys)) / 2;
+    const hw = Math.min(
+      Math.max((Math.max(...fxs) - Math.min(...fxs)) / 2 + 35, 55),
+      90,
+    );
+    const hh = Math.min(
+      Math.max((Math.max(...fys) - Math.min(...fys)) / 2 + 35, 55),
+      90,
+    );
+    vb = `${cx - hw} ${cy - hh} ${hw * 2} ${hh * 2}`;
+  } else {
+    vb = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+  }
+
   const drawnEdges = new Set<string>();
   const r = compact ? 4 : 5;
-  const currentNode = nodeById[currentSceneId];
   const frontierNodeIds = new Set(
     mapNodes
       .filter(

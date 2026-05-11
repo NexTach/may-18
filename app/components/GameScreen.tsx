@@ -347,18 +347,22 @@ export default function GameScreen() {
         <div className="shrink-0 md:flex-1 flex flex-col min-w-0 md:min-h-0 gap-2 md:gap-4">
           <div
             ref={sceneSlotRef}
-            className="relative aspect-video md:aspect-auto md:flex-[1.45] md:min-h-0 overflow-hidden border border-game-border bg-game-bg"
+            className="relative aspect-video md:aspect-auto md:flex-[1.45] md:min-h-[100px] overflow-hidden border border-game-border bg-game-bg"
           >
-            <div className="absolute inset-0 flex items-center justify-center p-3">
+            <div className={`absolute inset-0 flex items-center justify-center ${sceneFrame.isCrop ? "" : "p-3"}`}>
               <div
                 className="relative overflow-hidden bg-game-bg"
-                style={{
-                  width: sceneFrame.width || undefined,
-                  height: sceneFrame.height || undefined,
-                  aspectRatio: "16 / 9",
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                }}
+                style={
+                  sceneFrame.isCrop
+                    ? { position: "absolute", inset: 0 }
+                    : {
+                        width: sceneFrame.width || undefined,
+                        height: sceneFrame.height || undefined,
+                        aspectRatio: "16 / 9",
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                      }
+                }
               >
                 <PixelScene sceneType={currentScene.sceneType} />
 
@@ -388,7 +392,7 @@ export default function GameScreen() {
             </div>
           </div>
 
-          <div className="hidden md:flex flex-[0.66] min-h-0 border border-game-border overflow-hidden">
+          <div className="hidden md:flex flex-[0.66] min-h-[160px] border border-game-border overflow-hidden">
             <div
               className="flex flex-col gap-4 p-4 xl:p-5 border-r border-game-border bg-game-panel overflow-y-auto"
               style={{ minWidth: 0, flex: "0 0 38%" }}
@@ -430,6 +434,7 @@ export default function GameScreen() {
                 <MiniMap
                   currentSceneId={currentSceneId}
                   visitedSceneIds={visitedSceneIds}
+                  focusMode
                 />
               </div>
             </div>
