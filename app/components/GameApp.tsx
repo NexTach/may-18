@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { usePoorViewport } from "../hooks/usePoorViewport";
@@ -17,8 +18,10 @@ import {
   scheduleIdlePreload,
 } from "../lib/asset-cache";
 import { SOUNDS } from "../lib/audio-config";
+import type { GameProgress } from "../types";
 import GameScreen from "./GameScreen";
 import MainMenu from "./MainMenu";
+import SettingsModal from "./SettingsModal";
 import ToastLayer from "./ToastLayer";
 
 function ViewportWarningOverlay({ onDismiss }: { onDismiss: () => void }) {
@@ -50,6 +53,92 @@ function ViewportWarningOverlay({ onDismiss }: { onDismiss: () => void }) {
   );
 }
 
+function ContinuePrompt({
+  progress,
+  onContinue,
+  onFresh,
+}: {
+  progress: GameProgress;
+  onContinue: () => void;
+  onFresh: () => void;
+}) {
+  const btnBase: React.CSSProperties = {
+    display: "block",
+    width: "100%",
+    border: "1.5px solid",
+    padding: "12px",
+    fontFamily: "'DungGeunMo', monospace",
+    fontSize: 13,
+    cursor: "pointer",
+    transition: "background 0.1s, border-color 0.1s, color 0.1s",
+  };
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-game-bg">
+      <Image
+        src="/menu-bg.png"
+        alt=""
+        fill
+        quality={100}
+        className="object-cover object-bottom"
+        style={{ imageRendering: "pixelated", opacity: 0.25 }}
+      />
+      <div
+        className="relative z-10 bg-game-panel p-8 w-[320px]"
+        style={{
+          border: "2px solid var(--color-game-border-bright)",
+          boxShadow: "0 0 0 2px var(--color-game-border), 0 0 40px rgba(245,208,108,0.1)",
+        }}
+      >
+        <p
+          className="text-center mb-1.5"
+          style={{ fontSize: 10, color: "var(--color-game-text-muted)", fontFamily: "'DungGeunMo', monospace", letterSpacing: "2px" }}
+        >
+          저장된 기록 발견
+        </p>
+        <p
+          className="text-center mb-2"
+          style={{ fontSize: 14, color: "var(--color-game-text)", fontFamily: "'DungGeunMo', monospace" }}
+        >
+          이어서 하시겠습니까?
+        </p>
+        <p
+          className="text-center mb-7"
+          style={{ fontSize: 11, color: "var(--color-game-text-muted)", fontFamily: "monospace" }}
+        >
+          {progress.sceneIndex - 1}번의 선택 기록이 있습니다
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={onContinue}
+            style={{
+              ...btnBase,
+              borderColor: "var(--color-game-border-bright)",
+              background: "#0f2420",
+              color: "var(--color-game-accent)",
+            }}
+          >
+            이어서 하기
+          </button>
+          <button
+            type="button"
+            onClick={onFresh}
+            style={{
+              ...btnBase,
+              borderColor: "var(--color-game-border)",
+              background: "var(--color-game-panel)",
+              color: "var(--color-game-text-dim)",
+            }}
+          >
+            새로 시작
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function GameApp() {
   const {
     state,
@@ -65,8 +154,9 @@ export default function GameApp() {
 
   const isPoorViewport = usePoorViewport();
   const [viewportDismissed, setViewportDismissed] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [continuePromptDone, setContinuePromptDone] = useState(false);
 
-  // 화면이 정상 크기로 돌아오면 dismissed 리셋 (다시 작아지면 재표시)
   useEffect(() => {
     if (!isPoorViewport) setViewportDismissed(false);
   }, [isPoorViewport]);
@@ -76,7 +166,6 @@ export default function GameApp() {
     [],
   );
 
-  // Asset preload on boot
   useEffect(() => {
     if (!booted) return;
     preloadImage("/menu-bg.png");
@@ -84,7 +173,6 @@ export default function GameApp() {
     preloadAudio(SOUNDS.march);
   }, [booted]);
 
-  // Scene asset preload on scene change
   useEffect(() => {
     if (!booted) return;
     const activeScene = sceneById.get(progress.currentSceneId) ?? sceneById.get("start");
@@ -98,16 +186,91 @@ export default function GameApp() {
     });
   }, [booted, progress.currentSceneId, sceneById]);
 
+  const canContinue = hasContinuableProgress(progress);
+  const showContinuePrompt = booted && canContinue && !continuePromptDone;
+
+  const settingsProps = {
+    settings,
+    syncStatus,
+    syncBusy,
+    onClose: () => setSettingsOpen(false),
+    onSettingsChange: (patch: Partial<typeof settings>) =>
+      dispatch({ type: "PATCH_SETTINGS", patch }),
+    onLogin: () => { window.location.href = "/api/auth/datagsm/login"; },
+    onLogout: () => {
+      void fetch("/api/auth/datagsm/logout", { method: "POST" })
+        .then(() => {
+          pushToast("DataGSM 계정에서 로그아웃했습니다.", "success");
+          dispatch({
+            type: "SET_SYNC_STATUS",
+            status: { ...syncStatus, authenticated: false, user: null },
+          });
+        })
+        .catch(() => pushToast("로그아웃 중 문제가 생겼습니다.", "error"));
+    },
+    onPull: () => { void syncPull(); },
+    onPush: () => { void syncPush(); },
+    onResetProgress: () => {
+      dispatch({ type: "SET_PROGRESS", progress: createFreshProgress() });
+      pushToast("이 기기의 진행 기록을 초기화했습니다.", "success");
+    },
+    onResetServerData: async () => {
+      try {
+        const res = await fetch("/api/sync", { method: "DELETE" });
+        if (!res.ok) {
+          const data = (await res.json()) as { message?: string };
+          throw new Error(data.message ?? "서버 데이터를 삭제하지 못했습니다.");
+        }
+        dispatch({
+          type: "SET_SYNC_STATUS",
+          status: { ...syncStatus, lastSyncedAt: null },
+        });
+        pushToast("서버에 저장된 데이터를 삭제했습니다.", "success");
+      } catch (e) {
+        pushToast(
+          e instanceof Error ? e.message : "서버 데이터 삭제에 실패했습니다.",
+          "error",
+        );
+      }
+    },
+  };
+
   const viewportOverlay =
     isPoorViewport && !viewportDismissed ? (
       <ViewportWarningOverlay onDismiss={() => setViewportDismissed(true)} />
     ) : null;
 
+  const achievementViews = getAchievementState(
+    collectibleDefs,
+    progress.collectedItems ?? [],
+  );
+
+  if (showContinuePrompt) {
+    return (
+      <>
+        <ContinuePrompt
+          progress={progress}
+          onContinue={() => {
+            setContinuePromptDone(true);
+            dispatch({ type: "SET_SCREEN", screen: "game" });
+          }}
+          onFresh={() => {
+            dispatch({ type: "SET_PROGRESS", progress: createFreshProgress() });
+            dispatch({ type: "SET_SCREEN", screen: "menu" });
+            setContinuePromptDone(true);
+          }}
+        />
+        {viewportOverlay}
+      </>
+    );
+  }
+
   if (screen === "game") {
     return (
       <>
-        <GameScreen />
+        <GameScreen onOpenSettings={() => setSettingsOpen(true)} />
         <ToastLayer toasts={toasts} onDismiss={dismissToast} />
+        {settingsOpen && <SettingsModal {...settingsProps} />}
         {viewportOverlay}
       </>
     );
@@ -117,52 +280,23 @@ export default function GameApp() {
     <>
       <MainMenu
         onStart={() => dispatch({ type: "SET_SCREEN", screen: "game" })}
-        canContinue={hasContinuableProgress(progress)}
+        canContinue={canContinue}
         progress={progress}
         settings={settings}
-        achievements={achievements}
+        achievements={achievementViews}
         syncStatus={syncStatus}
         syncBusy={syncBusy}
         onSettingsChange={(patch) => dispatch({ type: "PATCH_SETTINGS", patch })}
-        onLogin={() => { window.location.href = "/api/auth/datagsm/login"; }}
-        onLogout={() => {
-          void fetch("/api/auth/datagsm/logout", { method: "POST" })
-            .then(() => {
-              pushToast("DataGSM 계정에서 로그아웃했습니다.", "success");
-              dispatch({
-                type: "SET_SYNC_STATUS",
-                status: { ...syncStatus, authenticated: false, user: null },
-              });
-            })
-            .catch(() => pushToast("로그아웃 중 문제가 생겼습니다.", "error"));
-        }}
-        onPull={() => { void syncPull(); }}
-        onPush={() => { void syncPush(); }}
-        onResetProgress={() => {
-          dispatch({ type: "SET_PROGRESS", progress: createFreshProgress() });
-          pushToast("이 기기의 진행 기록을 초기화했습니다.", "success");
-        }}
-        onResetServerData={async () => {
-          try {
-            const res = await fetch("/api/sync", { method: "DELETE" });
-            if (!res.ok) {
-              const data = (await res.json()) as { message?: string };
-              throw new Error(data.message ?? "서버 데이터를 삭제하지 못했습니다.");
-            }
-            dispatch({
-              type: "SET_SYNC_STATUS",
-              status: { ...syncStatus, lastSyncedAt: null },
-            });
-            pushToast("서버에 저장된 데이터를 삭제했습니다.", "success");
-          } catch (e) {
-            pushToast(
-              e instanceof Error ? e.message : "서버 데이터 삭제에 실패했습니다.",
-              "error",
-            );
-          }
-        }}
+        onOpenSettings={() => setSettingsOpen(true)}
+        onLogin={settingsProps.onLogin}
+        onLogout={settingsProps.onLogout}
+        onPull={settingsProps.onPull}
+        onPush={settingsProps.onPush}
+        onResetProgress={settingsProps.onResetProgress}
+        onResetServerData={settingsProps.onResetServerData}
       />
       <ToastLayer toasts={toasts} onDismiss={dismissToast} />
+      {settingsOpen && <SettingsModal {...settingsProps} />}
       {viewportOverlay}
     </>
   );

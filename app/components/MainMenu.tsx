@@ -6,7 +6,6 @@ import { playSfx } from "../lib/sfx";
 import type { GameProgress, GameSettings, SyncStatus } from "../types";
 import AchievementModal from "./AchievementModal";
 import ArchiveModal from "./ArchiveModal";
-import SettingsModal from "./SettingsModal";
 
 type AchievementView = {
   id: string;
@@ -26,6 +25,7 @@ type Props = {
   syncStatus: SyncStatus;
   syncBusy: boolean;
   onSettingsChange: (patch: Partial<GameSettings>) => void;
+  onOpenSettings: () => void;
   onLogin: () => void;
   onLogout: () => void;
   onPull: () => void;
@@ -45,6 +45,7 @@ export default function MainMenu({
   syncStatus,
   syncBusy,
   onSettingsChange,
+  onOpenSettings,
   onLogin,
   onLogout,
   onPull,
@@ -55,13 +56,12 @@ export default function MainMenu({
   const [hovered, setHovered] = useState<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [achievementOpen, setAchievementOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [exitHint, setExitHint] = useState(false);
 
   const menuItems: MenuItem[] = [
     { label: canContinue ? "이어하기" : "게임 시작", action: onStart },
     { label: "기록 보기", action: () => setArchiveOpen(true) },
-    { label: "설정", action: () => setSettingsOpen(true) },
+    { label: "설정", action: onOpenSettings },
     { label: "게임 종료", action: () => { window.close(); setExitHint(true); } },
   ];
 
@@ -160,21 +160,6 @@ export default function MainMenu({
       )}
       {achievementOpen && (
         <AchievementModal achievements={achievements} onClose={() => setAchievementOpen(false)} />
-      )}
-      {settingsOpen && (
-        <SettingsModal
-          settings={settings}
-          syncStatus={syncStatus}
-          syncBusy={syncBusy}
-          onClose={() => setSettingsOpen(false)}
-          onSettingsChange={onSettingsChange}
-          onLogin={onLogin}
-          onLogout={onLogout}
-          onPull={onPull}
-          onPush={onPush}
-          onResetProgress={onResetProgress}
-          onResetServerData={onResetServerData}
-        />
       )}
       {exitHint && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/[0.88]">

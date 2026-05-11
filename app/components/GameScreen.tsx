@@ -175,7 +175,7 @@ function getChoiceDisabledReason(choice: Choice, stats: Stats) {
   return null;
 }
 
-export default function GameScreen() {
+export default function GameScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const { state, dispatch } = useGame();
   const { settings } = state;
   const initialProgress = state.progress;
@@ -522,6 +522,8 @@ export default function GameScreen() {
 
       {menuOpen && (
         <PauseMenu
+          settings={settings}
+          onSettingsChange={(patch) => dispatch({ type: "PATCH_SETTINGS", patch })}
           onResume={() => setMenuOpen(false)}
           onRestart={() => {
             setCurrentSceneId("start");
