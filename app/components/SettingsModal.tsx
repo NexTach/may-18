@@ -53,8 +53,8 @@ function ToggleRow({ label, description, checked, onChange }: {
         onClick={() => onChange(!checked)}
         className="shrink-0 min-w-14 md:min-w-20 border px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-[13px] transition-colors font-mono"
         style={{
-          borderColor: checked ? "#6a9a2a" : "var(--color-game-border)",
-          background: checked ? "#162010" : "var(--color-game-panel)",
+          borderColor: checked ? "var(--color-game-border-bright)" : "var(--color-game-border)",
+          background: checked ? "#0f2420" : "var(--color-game-panel)",
           color: checked ? "var(--color-game-text)" : "var(--color-game-text-dim)",
         }}
       >
@@ -83,8 +83,8 @@ function SegmentedRow({ label, description, options, value, onChange }: {
             onClick={() => onChange(opt.value)}
             className="flex-1 border px-2 md:px-4 py-2.5 md:py-3 text-left transition-colors font-mono"
             style={{
-              borderColor: value === opt.value ? "#6a9a2a" : "var(--color-game-border)",
-              background: value === opt.value ? "#162010" : "#0b1208",
+              borderColor: value === opt.value ? "var(--color-game-border-bright)" : "var(--color-game-border)",
+              background: value === opt.value ? "#0f2420" : "var(--color-game-panel)",
               color: value === opt.value ? "var(--color-game-text)" : "var(--color-game-text-dim)",
             }}
           >

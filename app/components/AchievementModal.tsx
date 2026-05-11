@@ -67,9 +67,9 @@ export default function AchievementModal({ achievements, onClose }: Props) {
                 <div
                   className="flex h-10 w-10 xl:h-12 xl:w-12 items-center justify-center border text-[18px] xl:text-[22px]"
                   style={{
-                    borderColor: achievement.unlocked ? "#6a9a2a" : "var(--color-game-border)",
+                    borderColor: achievement.unlocked ? "var(--color-game-border-bright)" : "var(--color-game-border)",
                     color: achievement.unlocked ? "var(--color-game-text)" : "var(--color-game-border-bright)",
-                    background: achievement.unlocked ? "#162010" : "var(--color-game-panel)",
+                    background: achievement.unlocked ? "#0f2420" : "var(--color-game-panel)",
                   }}
                 >
                   {achievement.icon}

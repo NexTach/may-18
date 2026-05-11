@@ -26,7 +26,7 @@ function ViewportWarningOverlay({ onDismiss }: { onDismiss: () => void }) {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm">
       <div
         className="border-2 border-[#4a6a1a] bg-[#0b1208] p-8 max-w-xs w-full text-center"
-        style={{ boxShadow: "0 0 0 1px #2c3f12, 0 0 40px rgba(74,106,26,0.15)" }}
+        style={{ boxShadow: "0 0 0 1px #3e4a36, 0 0 40px rgba(245,208,108,0.13)" }}
       >
         <p className="text-[28px] mb-4 text-[#8aaa40]">⚠</p>
         <p className="text-[13px] text-game-text font-pixel mb-4 leading-relaxed tracking-wide">

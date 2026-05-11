@@ -27,7 +27,7 @@ export default function PauseMenu({ onResume, onRestart, onMainMenu }: Props) {
             key={label}
             type="button"
             onClick={action}
-            className="w-full border border-game-border bg-game-panel hover:bg-[#162010] hover:border-game-border-bright py-3 mb-2.5 transition-all cursor-pointer font-pixel"
+            className="w-full border border-game-border bg-game-panel hover:bg-[#0f2420] hover:border-game-border-bright py-3 mb-2.5 transition-all cursor-pointer font-pixel"
           >
             <span className="text-[12px] text-game-accent">{label}</span>
           </button>

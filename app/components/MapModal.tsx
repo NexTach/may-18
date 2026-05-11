@@ -22,7 +22,7 @@ const LEGEND_ITEMS = [
   { color: "#c4d47a", label: "현재 위치" },
   { color: "#7d8f3a", label: "이동 가능" },
   { color: "#5a8a2a", label: "지나온 곳" },
-  { color: "#1a2a0c", label: "미방문" },
+  { color: "#0f2420", label: "미방문" },
 ] as const;
 
 export default function MapModal({
@@ -62,7 +62,7 @@ export default function MapModal({
                   className="px-2.5 py-1 xl:px-3 xl:py-1.5 text-[11px] xl:text-[12px] border transition-colors cursor-pointer font-mono"
                   style={{
                     borderColor: mode === m ? "#4a6a1a" : "#2c3f12",
-                    background: mode === m ? "#162010" : "#0d1608",
+                    background: mode === m ? "#0f2420" : "#0b1c18",
                     color: mode === m ? "#c4d47a" : "#4a6a1a",
                   }}
                 >

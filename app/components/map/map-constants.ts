@@ -28,10 +28,10 @@ export const GAME_NODE_SVG: Record<string, [number, number]> = {
 };
 
 export const MAP_COLORS = {
-  pinVisited: "#5a8a2a",
-  pinUnvisit: "#243014",
-  pinFrontier: "#879946",
-  stkVisited: "#3a6018",
-  stkUnvisit: "#1a2a0c",
-  stkFrontier: "#c4d47a",
+  pinVisited: "#b9ad76",
+  pinUnvisit: "#3e4a36",
+  pinFrontier: "#f5d06c",
+  stkVisited: "#8c8a5e",
+  stkUnvisit: "#10251f",
+  stkFrontier: "#f0d88a",
 } as const;

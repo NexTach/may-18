@@ -308,7 +308,7 @@ export default function MiniMap({
   return (
     <svg viewBox={vb} className="w-full h-full">
       <title>게임 활동 지도</title>
-      {!compact && <GwangjuMapBackground />}
+      {!compact && !focusMode && <GwangjuMapBackground />}
 
       {mapNodes.flatMap((node) =>
         node.connections.map((toId) => {
@@ -360,7 +360,7 @@ export default function MiniMap({
           : isFrontier
             ? "#b8c86a"
             : isVisited
-              ? "#6a9a2a"
+              ? "var(--color-game-border-bright)"
               : "#233112";
         const content = (
           <g style={onJump ? { cursor: "pointer" } : undefined}>
