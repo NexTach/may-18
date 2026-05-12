@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const SCENE_ASPECT_RATIO = 16 / 9;
 const CROP_HEIGHT_THRESHOLD = 260;
@@ -10,15 +10,18 @@ function getContainedFrame(width: number, height: number) {
 }
 
 export function useSceneFrame() {
-  const slotRef = useRef<HTMLDivElement | null>(null);
+  const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [sceneFrame, setSceneFrame] = useState({
     width: 0,
     height: 0,
     isCrop: false,
   });
 
+  const slotRef = useCallback((n: HTMLDivElement | null) => {
+    setNode(n);
+  }, []);
+
   useEffect(() => {
-    const node = slotRef.current;
     if (!node) return;
 
     const update = () => {
@@ -40,7 +43,7 @@ export function useSceneFrame() {
     observer.observe(node);
     update();
     return () => observer.disconnect();
-  }, []);
+  }, [node]);
 
   return { slotRef, sceneFrame };
 }
