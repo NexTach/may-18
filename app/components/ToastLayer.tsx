@@ -55,7 +55,7 @@ export default function ToastLayer({ toasts, onDismiss }: Props) {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed right-4 bottom-4 z-80 flex w-[min(92vw,360px)] flex-col gap-2">
+    <div className="pointer-events-none fixed left-4 bottom-4 z-80 flex w-[min(92vw,360px)] flex-col gap-2">
       {toasts.map((toast) => {
         const s = TOAST_STYLES[toast.tone];
         return (
